@@ -2,7 +2,8 @@ define([
   'backbone',
   '$',
   'd3',
-  'app/data/us-states'
+  //'app/data/world-countries-and-us-states-build'
+  'app/data/us-states-build'
 ], function(Backbone, $, d3, worldCountries) {
   var Map = Backbone.View.extend({
     options: {
@@ -147,7 +148,7 @@ define([
             });
 
       if (this.options.showPopupOnHover) {
-        $('<div class="hoverover"/>').appendTo(this.$el);
+        $('<div class="hoverover" style="z-index: 1001;"/>').appendTo(this.$el);
         feature.on('mouseover', function(d) {
           var hoverover = self.$el.find('.hoverover');
           var eventData = {

@@ -33,7 +33,7 @@ define(['$', 'underscore', 'app/views/Map'], function ($, _, Map) {
 
     $("#container2").on('map-click', function(e,d ) {
         $("#container2header").text('clicked: ' + d.geography.properties.name + ' with ' +  d.data.electoralVotes + ' votes');
-        console.log(d.geography.id, e, d, 'click');
+        console.log(d.geography.id, d.data, 'click');
     });
 
     $("#container2").on('map-touchstart', function(e,d) {
@@ -267,6 +267,7 @@ define(['$', 'underscore', 'app/views/Map'], function ($, _, Map) {
 
     /* Defaults */
     new Map({
-      el: $('#container3')
+      el: $('#container3'),
+      projection: 'bonne'
     }).render();
 });
