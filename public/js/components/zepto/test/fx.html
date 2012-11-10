@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Zepto FX unit tests</title>
+  <script src="../src/zepto.js"></script>
+  <script src="../src/fx.js"></script>
+  <script src="evidence.js"></script>
+</head>
+<body>
+  <h1>Zepto FX unit tests</h1>
+  <p>
+    See the browser console for results.
+  </p>
+  
+  <div id="animtest" style="width:40px;height:40px;background:red"></div>
+  
+  <script>
+    Evidence.TestCase.extend('ZeptoFXTest', {
+
+      testAnim: function(t){
+        var el = $('#animtest').get(0);
+
+        $('#animtest').anim({
+          translate3d: '100px, 100px, 100px',
+          rotateZ: '90deg',
+          opacity: 0.5
+        }, 2, 'ease-out');
+        t.assertEqual('translate3d(100px, 100px, 100px) rotateZ(90deg)', el.style.webkitTransform);
+        t.assertEqual('ease-out', el.style.webkitTransitionTimingFunction);
+        t.assertEqual('0.5', el.style.opacity);
+      }
+
+    });
+  </script>
+</body>
+</html>

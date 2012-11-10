@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Zepto Ajax unit tests</title>
+  <script src="../src/zepto.js"></script>
+  <script src="../src/ajax.js"></script>
+  <script src="evidence.js"></script>
+</head>
+<body>
+  <h1>Zepto Ajax unit tests</h1>
+  <p>
+    See the browser console for results.
+  </p>
+  
+  <div id="ajax_load" style="display:none"></div>
+  
+  <script>
+    Evidence.TestCase.extend('ZeptoAjaxTest', {
+      
+      testAjaxGet: function(t){
+        t.pause();
+        $.get('http://example.com/', function(response){
+          t.resume(function(){
+            this.assert(response);
+          });
+        });
+      },
+
+      testAjaxPost: function(t){
+        t.pause();
+        $.post('http://example.com/', function(response){
+          t.resume(function(){
+            this.assert(response);
+          });
+        });
+      },
+
+      testAjaxGetJSON: function(t){
+        t.pause();
+        $.getJSON('zepto.json', function(data){
+          t.resume(function(){
+            this.assertEqual('awesomeness', data.zepto);
+          });
+        });
+      },
+      
+      testAjaxLoad: function(t) {
+        var testEl = $('#ajax_load');
+        t.pause();
+        testEl.load('fixtures/ajax_load_simple.html', function(){
+          t.resume(function() {
+            this.assertEqual('simple ajax load', testEl.html());
+          });
+        });
+      },  
+      
+      testAjaxLoadWithSelector: function(t) {
+        var testEl = $('#ajax_load');
+        t.pause();
+        testEl.load('fixtures/ajax_load_selector.html #ajax_load_test_div', function() {
+          t.resume(function() {
+            this.assertEqual('ajax load with selector', testEl.html());
+          });
+        });
+      },
+
+      testAjaxRequestHeader: function(t){
+        // @see Net Panel/Resources
+        // TODO
+      }
+
+    });
+  </script>
+</body>
+</html>
