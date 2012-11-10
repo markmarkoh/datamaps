@@ -1,37 +1,14 @@
 define([
   'backbone',
   '$',
-  'd3',
-  //'app/data/world-countries-and-us-states-build'
-  'app/data/us-states-build'
-], function(Backbone, $, d3, worldCountries) {
+  'd3'
+], function(Backbone, $, d3) {
   var Map = Backbone.View.extend({
-    options: {
-      projection: 'equirectangular',
-      scope: 'world', // 'usa', 'northAmerica', 'southAmerica', 'europe', 'asia'
-      highlightOnHover: true,
-      showPopupOnHover: true,
-      popupTemplate: _.template('<div class="hoverinfo"><%= geography.properties.name %></div>'),
-
-      /* highlight defaults */
-      highlightBorderColor: '#FA0FA0',
-      highlightBorderWidth: 2,
-
-      borderColor: '#FFFFFF',
-      borderWidth: 1,
-
-      /* fill settings */
-      data: {},
-      fills: {
-        defaultFill: '#BADA55'
-      }
-
-    },
 
     initialize: function(options) {
       this._map = new Backbone.Model();
 
-      this._map.set('guid', _.uniqueId());
+      var worldCountries = this.options.pathData;
 
       var featureCollection = {"type":"FeatureCollection","features":[]};
 
@@ -50,11 +27,6 @@ define([
         }));
 
         this.options.projection = 'albersUsa'; //override them
-      }
-      else if (this.options.scope === 'southamerica') {
-        this._map.set('pathData', _.reject(worldCountries.features, function(val) {
-          return val.properties.continent === "USA";
-        }));
       }
 
       this._map.set('projection', d3.geo[this.options.projection]());
@@ -135,6 +107,7 @@ define([
             .style('stroke', self.options.borderColor)
             .style('stroke-width', self.options.borderWidth)
             .style('fill', function(d) {
+
               var fillColor, fillKey = self.options.data[d.id];
               if ( fillKey && fillKey.fillKey && self.options.fills[fillKey.fillKey] ) {
                 fillColor = self.options.fills[ fillKey.fillKey ];
@@ -215,12 +188,6 @@ var hoverover = self.$el.find('.hoverover');
       }
     }
   });
-
-  if (window.define && window.define.amd) {
-    define( "Map", [], function () { return Map; } );
-  } else {
-    window.Map = Map;
-  }
 
   return Map;
 });

@@ -30,7 +30,7 @@ module.exports = function(grunt) {
           exports: 'Backbone'
         }
       },
-      optimize: 'uglify',
+      optimize: 'none',
       optimizeCss: 'none',
       //name: "views/Map",
       //out: "public/js/MapBuild.js",
@@ -40,12 +40,13 @@ module.exports = function(grunt) {
         {
           name: 'datamaps',
           create: true,
-          include: ['requireLib', 'app/views/Map']
+          include: ['requireLib', 'app/views/MapCountriesOnly']
         },
         {
           name: 'datamaps-us-only',
           create: true,
-          include: ['requireLib', 'app/views/Map']
+          include: ['requireLib', 'app/views/MapUsOnly'],
+          insertRequire: ['app/views/MapUsOnly']
         }
       ]
     },
