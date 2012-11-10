@@ -6,29 +6,48 @@ module.exports = function(grunt) {
       files: ['grunt.js', 'public/js/app/**/*.js']
     },
     requirejs: {
-      baseUrl: 'public/js/app',
+      baseUrl: 'public/js',
       namespace: 'datamaps',
       paths: {
-          requireLib: 'require',
-          app: '../app',
-          jquery: '../lib/jquery',
-          d3: '../lib/d3',
-          projections: '../lib/projections',
-          underscore: '../lib/underscore',
-          backbone: '../lib/backbone'
+        'requireLib': 'components/requirejs/require',
+        'd3': 'components/d3/d3.v2',
+        'underscore': 'components/underscore/underscore',
+        '$': 'components/zepto/dist/zepto',
+        'backbone': 'components/backbone/backbone'
+      },
+      shim: {
+        'd3': {
+          exports: 'd3'
         },
-        optimize: 'none',
-        //name: "views/Map",
-        //out: "public/js/MapBuild.js",
-        dir: 'dist',
+        'underscore': {
+          exports: '_'
+        },
+        '$': {
+          exports: '$'
+        },
+        'backbone': {
+          deps: ['underscore', '$'],
+          exports: 'Backbone'
+        }
+      },
+      optimize: 'uglify',
+      optimizeCss: 'none',
+      //name: "views/Map",
+      //out: "public/js/MapBuild.js",
+      dir: 'dist',
 
-        modules: [
-          {
-            name: 'datamaps',
-            create: true,
-            include: ['requireLib', 'views/Map']
-          }
-        ]
+      modules: [
+        {
+          name: 'datamaps',
+          create: true,
+          include: ['requireLib', 'app/views/Map']
+        },
+        {
+          name: 'datamaps-us-only',
+          create: true,
+          include: ['requireLib', 'app/views/Map']
+        }
+      ]
     },
     concat: {
       us: {

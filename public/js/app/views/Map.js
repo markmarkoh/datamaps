@@ -216,8 +216,8 @@ var hoverover = self.$el.find('.hoverover');
     }
   });
 
-  if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
-    define( "jquery", [], function () { return jQuery; } );
+  if (window.define && window.define.amd) {
+    define( "Map", [], function () { return Map; } );
   } else {
     window.Map = Map;
   }

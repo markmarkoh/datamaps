@@ -1,1 +1,4 @@
 node_modules
+dist/data
+dist/app
+dist/components
