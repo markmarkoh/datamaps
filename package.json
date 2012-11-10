@@ -1,0 +1,8 @@
+{
+  "name": "datamaps",
+  "description": "datamaps with d3.js",
+  "author": "Mark DiMarco<markmarkoh@gmail.com>",
+  "dependencies": {
+    "grunt-requirejs": "~0.2.14"
+  }
+}

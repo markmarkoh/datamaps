@@ -20,6 +20,7 @@ module.exports = function(grunt) {
         optimize: 'none',
         //name: "views/Map",
         //out: "public/js/MapBuild.js",
+        dir: 'dist',
 
         modules: [
           {
