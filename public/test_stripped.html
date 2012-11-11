@@ -34,15 +34,19 @@
         <div id="container4" style="height: 200px; width: 360px"></div>
         <div id="container3" style="height: 660px; width: 660px"></div>
         <!-- <script data-main="js/app" src="js/components/requirejs/require.js"></script> -->
+        <!--<script src="/dist/components/zepto/dist/zepto.js"></script>-->
         <script src="/dist/datamaps-us-only.js"></script>
         <script>
-        datamaps.require(["app/views/MapUsOnly", "underscore"], function(Map, _) {
-            new Map({
-      el: $('#container2'),
+
+        $("#container2").on('map-click', function(event, data) {
+            console.log(data.data.electoralVotes, 'yo');
+        });
+    new Map({
       scope: 'usa',
+      el: $("#container2"),
       highlightBorderColor: '#222',
       highlightOnHover: true,
-      popupTemplate: _.template('<div class="hoverinfo"><strong><%= geography.properties.name %></strong> <% if (data.electoralVotes) { %><hr/>  Electoral Votes: <%= data.electoralVotes %> <% } %></div>'),
+      //popupTemplate: _.template('<div class="hoverinfo"><strong><%= geography.properties.name %></strong> <% if (data.electoralVotes) { %><hr/>  Electoral Votes: <%= data.electoralVotes %> <% } %></div>'),
 
       fills: {
         'REP': '#CC4731',
@@ -256,7 +260,7 @@
         }
 }
     }).render();
-        });
         </script>
     </body>
 </html>
+

@@ -1,4 +1,4 @@
-define(function() {
+define(['underscore'], function(_) {
   return {
       projection: 'equirectangular',
       scope: 'world', // 'usa', 'northAmerica', 'southAmerica', 'europe', 'asia'

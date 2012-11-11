@@ -7,9 +7,10 @@ module.exports = function(grunt) {
     },
     requirejs: {
       baseUrl: 'public/js',
-      namespace: 'datamaps',
+      //namespace: 'datamaps',
       paths: {
         'requireLib': 'components/requirejs/require',
+        'almondLib': '../../build/almond',
         'd3': 'components/d3/d3.v2',
         'underscore': 'components/underscore/underscore',
         '$': 'components/zepto/dist/zepto',
@@ -30,23 +31,32 @@ module.exports = function(grunt) {
           exports: 'Backbone'
         }
       },
-      optimize: 'none',
+      optimize: 'uglify',
       optimizeCss: 'none',
       //name: "views/Map",
       //out: "public/js/MapBuild.js",
       dir: 'dist',
 
+      wrap: {
+        startFile: "build/wrap_start.frag",
+        endFile: "build/wrap_end.frag"
+      },
       modules: [
         {
           name: 'datamaps',
           create: true,
-          include: ['requireLib', 'app/views/MapCountriesOnly']
+          include: ['almondLib', 'app/views/MapCountriesOnly']
         },
         {
           name: 'datamaps-us-only',
           create: true,
-          include: ['requireLib', 'app/views/MapUsOnly'],
-          insertRequire: ['app/views/MapUsOnly']
+          include: ['almondLib', 'app/views/MapUsOnly']
+        },
+        {
+          name: 'datamaps-stripped-us-only',
+          create: true,
+          exclude: ['$', 'underscore', 'backbone'],
+          include: ['almondLib', 'app/views/MapUsOnly']
         }
       ]
     },

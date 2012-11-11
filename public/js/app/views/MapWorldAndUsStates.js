@@ -1,8 +1,9 @@
 define([
+  'underscore',
   'app/views/Map',
   'app/views/MapOptions',
   'app/data/world-countries-and-us-states-build'
-], function(Map, MapOptions, features) {
+], function(_, Map, MapOptions, features) {
 
   var MapWithFeatures = Map.extend({
     options: _.extend(MapOptions, {
@@ -17,6 +18,8 @@ define([
   } else {
     window.Map = MapWithFeatures;
   }
+
+  return MapWithFeatures;
 
 
 });

@@ -1,8 +1,9 @@
 define([
   'backbone',
+  'underscore',
   '$',
   'd3'
-], function(Backbone, $, d3) {
+], function(Backbone, _, $, d3) {
   var Map = Backbone.View.extend({
 
     initialize: function(options) {

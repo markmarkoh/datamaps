@@ -1,7 +1,7 @@
 
 datamaps.js
 ----------------
-components/requirejs/require.js
+almondLib.js
 components/underscore/underscore.js
 components/zepto/dist/zepto.js
 components/backbone/backbone.js
@@ -13,10 +13,19 @@ app/views/MapCountriesOnly.js
 
 datamaps-us-only.js
 ----------------
-components/requirejs/require.js
+almondLib.js
 components/underscore/underscore.js
 components/zepto/dist/zepto.js
 components/backbone/backbone.js
+components/d3/d3.v2.js
+app/views/Map.js
+app/views/MapOptions.js
+app/data/us-states-build.js
+app/views/MapUsOnly.js
+
+datamaps-stripped-us-only.js
+----------------
+almondLib.js
 components/d3/d3.v2.js
 app/views/Map.js
 app/views/MapOptions.js
