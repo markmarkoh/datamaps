@@ -6,7 +6,8 @@ define([
 
   var MapWithFeatures = Map.extend({
     options: _.extend(MapOptions, {
-      pathData: features
+      pathData: features,
+      scope: 'world'
     })
   });
 

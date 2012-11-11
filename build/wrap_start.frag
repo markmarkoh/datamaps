@@ -1,0 +1,11 @@
+//Copyright 2012, etc.
+
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD.
+        define(['jquery', 'underscore'], factory);
+    } else {
+        // Browser globals
+        root.Map = factory(root.$, root._);
+    }
+}(this, function ($, _) {
