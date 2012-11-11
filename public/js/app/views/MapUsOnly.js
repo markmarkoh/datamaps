@@ -14,11 +14,11 @@ define([
   });
 
   //don't namespace this
-  if (window.define && window.define.amd) {
+  /*if (window.define && window.define.amd) {
     window.define( "Map", [], function () { return MapWithFeatures; } );
   } else {
     window.Map = MapWithFeatures;
-  }
+  }*/
 
   return MapWithFeatures;
 

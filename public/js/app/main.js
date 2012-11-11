@@ -1,4 +1,4 @@
-define(['$', 'underscore', 'app/views/Map'], function ($, _, Map) {
+define(['jquery', 'underscore', 'app/views/Map'], function ($, _, Map) {
     // Load any app-specific modules
     // with a relative require call,
     // like:

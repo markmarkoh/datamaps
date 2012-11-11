@@ -3,6 +3,7 @@
   "description": "datamaps with d3.js",
   "author": "Mark DiMarco<markmarkoh@gmail.com>",
   "dependencies": {
-    "grunt-requirejs": "~0.2.14"
+    "grunt-requirejs": "~0.2.14",
+    "underscore": "~1.4.2"
   }
 }

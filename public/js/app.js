@@ -3,7 +3,7 @@ require.config({
   paths: {
     'd3': 'components/d3/d3.v2',
     'underscore': 'components/underscore/underscore',
-    '$': 'components/zepto/dist/zepto',
+    'jquery': 'components/zepto/dist/zepto',
     'backbone': 'components/backbone/backbone'
   },
   shim: {
@@ -13,11 +13,11 @@ require.config({
     'underscore': {
       exports: '_'
     },
-    '$': {
+    'jquery': {
       exports: '$'
     },
     'backbone': {
-      deps: ['underscore', '$'],
+      deps: ['underscore', 'jquery'],
       exports: 'Backbone'
     }
   }

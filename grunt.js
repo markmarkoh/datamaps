@@ -6,59 +6,78 @@ module.exports = function(grunt) {
       files: ['grunt.js', 'public/js/app/**/*.js']
     },
     requirejs: {
-      baseUrl: 'public/js',
-      //namespace: 'datamaps',
-      paths: {
-        'requireLib': 'components/requirejs/require',
-        'almondLib': '../../build/almond',
-        'd3': 'components/d3/d3.v2',
-        'underscore': 'components/underscore/underscore',
-        '$': 'components/zepto/dist/zepto',
-        'backbone': 'components/backbone/backbone'
-      },
-      shim: {
-        'd3': {
-          exports: 'd3'
+      withDeps: {
+        baseUrl: 'public/js',
+        //namespace: 'datamaps',
+        paths: {
+          'requireLib': 'components/requirejs/require',
+          'almondLib': '../../build/almond',
+          'd3': 'components/d3/d3.v2',
+          'underscore': 'components/underscore/underscore',
+          'jquery': 'components/zepto/dist/zepto',
+          'backbone': 'components/backbone/backbone'
         },
-        'underscore': {
-          exports: '_'
+        shim: {
+          'd3': {
+            exports: 'd3'
+          },
+          'underscore': {
+            exports: '_'
+          },
+          'jquery': {
+            exports: '$'
+          },
+          'backbone': {
+            deps: ['underscore', 'jquery'],
+            exports: 'Backbone'
+          }
         },
-        '$': {
-          exports: '$'
+        optimize: 'uglify',
+        optimizeCss: 'none',
+        dir: 'dist',
+        pragmas: {
+          hasDeps: true
         },
-        'backbone': {
-          deps: ['underscore', '$'],
-          exports: 'Backbone'
-        }
-      },
-      optimize: 'uglify',
-      optimizeCss: 'none',
-      //name: "views/Map",
-      //out: "public/js/MapBuild.js",
-      dir: 'dist',
 
-      wrap: {
-        startFile: "build/wrap_start.frag",
-        endFile: "build/wrap_end.frag"
-      },
-      modules: [
-        {
-          name: 'datamaps',
-          create: true,
-          include: ['almondLib', 'app/views/MapCountriesOnly']
+        wrap: {
+          startFile: "build/wrap_start.frag",
+          endFile: "build/wrap_end.frag"
         },
-        {
-          name: 'datamaps-us-only',
-          create: true,
-          include: ['almondLib', 'app/views/MapUsOnly']
-        },
-        {
-          name: 'datamaps-stripped-us-only',
-          create: true,
-          exclude: ['$', 'underscore', 'backbone'],
-          include: ['almondLib', 'app/views/MapUsOnly']
-        }
-      ]
+        modules: [
+          {
+            name: 'datamaps',
+            create: true,
+            include: ['almondLib', 'app/views/MapCountriesOnly']
+          },
+          {
+            name: 'datamaps-stripped-countries-only',
+            create: true,
+            exclude: ['jquery', 'underscore', 'backbone'],
+            include: ['almondLib', 'app/views/MapCountriesOnly'],
+            override: {
+                pragmasOnSave: {
+                    hasDeps: false
+                }
+            }
+          },
+          {
+            name: 'datamaps-us-only',
+            create: true,
+            include: ['almondLib', 'app/views/MapUsOnly']
+          },
+          {
+            name: 'datamaps-stripped-us-only',
+            create: true,
+            exclude: ['jquery', 'underscore', 'backbone'],
+            include: ['almondLib', 'app/views/MapUsOnly'],
+            override: {
+                pragmasOnSave: {
+                    hasDeps: false
+                }
+            }
+          }
+        ]
+      }
     },
     concat: {
       us: {

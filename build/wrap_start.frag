@@ -3,9 +3,9 @@
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD.
-        define(['jquery', 'underscore'], factory);
+        define(['jquery', 'underscore', 'backbone'], factory);
     } else {
         // Browser globals
-        root.Map = factory(root.$, root._);
+        root.Map = factory(root.$, root._, root.Backbone);
     }
-}(this, function ($, _) {
+}(this, function ($, _, Backbone) {
