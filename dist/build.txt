@@ -11,6 +11,15 @@ app/views/MapOptions.js
 app/data/world-countries-build.js
 app/views/MapCountriesOnly.js
 
+datamaps-stripped-countries-only.js
+----------------
+almondLib.js
+components/d3/d3.v2.js
+app/views/Map.js
+app/views/MapOptions.js
+app/data/world-countries-build.js
+app/views/MapCountriesOnly.js
+
 datamaps-us-only.js
 ----------------
 almondLib.js

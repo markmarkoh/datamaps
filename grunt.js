@@ -6,7 +6,6 @@ module.exports = function(grunt) {
       files: ['grunt.js', 'public/js/app/**/*.js']
     },
     requirejs: {
-      withDeps: {
         baseUrl: 'public/js',
         //namespace: 'datamaps',
         paths: {
@@ -63,13 +62,15 @@ module.exports = function(grunt) {
           {
             name: 'datamaps-us-only',
             create: true,
-            include: ['almondLib', 'app/views/MapUsOnly']
+            include: ['almondLib', 'app/views/MapUsOnly'],
+            insertRequire: ['app/views/MapUsOnly']
           },
           {
             name: 'datamaps-stripped-us-only',
             create: true,
             exclude: ['jquery', 'underscore', 'backbone'],
             include: ['almondLib', 'app/views/MapUsOnly'],
+            insertRequire: ['app/views/MapUsOnly'],
             override: {
                 pragmasOnSave: {
                     hasDeps: false
@@ -77,7 +78,6 @@ module.exports = function(grunt) {
             }
           }
         ]
-      }
     },
     concat: {
       us: {
