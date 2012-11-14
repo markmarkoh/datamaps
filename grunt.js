@@ -31,11 +31,12 @@ module.exports = function(grunt) {
             exports: 'Backbone'
           }
         },
-        optimize: 'uglify',
+        optimize: 'none',
         optimizeCss: 'none',
         dir: 'dist',
         pragmas: {
-          hasDeps: true
+          hasDeps: true,
+          usOnly: false
         },
 
         wrap: {
@@ -63,7 +64,12 @@ module.exports = function(grunt) {
             name: 'datamaps-us-only',
             create: true,
             include: ['almondLib', 'app/views/MapUsOnly'],
-            insertRequire: ['app/views/MapUsOnly']
+            insertRequire: ['app/views/MapUsOnly'],
+            override: {
+              pragmasOnSave: {
+                usOnly: true
+              }
+            }
           },
           {
             name: 'datamaps-stripped-us-only',
@@ -73,7 +79,8 @@ module.exports = function(grunt) {
             insertRequire: ['app/views/MapUsOnly'],
             override: {
                 pragmasOnSave: {
-                    hasDeps: false
+                    hasDeps: false,
+                    usOnly: true
                 }
             }
           }

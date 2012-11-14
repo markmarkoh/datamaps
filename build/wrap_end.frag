@@ -13,8 +13,26 @@
     });
     //>>excludeEnd("hasDeps");
 
+    //Make it a jQuery plugin
+    $ = $ ? $ : window.$;
+    $.fn.datamap = function(config) {
+        var el = this,
+            config = config || {};
+        $.extend(config, {el: el})
+        var map = new Map(config);
+        map.render();
+        return map;
+    };
+
     //Use almond's special top-level, synchronous require to trigger factory
     //functions, get the final module value, and export it as the public
     //value.
-    //return require('app/views/MapUsOnly');
+
+    //>>includeStart("usOnly", pragmas.usOnly)
+    return require('app/views/MapUsOnly');
+    //>>includeEnd("usOnly")
+
+    //>>includeStart("notUsOnly", !pragmas.usOnly)
+    return require('app/views/MapCountriesOnly');
+    //>>includeEnd("notUsOnly")
 }));

@@ -38,7 +38,6 @@
         <script src="/dist/components/underscore/underscore.js"></script>
         <script src="/dist/components/backbone/backbone.js"></script>
         <script>
-        console.log(_);
         </script>
         <script src="/dist/datamaps-stripped-us-only.js"></script>
         <script>
@@ -46,6 +45,7 @@
         $("#container2").on('map-click', function(event, data) {
             console.log(data.data.electoralVotes, 'yo');
         });
+        console.log(_, Map);
     new Map({
       scope: 'usa',
       el: $("#container2"),
