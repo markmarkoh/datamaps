@@ -31,12 +31,13 @@ module.exports = function(grunt) {
             exports: 'Backbone'
           }
         },
-        optimize: 'none',
+        optimize: 'uglify',
         optimizeCss: 'none',
         dir: 'dist',
         pragmas: {
           hasDeps: true,
-          usOnly: false
+          usOnly: false,
+          worldAndUs: false
         },
 
         wrap: {
@@ -44,6 +45,7 @@ module.exports = function(grunt) {
           endFile: "build/wrap_end.frag"
         },
         modules: [
+          /* Countries only build */
           {
             name: 'datamaps',
             create: true,
@@ -60,6 +62,7 @@ module.exports = function(grunt) {
                 }
             }
           },
+          /* US States only builds */
           {
             name: 'datamaps-us-only',
             create: true,
@@ -81,6 +84,29 @@ module.exports = function(grunt) {
                 pragmasOnSave: {
                     hasDeps: false,
                     usOnly: true
+                }
+            }
+          },
+          /* World and US states builds */
+          {
+            name: 'datamaps-all',
+            create: true,
+            include: ['almondLib', 'app/views/MapWorldAndUsStates'],
+            override: {
+              pragmasOnSave: {
+                worldAndUs: true
+              }
+            }
+          },
+          {
+            name: 'datamaps-all-stripped',
+            create: true,
+            exclude: ['jquery', 'underscore', 'backbone'],
+            include: ['almondLib', 'app/views/MapWorldAndUsStates'],
+            override: {
+                pragmasOnSave: {
+                    hasDeps: false,
+                    worldAndUs: true
                 }
             }
           }

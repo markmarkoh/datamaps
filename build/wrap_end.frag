@@ -32,7 +32,11 @@
     return require('app/views/MapUsOnly');
     //>>includeEnd("usOnly")
 
-    //>>includeStart("notUsOnly", !pragmas.usOnly)
+    //>>includeStart("notUsOnly", !pragmas.usOnly && !pragmas.worldAndUs)
     return require('app/views/MapCountriesOnly');
     //>>includeEnd("notUsOnly")
+
+    //>>includeStart("worldAndUs", pragmas.worldAndUs)
+    return require('app/views/MapWorldAndUsStates');
+    //>>includeEnd("worldAndUs")
 }));
