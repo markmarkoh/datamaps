@@ -1,13 +1,14 @@
 {
   "name": "datamaps",
   "description": "datamaps with d3.js",
-	"version": "0.0.1",
+  "version": "0.0.1",
   "author": "Mark DiMarco<markmarkoh@gmail.com>",
-	"scripts": {
-			"test": "grunt jasmine"
-	},
+  "scripts": {
+    "test": "grunt jasmine"
+  },
   "dependencies": {
     "grunt-requirejs": "~0.2.14",
-    "grunt-jasmine-task": "~0.2.3"
+    "grunt-jasmine-task": "~0.2.3",
+    "grunt": "~0.3.16"
   }
 }
