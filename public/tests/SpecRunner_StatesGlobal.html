@@ -29,14 +29,21 @@
         <link rel="stylesheet" type="text/css" href="lib/jasmine-1.2.0/jasmine.css">
         <script type="text/javascript" src="lib/jasmine-1.2.0/jasmine.js"></script>
         <script type="text/javascript" src="lib/jasmine-1.2.0/jasmine-html.js"></script>
+        <h1>Test build all dependencies</h1>
+        <div id="container1" style="border:3px dotted blue; height: 350px; width: 660px"></div>
+
+
+        <!-- Datamaps Source -->
+        <script src="/dist/datamaps-us-only.js"></script>
         
-        <h1>Hello World</h1>
-        <div id="container1" style="height: 350px; width: 660px"></div>
-        <h2 id="container1header">clicked:</h2>
-        <h2 id="container2header">clicked:</h2>
-        <div id="container2" style="height: 300px; width: 660px"></div>
-        <script data-main="/public/js/test" src="/public/js/components/requirejs/require.js"></script>
-        <!--<script src="/dist/components/zepto/dist/zepto.js"></script>-->
-        <!-- <script src="/dist/datamaps-us-only.js"></script> -->
+        <!-- Specs -->
+        <script type="text/javascript" src="spec/MapSpec.js"></script>
+
+        <!-- Map Generating Function -->
+        <script src="src/USChoropleth.js"></script>
+
+        <!-- Jasmine Runner -->
+        <script src="lib/runner.js"></script>
+
     </body>
 </html>

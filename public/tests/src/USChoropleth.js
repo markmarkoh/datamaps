@@ -1,52 +1,10 @@
-<!DOCTYPE html>
-<html>
-    <head>
-      <style>
-        path {
-          /*fill: #BADA55;*/
-          stroke: #FFFFFF;
-          stroke-width: 1px;
-        }
-
-        .hoverover { 
-          font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        }
-        .hoverinfo {
-          padding: 4px;
-          border-radius: 1px;
-          background-color: #FFF;
-          box-shadow: 1px 1px 5px #CCC;
-          font-size: 12px;
-          border: 1px solid #CCC;
-        }
-
-        .hoverinfo hr {
-          border:1px dotted #CCC;
-        }
-      </style>
-    </head>
-    <body>
-        <h1>Hello World</h1>
-        <div id="container1" style="height: 350px; width: 660px"></div>
-        <h2 id="container1header">clicked:</h2>
-        <h2 id="container2header">clicked:</h2>
-        <div id="container2" style="height: 300px; width: 660px"></div>
-        <div id="container4" style="height: 200px; width: 360px"></div>
-        <div id="container3" style="height: 660px; width: 660px"></div>
-        <!-- <script data-main="js/app" src="js/components/requirejs/require.js"></script> -->
-        <!--<script src="/dist/components/zepto/dist/zepto.js"></script>-->
-        <script src="/dist/datamaps-us-only.js"></script>
-        <script>
-
-        $("#container2").on('map-click', function(event, data) {
-            console.log(data.data.electoralVotes, 'yo');
-        });
-    new Map({
+function makeMap($el) {
+    var map = new Map({
       scope: 'usa',
-      el: $("#container2"),
+      el: $el,
       highlightBorderColor: '#222',
       highlightOnHover: true,
-      //popupTemplate: _.template('<div class="hoverinfo"><strong><%= geography.properties.name %></strong> <% if (data.electoralVotes) { %><hr/>  Electoral Votes: <%= data.electoralVotes %> <% } %></div>'),
+      popupTemplate: _.template('<div class="hoverinfo"><strong><%= geography.properties.name %></strong> <% if (data.electoralVotes) { %><hr/>  Electoral Votes: <%= data.electoralVotes %> <% } %></div>'),
 
       fills: {
         'REP': '#CC4731',
@@ -57,7 +15,7 @@
         'LIGHT_REP': '#EAA9A8',
         defaultFill: '#EDDC4E'
       },
-      data:{
+      data: {
         "AZ": {
             "fillKey": "REP",
             "electoralVotes": 5
@@ -258,8 +216,8 @@
             "fillKey": "REP",
             "electoralVotes": 32
         }
+      }
+    });
+
+    return map;
 }
-    }).render();
-        </script>
-    </body>
-</html>

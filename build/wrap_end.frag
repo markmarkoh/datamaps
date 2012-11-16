@@ -28,15 +28,19 @@
     //functions, get the final module value, and export it as the public
     //value.
 
+    var map;
     //>>includeStart("usOnly", pragmas.usOnly)
-    return require('app/views/MapUsOnly');
+    map = require('app/views/MapUsOnly');
     //>>includeEnd("usOnly")
 
     //>>includeStart("notUsOnly", !pragmas.usOnly && !pragmas.worldAndUs)
-    return require('app/views/MapCountriesOnly');
+    map = require('app/views/MapCountriesOnly');
     //>>includeEnd("notUsOnly")
 
     //>>includeStart("worldAndUs", pragmas.worldAndUs)
-    return require('app/views/MapWorldAndUsStates');
+    map = require('app/views/MapWorldAndUsStates');
     //>>includeEnd("worldAndUs")
+
+    window.Map = map;
+    return map;
 }));

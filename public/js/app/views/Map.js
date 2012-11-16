@@ -139,7 +139,7 @@ define([
         });
 
         feature.on('touchstart', function(d) {
-var hoverover = self.$el.find('.hoverover');
+          var hoverover = self.$el.find('.hoverover');
           var eventData = {
               geography: d,
               data: self.options.data[d.id] || {}

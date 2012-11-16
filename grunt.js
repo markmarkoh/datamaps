@@ -67,7 +67,6 @@ module.exports = function(grunt) {
             name: 'datamaps-us-only',
             create: true,
             include: ['almondLib', 'app/views/MapUsOnly'],
-            insertRequire: ['app/views/MapUsOnly'],
             override: {
               pragmasOnSave: {
                 usOnly: true
@@ -79,7 +78,6 @@ module.exports = function(grunt) {
             create: true,
             exclude: ['jquery', 'underscore', 'backbone'],
             include: ['almondLib', 'app/views/MapUsOnly'],
-            insertRequire: ['app/views/MapUsOnly'],
             override: {
                 pragmasOnSave: {
                     hasDeps: false,
@@ -138,12 +136,16 @@ module.exports = function(grunt) {
         ],
         dest: 'public/js/app/data/world-countries-and-us-states-build.js'
       }
+    },
+    jasmine: {
+      all: ['public/tests/SpecRunner_StatesGlobal.html'],
+			errorReporting: true
     }
   });
 
   grunt.loadNpmTasks('grunt-requirejs');
-  // Default task.
+  grunt.loadNpmTasks('grunt-jasmine-task');
 
-  grunt.registerTask('default', 'lint');
+  grunt.registerTask('default', 'jasmine');
 
 };
