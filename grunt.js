@@ -12,22 +12,18 @@ module.exports = function(grunt) {
           'requireLib': 'components/requirejs/require',
           'almondLib': '../../build/almond',
           'd3': 'components/d3/d3.v2',
-          'underscore': 'components/underscore/underscore',
+          'underscore': 'components/underscore-amd/underscore',
           'jquery': 'components/zepto/dist/zepto',
-          'backbone': 'components/backbone/backbone'
+          'backbone': 'components/backbone-amd/backbone'
         },
         shim: {
           'd3': {
             exports: 'd3'
           },
-          'underscore': {
-            exports: '_'
-          },
           'jquery': {
             exports: '$'
           },
           'backbone': {
-            deps: ['underscore', 'jquery'],
             exports: 'Backbone'
           }
         },
@@ -138,8 +134,14 @@ module.exports = function(grunt) {
       }
     },
     jasmine: {
-      all: ['public/tests/SpecRunner_StatesGlobal.html'],
-			errorReporting: true
+      all: [
+        'public/tests/SpecRunner_StatesGlobal.html',
+        'public/tests/SpecRunner_StatesStripped.html',
+        'public/tests/SpecRunner_CountriesStripped.html',
+        'public/tests/SpecRunner_CountriesGlobal.html',
+        'public/tests/SpecRunner_AllStripped.html',
+        'public/tests/SpecRunner_AllGlobal.html'
+      ]
     }
   });
 

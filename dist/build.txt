@@ -2,9 +2,9 @@
 datamaps.js
 ----------------
 almondLib.js
-components/underscore/underscore.js
+components/underscore-amd/underscore.js
 components/zepto/dist/zepto.js
-components/backbone/backbone.js
+components/backbone-amd/backbone.js
 components/d3/d3.v2.js
 app/views/Map.js
 app/views/MapOptions.js
@@ -23,9 +23,9 @@ app/views/MapCountriesOnly.js
 datamaps-us-only.js
 ----------------
 almondLib.js
-components/underscore/underscore.js
+components/underscore-amd/underscore.js
 components/zepto/dist/zepto.js
-components/backbone/backbone.js
+components/backbone-amd/backbone.js
 components/d3/d3.v2.js
 app/views/Map.js
 app/views/MapOptions.js
@@ -44,9 +44,9 @@ app/views/MapUsOnly.js
 datamaps-all.js
 ----------------
 almondLib.js
-components/underscore/underscore.js
+components/underscore-amd/underscore.js
 components/zepto/dist/zepto.js
-components/backbone/backbone.js
+components/backbone-amd/backbone.js
 components/d3/d3.v2.js
 app/views/Map.js
 app/views/MapOptions.js
