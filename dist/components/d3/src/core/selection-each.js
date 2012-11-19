@@ -1,0 +1,1 @@
+function d3_selection_each(e,t){for(var n=0,r=e.length;n<r;n++)for(var i=e[n],s=0,o=i.length,u;s<o;s++)(u=i[s])&&t(u,s,n);return e}d3_selectionPrototype.each=function(e){return d3_selection_each(this,function(t,n,r){e.call(t,t.__data__,n,r)})}

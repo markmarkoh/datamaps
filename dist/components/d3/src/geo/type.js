@@ -1,0 +1,1 @@
+function d3_geo_type(e,t){return function(n){return n&&e.hasOwnProperty(n.type)?e[n.type](n):t}}

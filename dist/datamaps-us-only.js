@@ -11,7 +11,7 @@
 //     (c) 2009-2012 Jeremy Ashkenas, DocumentCloud Inc.
 //     Underscore may be freely distributed under the MIT license.
 
-/* Zepto v1.0rc1-107-gdea8af9 - polyfill zepto event detect fx ajax form - zeptojs.com/license */
+/* Zepto 1.0rc1 - polyfill zepto event detect fx ajax form - zeptojs.com/license */
 
 //     (c) 2010-2012 Jeremy Ashkenas, DocumentCloud Inc.
 //     Backbone may be freely distributed under the MIT license.

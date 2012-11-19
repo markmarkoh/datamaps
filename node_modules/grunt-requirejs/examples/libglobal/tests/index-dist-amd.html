@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Test Suite - Dist AMD</title>
+    <link rel="stylesheet" href="qunit.css">
+    <script src="qunit.js"></script>
+    <script src="../lib/require.js"></script>
+    <script>
+        QUnit.config.autostart = false;
+        require(['principium-tests'], function () {
+            //Tests loaded, now run them.
+            QUnit.start();
+        });
+    </script>
+</head>
+<body>
+<div id="qunit"></div>
+<div id="qunit-fixture"></div>
+</body>
+</html>
+

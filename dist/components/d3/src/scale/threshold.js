@@ -1,0 +1,1 @@
+function d3_scale_threshold(e,t){function n(n){return t[d3.bisect(e,n)]}return n.domain=function(t){return arguments.length?(e=t,n):e},n.range=function(e){return arguments.length?(t=e,n):t},n.copy=function(){return d3_scale_threshold(e,t)},n}d3.scale.threshold=function(){return d3_scale_threshold([.5],[0,1])}

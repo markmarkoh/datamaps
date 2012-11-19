@@ -1,0 +1,1 @@
+d3.time.hour=d3_time_interval(function(e){var t=e.getTimezoneOffset()/60;return new d3_time((Math.floor(e/36e5-t)+t)*36e5)},function(e,t){e.setTime(e.getTime()+Math.floor(t)*36e5)},function(e){return e.getHours()}),d3.time.hours=d3.time.hour.range,d3.time.hours.utc=d3.time.hour.utc.range

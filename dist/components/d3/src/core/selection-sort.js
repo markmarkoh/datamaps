@@ -1,0 +1,1 @@
+function d3_selection_sortComparator(e){return arguments.length||(e=d3.ascending),function(t,n){return e(t&&t.__data__,n&&n.__data__)}}d3_selectionPrototype.sort=function(e){e=d3_selection_sortComparator.apply(this,arguments);for(var t=-1,n=this.length;++t<n;)this[t].sort(e);return this.order()}

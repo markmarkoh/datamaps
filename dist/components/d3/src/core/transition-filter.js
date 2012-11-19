@@ -1,0 +1,1 @@
+d3_transitionPrototype.filter=function(e){var t=[],n,r,i;typeof e!="function"&&(e=d3_selection_filter(e));for(var s=0,o=this.length;s<o;s++){t.push(n=[]);for(var r=this[s],u=0,a=r.length;u<a;u++)(i=r[u])&&e.call(i.node,i.node.__data__,u)&&n.push(i)}return d3_transition(t,this.id,this.time).ease(this.ease())}

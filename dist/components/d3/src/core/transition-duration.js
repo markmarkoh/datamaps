@@ -1,0 +1,1 @@
+d3_transitionPrototype.duration=function(e){return d3_selection_each(this,typeof e=="function"?function(t,n,r){t.duration=Math.max(1,e.call(t=t.node,t.__data__,n,r)|0)}:(e=Math.max(1,e|0),function(t){t.duration=e}))}

@@ -1,0 +1,1 @@
+d3_transitionPrototype.remove=function(){return this.each("end.transition",function(){var e;!this.__transition__&&(e=this.parentNode)&&e.removeChild(this)})}

@@ -1,0 +1,1 @@
+d3_transitionPrototype.delay=function(e){return d3_selection_each(this,typeof e=="function"?function(t,n,r){t.delay=e.call(t=t.node,t.__data__,n,r)|0}:(e|=0,function(t){t.delay=e}))}

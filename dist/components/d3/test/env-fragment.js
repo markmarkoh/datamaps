@@ -1,0 +1,1 @@
+var jsdom=require("jsdom");document.createRange=function(){return{selectNode:function(){},createContextualFragment:function(e){return jsdom.jsdom(e)}}}

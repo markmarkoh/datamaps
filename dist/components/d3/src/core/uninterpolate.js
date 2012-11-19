@@ -1,0 +1,1 @@
+function d3_uninterpolateNumber(e,t){return t=t-(e=+e)?1/(t-e):0,function(n){return(n-e)*t}}function d3_uninterpolateClamp(e,t){return t=t-(e=+e)?1/(t-e):0,function(n){return Math.max(0,Math.min(1,(n-e)*t))}}

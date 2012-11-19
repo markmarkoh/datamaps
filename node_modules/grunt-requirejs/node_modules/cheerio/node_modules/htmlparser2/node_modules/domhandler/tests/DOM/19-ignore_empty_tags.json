@@ -1,0 +1,23 @@
+{
+  "name": "Ignore empty tags (xml mode)",
+  "options": {
+    "handler": {},
+    "parser": {
+      "xmlMode": true
+    }
+  },
+  "html": "<link>text</link>",
+  "expected": [
+    {
+      "type": "tag",
+      "name": "link",
+      "attribs": {},
+      "children": [
+        {
+          "data": "text",
+          "type": "text"
+        }
+      ]
+    }
+  ]
+}

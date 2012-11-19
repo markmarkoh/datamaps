@@ -1,0 +1,5 @@
+//     Zepto.js
+//     (c) 2010-2012 Thomas Fuchs
+//     Zepto.js may be freely distributed under the MIT license.
+
+(function(e){function s(s,u){var a=s[i],f=a&&t[a];if(u===undefined)return f||o(s);if(f){if(u in f)return f[u];var l=r(u);if(l in f)return f[l]}return n.call(e(s),u)}function o(n,s,o){var a=n[i]||(n[i]=++e.uuid),f=t[a]||(t[a]=u(n));return s!==undefined&&(f[r(s)]=o),f}function u(t){var n={};return e.each(t.attributes,function(t,i){i.name.indexOf("data-")==0&&(n[r(i.name.replace("data-",""))]=e.zepto.deserializeValue(i.value))}),n}var t={},n=e.fn.data,r=e.camelCase,i=e.expando="Zepto"+ +(new Date);e.fn.data=function(t,n){return n===undefined?e.isPlainObject(t)?this.each(function(n,r){e.each(t,function(e,t){o(r,e,t)})}):this.length==0?undefined:s(this[0],t):this.each(function(){o(this,t,n)})},e.fn.removeData=function(n){return typeof n=="string"&&(n=n.split(/\s+/)),this.each(function(){var s=this[i],o=s&&t[s];o&&e.each(n,function(){delete o[r(this)]})})}})(Zepto)

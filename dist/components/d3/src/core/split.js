@@ -1,0 +1,1 @@
+function d3_splitter(e){return e==null}d3.split=function(e,t){var n=[],r=[],i,s=-1,o=e.length;arguments.length<2&&(t=d3_splitter);while(++s<o)t.call(r,i=e[s],s)?r=[]:(r.length||n.push(r),r.push(i));return n}

@@ -1,0 +1,6 @@
+src/
+support/
+tests/
+examples/
+*.sock
+*.tmproj

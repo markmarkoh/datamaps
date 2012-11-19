@@ -1,0 +1,1 @@
+define(["require","jquery","./lib","./controller/c2","./model/m2"],function(e){var t=e("jquery"),n=e("./lib"),r=e("./controller/c2"),i=e("./model/m2");r.setModel(i),t(function(){r.render(n.getBody())})})

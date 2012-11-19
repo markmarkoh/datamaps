@@ -1,0 +1,1 @@
+function d3_selection_selectorAll(e){return function(){return d3_selectAll(e,this)}}d3_selectionPrototype.selectAll=function(e){var t=[],n,r;typeof e!="function"&&(e=d3_selection_selectorAll(e));for(var i=-1,s=this.length;++i<s;)for(var o=this[i],u=-1,a=o.length;++u<a;)if(r=o[u])t.push(n=d3_array(e.call(r,r.__data__,u))),n.parentNode=r;return d3_selection(t)}

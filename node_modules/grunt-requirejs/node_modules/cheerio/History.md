@@ -1,0 +1,164 @@
+
+0.9.2 / 2012-08-10 
+==================
+
+* added $(...).map(fn)
+* manipulation: refactor `makeCheerioArray`
+* make .removeClass() remove *all* occurrences (#64)
+
+0.9.1 / 2012-08-03
+==================
+
+* fixed bug causing options not to make it to the parser
+
+0.9.0 / 2012-07-24 
+==================
+
+* Added node 8.x support
+* Removed node 4.x support
+* Add html(dom) support (@wvl)
+* fixed xss vulnerabilities on .attr(), .text(), & .html() (@benatkin, @FB55)
+* Rewrote tests into javascript, removing coffeescript dependency (@davidchambers)
+* Tons of cleanup (@davidchambers)
+
+0.8.3 / 2012-06-12
+==================
+
+* Fixed minor package regression (closes #60)
+
+0.8.2 / 2012-06-11
+==================
+
+* Now fails gracefully in cases that involve special chars, which is inline with jQuery (closes #59)
+* text() now decode special entities (closes #52)
+* updated travis.yml to test node 4.x
+
+0.8.1 / 2012-06-02
+==================
+
+* fixed regression where if you created an element, it would update the root
+* compatible with node 4.x (again)
+
+0.8.0 / 2012-05-27
+==================
+
+* Updated CSS parser to use FB55/CSSselect. Cheerio now supports most CSS3 psuedo selectors thanks to @FB55.
+* ignoreWhitespace now on by default again. See #55 for context.
+* Changed $(':root') to $.root(), cleaned up $.clone()
+* Support for .eq(i) thanks to @alexbardas
+* Removed support for node 0.4.x
+* Fixed memory leak where package.json was continually loaded
+* Tons more tests
+
+0.7.0 / 2012-04-08
+==================
+
+* Now testing with node v0.7.7
+* Added travis-ci integration
+* Replaced should.js with expect.js. Browser testing to come
+* Fixed spacing between attributes and their values
+* Added HTML pretty print
+* Exposed node-htmlparser2 parsing options
+* Revert .replaceWith(...) to be consistent with jQuery
+
+0.6.2 / 2012-02-12
+==================
+
+* Fixed .replaceWith(...) regression
+
+0.6.1 / 2012-02-12
+==================
+
+* Added .first(), .last(), and .clone() commands.
+* Option to parse using whitespace added to `.load`.
+* Many bug fixes to make cheerio more aligned with jQuery.
+* Added $(':root') to select the highest level element.
+
+Many thanks to the contributors that made this release happen: @ironchefpython and @siddMahen
+
+0.6.0 / 2012-02-07
+==================
+
+* *Important:* `$(...).html()` now returns inner HTML, which is in line with the jQuery spec
+* `$.html()` returns the full HTML string. `$.html([cheerioObject])` will return the outer(selected element's tag) and inner HTML of that object
+* Fixed bug that prevented HTML strings with depth (eg. `append('<ul><li><li></ul>')`) from getting `parent`, `next`, `prev` attributes.
+* Halted [htmlparser2](https://github.com/FB55/node-htmlparser) at v2.2.2 until single attributes bug gets fixed.
+
+0.5.1 / 2012-02-05
+==================
+
+* Fixed minor regression: $(...).text(fn) would fail
+
+0.5.1 / 2012-02-05
+==================
+
+* Fixed regression: HTML pages with comments would fail
+
+0.5.0 / 2012-02-04
+==================
+
+* Transitioned from Coffeescript back to Javascript
+* Parser now ignores whitespace
+* Fixed issue with double slashes on self-enclosing tags
+* Added boolean attributes to html rendering
+
+0.4.2 / 2012-01-16
+==================
+
+* Multiple selectors support: $('.apple, .orange'). Thanks @siddMahen!
+* Update package.json to always use latest cheerio-soupselect
+* Fix memory leak in index.js
+
+0.4.1 / 2011-12-19
+==================
+* Minor packaging changes to allow `make test` to work from npm installation
+
+0.4.0 / 2011-12-19
+==================
+
+* Rewrote all unit tests as cheerio transitioned from vows -> mocha
+* Internally, renderer.render -> render(...), parser.parse -> parse(...)
+* Append, prepend, html, before, after all work with only text (no tags)
+* Bugfix: Attributes can now be removed from script and style tags
+* Added yield as a single tag
+* Cheerio now compatible with node >=0.4.7
+
+0.3.2 / 2011-12-1
+=================
+
+* Fixed $(...).text(...) to work with "root" element
+
+0.3.1 / 2011-11-25
+==================
+
+* Now relying on cheerio-soupselect instead of node-soupselect
+* Removed all lingering htmlparser dependencies
+* parser now returns parent "root" element. Root now never needs to be updated when there is multiple roots. This fixes ongoing issues with before(...), after(...) and other manipulation functions
+* Added jQuery's $(...).replaceWith(...)
+
+0.3.0 / 2011-11-19
+==================
+
+* Now using htmlparser2 for parsing (2x speed increase, cleaner, actively developed)
+* Added benchmark directory for future speed tests
+* $('...').dom() was funky, so it was removed in favor of $('...').get(). $.dom() still works the same.
+* $.root now correctly static across all instances of $
+* Added a screencast
+
+0.2.2 / 2011-11-9
+=================
+
+* Traversing will select `<script>` and `<style>` tags (Closes Issue: #8)
+* .text(string) now working with empty elements (Closes Issue: #7)
+* Fixed before(...) & after(...) again if there is no parent (Closes Issue: #2)
+
+0.2.1 / 2011-11-5
+=================
+
+* Fixed before(...) & after(...) if there is no parent (Closes Issue: #2)
+* Comments now rendered correctly (Closes Issue: #5)
+
+< 0.2.0 / 2011-10-31
+====================
+
+* Initial release (untracked development)

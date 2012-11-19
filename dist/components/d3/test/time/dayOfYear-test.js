@@ -1,0 +1,1 @@
+require("../env");var vows=require("vows"),assert=require("assert"),time=require("./time"),local=time.local,utc=time.utc,suite=vows.describe("d3.time.dayOfYear");suite.addBatch({dayOfYear:{topic:function(){return d3.time.dayOfYear},"no floating-point rounding error":function(e){assert.equal(e(new Date(2011,4,9)),128)}}}),suite.export(module)

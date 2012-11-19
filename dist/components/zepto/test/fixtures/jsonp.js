@@ -1,0 +1,1 @@
+for(key in window)/^jsonp(\d+)$/.test(key)&&window[key]({hello:"world"});delete window.key

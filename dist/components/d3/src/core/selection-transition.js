@@ -1,0 +1,1 @@
+d3_selectionPrototype.transition=function(){var e=[],t,n;for(var r=-1,i=this.length;++r<i;){e.push(t=[]);for(var s=this[r],o=-1,u=s.length;++o<u;)t.push((n=s[o])?{node:n,delay:d3_transitionDelay,duration:d3_transitionDuration}:null)}return d3_transition(e,d3_transitionId||++d3_transitionNextId,Date.now())}

@@ -1,0 +1,1 @@
+d3.geo.equirectangular=function(){function n(n){var r=n[0]/360,i=-n[1]/360;return[e*r+t[0],e*i+t[1]]}var e=500,t=[480,250];return n.invert=function(n){var r=(n[0]-t[0])/e,i=(n[1]-t[1])/e;return[360*r,-360*i]},n.scale=function(t){return arguments.length?(e=+t,n):e},n.translate=function(e){return arguments.length?(t=[+e[0],+e[1]],n):t},n}

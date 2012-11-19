@@ -1,0 +1,1 @@
+(function(){science.lin={},science.lin.tridag=function(e,t,n,r,i,s){var o,u;for(o=1;o<s;o++)u=e[o]/t[o-1],t[o]-=u*n[o-1],r[o]-=u*r[o-1];i[s-1]=r[s-1]/t[s-1];for(o=s-2;o>=0;o--)i[o]=(r[o]-n[o]*i[o+1])/t[o]}})()

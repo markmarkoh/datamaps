@@ -1,0 +1,1 @@
+define(["underscore"],function(e){return{projection:"equirectangular",scope:"world",highlightOnHover:!0,showPopupOnHover:!0,popupTemplate:e.template('<div class="hoverinfo"><%= geography.properties.name %></div>'),highlightBorderColor:"#FA0FA0",highlightBorderWidth:2,borderColor:"#FFFFFF",borderWidth:1,pathData:{},data:{},fills:{defaultFill:"#BADA55"}}})

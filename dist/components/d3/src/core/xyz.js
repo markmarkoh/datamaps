@@ -1,0 +1,1 @@
+function d3_xyz_lab(e){return e>.008856?Math.pow(e,1/3):7.787037*e+4/29}function d3_xyz_rgb(e){return Math.round(255*(e<=.00304?12.92*e:1.055*Math.pow(e,1/2.4)-.055))}
