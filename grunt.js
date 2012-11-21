@@ -2,9 +2,6 @@ module.exports = function(grunt) {
 
   // Project configuration.
   grunt.initConfig({
-    lint: {
-      files: ['grunt.js', 'public/js/app/**/*.js']
-    },
     requirejs: {
         baseUrl: 'public/js',
         //namespace: 'datamaps',
@@ -140,7 +137,8 @@ module.exports = function(grunt) {
         'public/tests/SpecRunner_CountriesStripped.html',
         'public/tests/SpecRunner_CountriesGlobal.html',
         'public/tests/SpecRunner_AllStripped.html',
-        'public/tests/SpecRunner_AllGlobal.html'
+        'public/tests/SpecRunner_AllGlobal.html',
+        'public/tests/SpecRunner_jQueryPlugin.html'
       ]
     }
   });
@@ -148,6 +146,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-requirejs');
   grunt.loadNpmTasks('grunt-jasmine-task');
 
-  grunt.registerTask('default', 'jasmine');
+  grunt.registerTask('test', 'jasmine');
+  grunt.registerTask('build', 'jasmine requirejs');
 
 };
