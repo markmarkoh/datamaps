@@ -1,4 +1,4 @@
-define(['jquery', 'underscore', 'app/views/Map'], function ($, _, Map) {
+define(['jquery', 'underscore', 'app/views/MapUsOnly'], function ($, _, Map) {
     // Load any app-specific modules
     // with a relative require call,
     // like:
@@ -9,44 +9,9 @@ define(['jquery', 'underscore', 'app/views/Map'], function ($, _, Map) {
 
     //var plots = new Backbone.Collection([{count: 10, longitude: -97.42, latitude: 30.42},{count: 20, longitude: -74.14, latitude: 41.31} ]);
 
-    new Map({
-      el: $('#container1'),
-      projection: 'equirectangular',
-      highlightFillColor: 'rgba(0,0,0,.5)',
-      fills: {
-        'USA': '#FA0FA0',
-        defaultFill: '#BADA55'
-      },
-      data: {
-        "USA": {
-            "fillKey": "USA"
-        }
-      },
-      popupTemplate: _.template('<div class="hoverinfo"><strong><%= geography.properties.name %></strong><hr/> <%= geography.id %></div>')
-    }).render();
-
-    $("#container2").on('map-mouseover', function(e,d ) {
-    });
-    
-    $("#container2").on('map-mouseout', function(e,d ) {
-    });
-
-    $("#container2").on('map-click', function(e,d ) {
-        $("#container2header").text('clicked: ' + d.geography.properties.name + ' with ' +  d.data.electoralVotes + ' votes');
-        console.log(d.geography.id, d.data, 'click');
-    });
-
-    $("#container2").on('map-touchstart', function(e,d) {
-        $("#container2header").text('touched: ' + d.geography.properties.name + ' with ' +  d.data.electoralVotes + ' votes');
-    });
-
-    new Map({
-     el: $('#container4'),
-     scope: 'usa'
-    }).render();
     /* Scope (continent) */
     new Map({
-      el: $('#container2'),
+      el: $('#container1'),
       scope: 'usa',
       highlightBorderColor: '#222',
       highlightOnHover: true,
@@ -265,9 +230,4 @@ define(['jquery', 'underscore', 'app/views/Map'], function ($, _, Map) {
 }
     }).render();
 
-    /* Defaults */
-    new Map({
-      el: $('#container3'),
-      projection: 'bonne'
-    }).render();
 });

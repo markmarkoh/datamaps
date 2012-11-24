@@ -6,6 +6,7 @@ components/underscore-amd/underscore.js
 components/zepto/dist/zepto.js
 components/backbone-amd/backbone.js
 components/d3/d3.v2.js
+app/views/injector.js
 app/views/Map.js
 app/views/MapOptions.js
 app/data/world-countries-build.js
@@ -15,6 +16,7 @@ datamaps-stripped-countries-only.js
 ----------------
 almondLib.js
 components/d3/d3.v2.js
+app/views/injector.js
 app/views/Map.js
 app/views/MapOptions.js
 app/data/world-countries-build.js
@@ -27,6 +29,7 @@ components/underscore-amd/underscore.js
 components/zepto/dist/zepto.js
 components/backbone-amd/backbone.js
 components/d3/d3.v2.js
+app/views/injector.js
 app/views/Map.js
 app/views/MapOptions.js
 app/data/us-states-build.js
@@ -36,6 +39,7 @@ datamaps-stripped-us-only.js
 ----------------
 almondLib.js
 components/d3/d3.v2.js
+app/views/injector.js
 app/views/Map.js
 app/views/MapOptions.js
 app/data/us-states-build.js
@@ -48,6 +52,7 @@ components/underscore-amd/underscore.js
 components/zepto/dist/zepto.js
 components/backbone-amd/backbone.js
 components/d3/d3.v2.js
+app/views/injector.js
 app/views/Map.js
 app/views/MapOptions.js
 app/data/world-countries-and-us-states-build.js
@@ -57,6 +62,7 @@ datamaps-all-stripped.js
 ----------------
 almondLib.js
 components/d3/d3.v2.js
+app/views/injector.js
 app/views/Map.js
 app/views/MapOptions.js
 app/data/world-countries-and-us-states-build.js

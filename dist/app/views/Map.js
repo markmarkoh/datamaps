@@ -2,7 +2,8 @@ define([
   'backbone',
   'underscore',
   'jquery',
-  'd3'
+  'd3',
+  './injector'
 ], function(Backbone, _, $, d3) {
   var Map = Backbone.View.extend({
 
