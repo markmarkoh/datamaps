@@ -1,1 +1,4 @@
-window.legacy={name:"legacy"}
+window.legacy = {
+    name: 'legacy'
+};
+

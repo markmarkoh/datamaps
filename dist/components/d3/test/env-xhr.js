@@ -1,1 +1,55 @@
-var fs=require("fs");XMLHttpRequest=function(){function i(){fs.readFile(t.url,"binary",function(t,r){t?e.status=404:(e.status=200,e.responseText=r,e.responseXML={_xml:r},n["Content-Length"]=r.length),e.readyState=4,XMLHttpRequest._last=e,e.onreadystatechange&&e.onreadystatechange()})}function s(){try{var r=fs.readFileSync(t.url,"binary");e.status=200,e.responseText=r,e.responseXML={_xml:r},n["Content-Length"]=r.length}catch(i){e.status=404}e.readyState=4,XMLHttpRequest._last=e,e.onreadystatechange&&e.onreadystatechange()}var e=this,t=e._info={},n={},r;e.open=function(n,r,o){t.url=r,t.async=o,e.send=o?i:s},e.setRequestHeader=function(e,n){/^Accept$/i.test(e)&&(t.mimeType=n)},e.getResponseHeader=function(e){return n[e]}}
+var fs = require("fs");
+
+XMLHttpRequest = function() {
+  var self = this,
+      info = self._info = {},
+      headers = {},
+      url;
+
+  // TODO handle file system errors?
+
+  self.open = function(m, u, a) {
+    info.url = u;
+    info.async = a;
+    self.send = a ? read : readSync;
+  };
+
+  self.setRequestHeader = function(n, v) {
+    if (/^Accept$/i.test(n)) info.mimeType = v;
+  };
+
+  function read() {
+    fs.readFile(info.url, "binary", function(e, d) {
+      if (e) {
+        self.status = 404; // assumed
+      } else {
+        self.status = 200;
+        self.responseText = d;
+        self.responseXML = {_xml: d};
+        headers["Content-Length"] = d.length;
+      }
+      self.readyState = 4;
+      XMLHttpRequest._last = self;
+      if (self.onreadystatechange) self.onreadystatechange();
+    });
+  }
+
+  function readSync() {
+    try {
+      var d = fs.readFileSync(info.url, "binary");
+      self.status = 200;
+      self.responseText = d;
+      self.responseXML = {_xml: d};
+      headers["Content-Length"] = d.length;
+    } catch (e) {
+      self.status = 404; // assumed
+    }
+    self.readyState = 4;
+    XMLHttpRequest._last = self;
+    if (self.onreadystatechange) self.onreadystatechange();
+  }
+
+  self.getResponseHeader = function(n) {
+    return headers[n];
+  };
+};

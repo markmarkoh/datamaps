@@ -1,1 +1,7 @@
-define(["collection","text!bigCollection.html"],function(e,t){return{name:"bigCollection",html:t,collection:e}})
+define(['collection', 'text!bigCollection.html'], function (collection, html) {
+    return {
+        name: 'bigCollection',
+        html: html,
+        collection: collection
+    };
+});

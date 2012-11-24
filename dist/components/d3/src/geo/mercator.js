@@ -1,1 +1,36 @@
-d3.geo.mercator=function(){function n(n){var r=n[0]/360,i=-(Math.log(Math.tan(Math.PI/4+n[1]*d3_geo_radians/2))/d3_geo_radians)/360;return[e*r+t[0],e*Math.max(-0.5,Math.min(.5,i))+t[1]]}var e=500,t=[480,250];return n.invert=function(n){var r=(n[0]-t[0])/e,i=(n[1]-t[1])/e;return[360*r,2*Math.atan(Math.exp(-360*i*d3_geo_radians))/d3_geo_radians-90]},n.scale=function(t){return arguments.length?(e=+t,n):e},n.translate=function(e){return arguments.length?(t=[+e[0],+e[1]],n):t},n}
+d3.geo.mercator = function() {
+  var scale = 500,
+      translate = [480, 250];
+
+  function mercator(coordinates) {
+    var x = coordinates[0] / 360,
+        y = -(Math.log(Math.tan(Math.PI / 4 + coordinates[1] * d3_geo_radians / 2)) / d3_geo_radians) / 360;
+    return [
+      scale * x + translate[0],
+      scale * Math.max(-.5, Math.min(.5, y)) + translate[1]
+    ];
+  }
+
+  mercator.invert = function(coordinates) {
+    var x = (coordinates[0] - translate[0]) / scale,
+        y = (coordinates[1] - translate[1]) / scale;
+    return [
+      360 * x,
+      2 * Math.atan(Math.exp(-360 * y * d3_geo_radians)) / d3_geo_radians - 90
+    ];
+  };
+
+  mercator.scale = function(x) {
+    if (!arguments.length) return scale;
+    scale = +x;
+    return mercator;
+  };
+
+  mercator.translate = function(x) {
+    if (!arguments.length) return translate;
+    translate = [+x[0], +x[1]];
+    return mercator;
+  };
+
+  return mercator;
+};

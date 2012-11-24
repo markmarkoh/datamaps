@@ -1,1 +1,27 @@
-(function(){science.lin={},science.lin.tridag=function(e,t,n,r,i,s){var o,u;for(o=1;o<s;o++)u=e[o]/t[o-1],t[o]-=u*n[o-1],r[o]-=u*r[o-1];i[s-1]=r[s-1]/t[s-1];for(o=s-2;o>=0;o--)i[o]=(r[o]-n[o]*i[o+1])/t[o]}})()
+(function(){science.lin = {};
+/**
+ * Solves tridiagonal systems of linear equations.
+ *
+ * Source: http://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm
+ *
+ * @param {number[]} a
+ * @param {number[]} b
+ * @param {number[]} c
+ * @param {number[]} d
+ * @param {number[]} x
+ * @param {number} n
+ */
+science.lin.tridag = function(a, b, c, d, x, n) {
+  var i,
+      m;
+  for (i = 1; i < n; i++) {
+    m = a[i] / b[i - 1];
+    b[i] -= m * c[i - 1];
+    d[i] -= m * d[i - 1];
+  }
+  x[n - 1] = d[n - 1] / b[n - 1];
+  for (i = n - 2; i >= 0; i--) {
+    x[i] = (d[i] - c[i] * x[i + 1]) / b[i];
+  }
+};
+})()

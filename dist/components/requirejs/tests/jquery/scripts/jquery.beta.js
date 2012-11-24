@@ -1,1 +1,3 @@
-$.fn.beta=function(){return"beta"}
+$.fn.beta = function() {
+    return "beta";
+};

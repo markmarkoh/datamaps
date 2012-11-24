@@ -1,1 +1,6 @@
-define(["./lib/monkey"],function(e){return{name:"funky",monkeyName:e.name}})
+define(['./lib/monkey'], function (monkey) {
+    return {
+        name: 'funky',
+        monkeyName: monkey.name
+    };
+});

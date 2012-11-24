@@ -1,1 +1,3 @@
-define({name:"sparkplugs"})
+define({
+    name: 'sparkplugs'
+});

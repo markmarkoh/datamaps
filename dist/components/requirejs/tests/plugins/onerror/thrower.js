@@ -1,1 +1,6 @@
-define({load:function(e,t,n,r){t(["fake"],n,n.error)}})
+
+define({
+    load: function (name, req, load, config) {
+        req(['fake'], load, load.error);
+    }
+});

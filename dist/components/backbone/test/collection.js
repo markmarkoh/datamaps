@@ -1,1 +1,568 @@
-$(document).ready(function(){var e=null,t=Backbone.sync,n,r,i,s,o,u,a;module("Backbone.Collection",{setup:function(){n=new Backbone.Model({id:3,label:"a"}),r=new Backbone.Model({id:2,label:"b"}),i=new Backbone.Model({id:1,label:"c"}),s=new Backbone.Model({id:0,label:"d"}),o=null,u=new Backbone.Collection([n,r,i,s]),a=new Backbone.Collection,Backbone.sync=function(t,n,r){e={method:t,model:n,options:r}}},teardown:function(){Backbone.sync=t}}),test("Collection: new and sort",function(){equal(u.first(),n,"a should be first"),equal(u.last(),s,"d should be last"),u.comparator=function(e,t){return e.id>t.id?-1:1},u.sort(),equal(u.first(),n,"a should be first"),equal(u.last(),s,"d should be last"),u.comparator=function(e){return e.id},u.sort(),equal(u.first(),s,"d should be first"),equal(u.last(),n,"a should be last"),equal(u.length,4)}),test("Collection: get, getByCid",function(){equal(u.get(0),s),equal(u.get(2),r),equal(u.getByCid(u.first().cid),u.first())}),test("Collection: get with non-default ids",function(){var e=new Backbone.Collection,t=Backbone.Model.extend({idAttribute:"_id"}),n=new t({_id:100});e.push(n),equal(e.get(100),n),n.set({_id:101}),equal(e.get(101),n)}),test("Collection: update index when id changes",function(){var e=new Backbone.Collection;e.add([{id:0,name:"one"},{id:1,name:"two"}]);var t=e.get(0);equal(t.get("name"),"one"),t.set({id:101}),equal(e.get(0),null),equal(e.get(101).get("name"),"one")}),test("Collection: at",function(){equal(u.at(2),i)}),test("Collection: pluck",function(){equal(u.pluck("label").join(" "),"a b c d")}),test("Collection: add",function(){var e,t,n;e=t=n=null,o=new Backbone.Model({id:10,label:"e"}),a.add(o),a.bind("add",function(){n=!0}),u.bind("add",function(n,r,i){e=n.get("label"),equal(i.index,4),t=i}),u.add(o,{amazing:!0}),equal(e,"e"),equal(u.length,5),equal(u.last(),o),equal(a.length,1),equal(n,null),ok(t.amazing);var r=new Backbone.Model({id:20,label:"f"}),i=new Backbone.Model({id:21,label:"g"}),s=new Backbone.Model({id:22,label:"h"}),f=new Backbone.Collection([r,i,s]);equal(f.length,3),f.add(o,{at:1}),equal(f.length,4),equal(f.at(1),o),equal(f.last(),s)}),test("Collection: add multiple models",function(){var e=new Backbone.Collection([{at:0},{at:1},{at:9}]);e.add([{at:2},{at:3},{at:4},{at:5},{at:6},{at:7},{at:8}],{at:2});for(var t=0;t<=5;t++)equal(e.at(t).get("at"),t)}),test("Collection: can't add model to collection twice",function(){var e=new Backbone.Collection([{id:1},{id:2},{id:1},{id:2},{id:3}]);equal(e.pluck("id").join(" "),"1 2 3")}),test("Collection: can't add different model with same id to collection twice",function(){var e=new Backbone.Collection;e.unshift({id:101}),e.add({id:101}),equal(e.length,1)}),test("Collection: add model to multiple collections",function(){var e=0,t=new Backbone.Model({id:10,label:"e"});t.bind("add",function(i,s){e++,equal(t,i),e>1?equal(s,r):equal(s,n)});var n=new Backbone.Collection([]);n.bind("add",function(e,r){equal(t,e),equal(n,r)});var r=new Backbone.Collection([]);r.bind("add",function(e,n){equal(t,e),equal(r,n)}),n.add(t),equal(t.collection,n),r.add(t),equal(t.collection,n)}),test("Collection: add model with parse",function(){var e=Backbone.Model.extend({parse:function(e){return e.value+=1,e}}),t=Backbone.Collection.extend({model:e}),n=new t;n.add({value:1},{parse:!0}),equal(n.at(0).get("value"),2)}),test("Collection: add model to collection with sort()-style comparator",function(){var e=new Backbone.Collection;e.comparator=function(e,t){return e.get("name")<t.get("name")?-1:1};var t=new Backbone.Model({name:"Tom"}),n=new Backbone.Model({name:"Rob"}),r=new Backbone.Model({name:"Tim"});e.add(t),e.add(n),e.add(r),equal(e.indexOf(n),0),equal(e.indexOf(r),1),equal(e.indexOf(t),2)}),test("Collection: comparator that depends on `this`",function(){var e=new Backbone.Collection;e.negative=function(e){return-e},e.comparator=function(e){return this.negative(e.id)},e.add([{id:1},{id:2},{id:3}]),equal(e.pluck("id").join(" "),"3 2 1")}),test("Collection: remove",function(){var e=null,t=null;u.bind("remove",function(t,n,r){e=t.get("label"),equal(r.index,3)}),a.bind("remove",function(e,n,r){t=!0}),u.remove(s),equal(e,"d"),equal(u.length,3),equal(u.first(),n),equal(t,null)}),test("Collection: shift and pop",function(){var e=new Backbone.Collection([{a:"a"},{b:"b"},{c:"c"}]);equal(e.shift().get("a"),"a"),equal(e.pop().get("c"),"c")}),test("Collection: events are unbound on remove",function(){var e=0,t=new Backbone.Model,n=new Backbone.Collection([t]);n.bind("change",function(){e++}),t.set({name:"Kool"}),equal(e,1),n.reset([]),equal(t.collection,undefined),t.set({name:"Shadow"}),equal(e,1)}),test("Collection: remove in multiple collections",function(){var e={id:5,title:"Othello"},t=!1,n=new Backbone.Model(e),r=new Backbone.Model(e);r.bind("remove",function(){t=!0});var i=new Backbone.Collection([n]),s=new Backbone.Collection([r]);ok(n!=r),ok(i.length==1),ok(s.length==1),i.remove(n),equal(t,!1),ok(i.length==0),s.remove(n),ok(s.length==0),equal(t,!0)}),test("Collection: remove same model in multiple collection",function(){var e=0,t=new Backbone.Model({id:5,title:"Othello"});t.bind("remove",function(i,s){e++,equal(t,i),e>1?equal(s,n):equal(s,r)});var n=new Backbone.Collection([t]);n.bind("remove",function(e,r){equal(t,e),equal(n,r)});var r=new Backbone.Collection([t]);r.bind("remove",function(e,n){equal(t,e),equal(r,n)}),equal(n,t.collection),r.remove(t),ok(r.length==0),ok(n.length==1),equal(e,1),equal(n,t.collection),n.remove(t),equal(null,t.collection),ok(n.length==0),equal(e,2)}),test("Collection: model destroy removes from all collections",function(){var e=new Backbone.Model({id:5,title:"Othello"});e.sync=function(e,t,n){n.success({})};var t=new Backbone.Collection([e]),n=new Backbone.Collection([e]);e.destroy(),ok(t.length==0),ok(n.length==0),equal(undefined,e.collection)}),test("Colllection: non-persisted model destroy removes from all collections",function(){var e=new Backbone.Model({title:"Othello"});e.sync=function(e,t,n){throw"should not be called"};var t=new Backbone.Collection([e]),n=new Backbone.Collection([e]);e.destroy(),ok(t.length==0),ok(n.length==0),equal(undefined,e.collection)}),test("Collection: fetch",function(){u.fetch(),equal(e.method,"read"),equal(e.model,u),equal(e.options.parse,!0),u.fetch({parse:!1}),equal(e.options.parse,!1)}),test("Collection: create",function(){var t=u.create({label:"f"},{wait:!0});equal(e.method,"create"),equal(e.model,t),equal(t.get("label"),"f"),equal(t.collection,u)}),test("Collection: create enforces validation",function(){var e=Backbone.Model.extend({validate:function(e){return"fail"}}),t=Backbone.Collection.extend({model:e}),n=new t;equal(n.create({foo:"bar"}),!1)}),test("Collection: a failing create runs the error callback",function(){var e=Backbone.Model.extend({validate:function(e){return"fail"}}),t=Backbone.Collection.extend({model:e}),n=!1,r=function(e,t){n=!0},i=new t;i.create({foo:"bar"},{error:r}),equal(n,!0)}),test("collection: initialize",function(){var e=Backbone.Collection.extend({initialize:function(){this.one=1}}),t=new e;equal(t.one,1)}),test("Collection: toJSON",function(){equal(JSON.stringify(u),'[{"id":3,"label":"a"},{"id":2,"label":"b"},{"id":1,"label":"c"},{"id":0,"label":"d"}]')}),test("Collection: where",function(){var e=new Backbone.Collection([{a:1},{a:1},{a:1,b:2},{a:2,b:2},{a:3}]);equal(e.where({a:1}).length,3),equal(e.where({a:2}).length,1),equal(e.where({a:3}).length,1),equal(e.where({b:1}).length,0),equal(e.where({b:2}).length,2),equal(e.where({a:1,b:2}).length,1)}),test("Collection: Underscore methods",function(){equal(u.map(function(e){return e.get("label")}).join(" "),"a b c d"),equal(u.any(function(e){return e.id===100}),!1),equal(u.any(function(e){return e.id===0}),!0),equal(u.indexOf(r),1),equal(u.size(),4),equal(u.rest().length,3),ok(!_.include(u.rest()),n),ok(!_.include(u.rest()),s),ok(!u.isEmpty()),ok(!_.include(u.without(s)),s),equal(u.max(function(e){return e.id}).id,3),equal(u.min(function(e){return e.id}).id,0),same(u.chain().filter(function(e){return e.id%2===0}).map(function(e){return e.id*2}).value(),[4,0])}),test("Collection: reset",function(){var e=0,t=u.models;u.bind("reset",function(){e+=1}),u.reset([]),equal(e,1),equal(u.length,0),equal(u.last(),null),u.reset(t),equal(e,2),equal(u.length,4),equal(u.last(),s),u.reset(_.map(t,function(e){return e.attributes})),equal(e,3),equal(u.length,4),ok(u.last()!==s),ok(_.isEqual(u.last().attributes,s.attributes))}),test("Collection: reset passes caller options",function(){var e=Backbone.Model.extend({initialize:function(e,t){this.model_parameter=t.model_parameter}}),t=new(Backbone.Collection.extend({model:e}));t.reset([{astring:"green",anumber:1},{astring:"blue",anumber:2}],{model_parameter:"model parameter"}),equal(t.length,2),t.each(function(e){equal(e.model_parameter,"model parameter")})}),test("Collection: trigger custom events on models",function(){var e=null;n.bind("custom",function(){e=!0}),n.trigger("custom"),equal(e,!0)}),test("Collection: add does not alter arguments",function(){var e={},t=[e];(new Backbone.Collection).add(t),equal(t.length,1),ok(e===t[0])}),test("#714: access `model.collection` in a brand new model.",2,function(){var e=new Backbone.Collection,t=Backbone.Model.extend({set:function(t){return equal(t.prop,"value"),equal(this.collection,e),this}});e.model=t,e.create({prop:"value"})}),test("#574, remove its own reference to the .models array.",function(){var e=new Backbone.Collection([{id:1},{id:2},{id:3},{id:4},{id:5},{id:6}]);equal(e.length,6),e.remove(e.models),equal(e.length,0)}),test("#861, adding models to a collection which do not pass validation",function(){raises(function(){var e=Backbone.Model.extend({validate:function(e){if(e.id==3)return"id can't be 3"}}),t=Backbone.Collection.extend({model:e}),n=new t;n.add([{id:1},{id:2},{id:3},{id:4},{id:5},{id:6}])},"Can't add an invalid model to a collection")}),test("Collection: index with comparator",function(){expect(4);var e=0,t=(new Backbone.Collection([{id:2},{id:4}],{comparator:function(e){return e.id}})).on("add",function(t,n,r){t.id==1&&(equal(r.index,0),equal(e++,0)),t.id==3&&(equal(r.index,2),equal(e++,1))});t.add([{id:3},{id:1}])}),test("Collection: throwing during add leaves consistent state",function(){expect(4);var e=new Backbone.Collection;e.bind("test",function(){ok(!1)}),e.model=Backbone.Model.extend({validate:function(e){if(!e.valid)return"invalid"}});var t=new e.model({id:1,valid:!0});raises(function(){e.add([t,{id:2}])}),t.trigger("test"),ok(!e.getByCid(t.cid)),ok(!e.get(1)),equal(e.length,0)}),test("Collection: multiple copies of the same model",function(){var e=new Backbone.Collection,t=new Backbone.Model;e.add([t,t]),equal(e.length,1),e.add([{id:1},{id:1}]),equal(e.length,2),equal(e.last().id,1)}),test("#964 - collection.get return in consistent",function(){var e=new Backbone.Collection;ok(e.get(null)===undefined),ok(e.get()===undefined)}),test("#1112 - passing options.model sets collection.model",function(){var e=Backbone.Model.extend({}),t=new Backbone.Collection([{id:1}],{model:e});ok(t.model===e),ok(t.at(0)instanceof e)})})
+$(document).ready(function() {
+
+  var lastRequest = null;
+  var sync = Backbone.sync;
+
+  var a, b, c, d, e, col, otherCol;
+
+  module("Backbone.Collection", {
+
+    setup: function() {
+      a         = new Backbone.Model({id: 3, label: 'a'});
+      b         = new Backbone.Model({id: 2, label: 'b'});
+      c         = new Backbone.Model({id: 1, label: 'c'});
+      d         = new Backbone.Model({id: 0, label: 'd'});
+      e         = null;
+      col       = new Backbone.Collection([a,b,c,d]);
+      otherCol  = new Backbone.Collection();
+
+      Backbone.sync = function(method, model, options) {
+        lastRequest = {
+          method: method,
+          model: model,
+          options: options
+        };
+      };
+    },
+
+    teardown: function() {
+      Backbone.sync = sync;
+    }
+
+  });
+
+  test("Collection: new and sort", function() {
+    equal(col.first(), a, "a should be first");
+    equal(col.last(), d, "d should be last");
+    col.comparator = function(a, b) {
+      return a.id > b.id ? -1 : 1;
+    };
+    col.sort();
+    equal(col.first(), a, "a should be first");
+    equal(col.last(), d, "d should be last");
+    col.comparator = function(model) { return model.id; };
+    col.sort();
+    equal(col.first(), d, "d should be first");
+    equal(col.last(), a, "a should be last");
+    equal(col.length, 4);
+  });
+
+  test("Collection: get, getByCid", function() {
+    equal(col.get(0), d);
+    equal(col.get(2), b);
+    equal(col.getByCid(col.first().cid), col.first());
+  });
+
+  test("Collection: get with non-default ids", function() {
+    var col = new Backbone.Collection();
+    var MongoModel = Backbone.Model.extend({
+      idAttribute: '_id'
+    });
+    var model = new MongoModel({_id: 100});
+    col.push(model);
+    equal(col.get(100), model);
+    model.set({_id: 101});
+    equal(col.get(101), model);
+  });
+
+  test("Collection: update index when id changes", function() {
+    var col = new Backbone.Collection();
+    col.add([
+      {id : 0, name : 'one'},
+      {id : 1, name : 'two'}
+    ]);
+    var one = col.get(0);
+    equal(one.get('name'), 'one');
+    one.set({id : 101});
+    equal(col.get(0), null);
+    equal(col.get(101).get('name'), 'one');
+  });
+
+  test("Collection: at", function() {
+    equal(col.at(2), c);
+  });
+
+  test("Collection: pluck", function() {
+    equal(col.pluck('label').join(' '), 'a b c d');
+  });
+
+  test("Collection: add", function() {
+    var added, opts, secondAdded;
+    added = opts = secondAdded = null;
+    e = new Backbone.Model({id: 10, label : 'e'});
+    otherCol.add(e);
+    otherCol.bind('add', function() {
+      secondAdded = true;
+    });
+    col.bind('add', function(model, collection, options){
+      added = model.get('label');
+      equal(options.index, 4);
+      opts = options;
+    });
+    col.add(e, {amazing: true});
+    equal(added, 'e');
+    equal(col.length, 5);
+    equal(col.last(), e);
+    equal(otherCol.length, 1);
+    equal(secondAdded, null);
+    ok(opts.amazing);
+
+    var f = new Backbone.Model({id: 20, label : 'f'});
+    var g = new Backbone.Model({id: 21, label : 'g'});
+    var h = new Backbone.Model({id: 22, label : 'h'});
+    var atCol = new Backbone.Collection([f, g, h]);
+    equal(atCol.length, 3);
+    atCol.add(e, {at: 1});
+    equal(atCol.length, 4);
+    equal(atCol.at(1), e);
+    equal(atCol.last(), h);
+  });
+
+  test("Collection: add multiple models", function() {
+    var col = new Backbone.Collection([{at: 0}, {at: 1}, {at: 9}]);
+    col.add([{at: 2}, {at: 3}, {at: 4}, {at: 5}, {at: 6}, {at: 7}, {at: 8}], {at: 2});
+    for (var i = 0; i <= 5; i++) {
+      equal(col.at(i).get('at'), i);
+    }
+  });
+
+  test("Collection: can't add model to collection twice", function() {
+    var col = new Backbone.Collection([{id: 1}, {id: 2}, {id: 1}, {id: 2}, {id: 3}]);
+    equal(col.pluck('id').join(' '), '1 2 3');
+  });
+
+  test("Collection: can't add different model with same id to collection twice", function() {
+    var col = new Backbone.Collection;
+    col.unshift({id: 101});
+    col.add({id: 101});
+    equal(col.length, 1);
+  });
+
+  test("Collection: add model to multiple collections", function() {
+    var counter = 0;
+    var e = new Backbone.Model({id: 10, label : 'e'});
+    e.bind('add', function(model, collection) {
+      counter++;
+      equal(e, model);
+      if (counter > 1) {
+        equal(collection, colF);
+      } else {
+        equal(collection, colE);
+      }
+    });
+    var colE = new Backbone.Collection([]);
+    colE.bind('add', function(model, collection) {
+      equal(e, model);
+      equal(colE, collection);
+    });
+    var colF = new Backbone.Collection([]);
+    colF.bind('add', function(model, collection) {
+      equal(e, model);
+      equal(colF, collection);
+    });
+    colE.add(e);
+    equal(e.collection, colE);
+    colF.add(e);
+    equal(e.collection, colE);
+  });
+
+  test("Collection: add model with parse", function() {
+    var Model = Backbone.Model.extend({
+      parse: function(obj) {
+        obj.value += 1;
+        return obj;
+      }
+    });
+
+    var Col = Backbone.Collection.extend({model: Model});
+    var col = new Col;
+    col.add({value: 1}, {parse: true});
+    equal(col.at(0).get('value'), 2);
+  });
+
+  test("Collection: add model to collection with sort()-style comparator", function() {
+    var col = new Backbone.Collection;
+    col.comparator = function(a, b) {
+      return a.get('name') < b.get('name') ? -1 : 1;
+    };
+    var tom = new Backbone.Model({name: 'Tom'});
+    var rob = new Backbone.Model({name: 'Rob'});
+    var tim = new Backbone.Model({name: 'Tim'});
+    col.add(tom);
+    col.add(rob);
+    col.add(tim);
+    equal(col.indexOf(rob), 0);
+    equal(col.indexOf(tim), 1);
+    equal(col.indexOf(tom), 2);
+  });
+
+  test("Collection: comparator that depends on `this`", function() {
+    var col = new Backbone.Collection;
+    col.negative = function(num) {
+      return -num;
+    };
+    col.comparator = function(a) {
+      return this.negative(a.id);
+    };
+    col.add([{id: 1}, {id: 2}, {id: 3}]);
+    equal(col.pluck('id').join(' '), '3 2 1');
+  });
+
+  test("Collection: remove", function() {
+    var removed = null;
+    var otherRemoved = null;
+    col.bind('remove', function(model, col, options) {
+      removed = model.get('label');
+      equal(options.index, 3);
+    });
+    otherCol.bind('remove', function(model, col, options) {
+      otherRemoved = true;
+    });
+    col.remove(d);
+    equal(removed, 'd');
+    equal(col.length, 3);
+    equal(col.first(), a);
+    equal(otherRemoved, null);
+  });
+
+  test("Collection: shift and pop", function() {
+    var col = new Backbone.Collection([{a: 'a'}, {b: 'b'}, {c: 'c'}]);
+    equal(col.shift().get('a'), 'a');
+    equal(col.pop().get('c'), 'c');
+  });
+
+  test("Collection: events are unbound on remove", function() {
+    var counter = 0;
+    var dj = new Backbone.Model();
+    var emcees = new Backbone.Collection([dj]);
+    emcees.bind('change', function(){ counter++; });
+    dj.set({name : 'Kool'});
+    equal(counter, 1);
+    emcees.reset([]);
+    equal(dj.collection, undefined);
+    dj.set({name : 'Shadow'});
+    equal(counter, 1);
+  });
+
+  test("Collection: remove in multiple collections", function() {
+    var modelData = {
+      id : 5,
+      title : 'Othello'
+    };
+    var passed = false;
+    var e = new Backbone.Model(modelData);
+    var f = new Backbone.Model(modelData);
+    f.bind('remove', function() {
+      passed = true;
+    });
+    var colE = new Backbone.Collection([e]);
+    var colF = new Backbone.Collection([f]);
+    ok(e != f);
+    ok(colE.length == 1);
+    ok(colF.length == 1);
+    colE.remove(e);
+    equal(passed, false);
+    ok(colE.length == 0);
+    colF.remove(e);
+    ok(colF.length == 0);
+    equal(passed, true);
+  });
+
+  test("Collection: remove same model in multiple collection", function() {
+    var counter = 0;
+    var e = new Backbone.Model({id: 5, title: 'Othello'});
+    e.bind('remove', function(model, collection) {
+      counter++;
+      equal(e, model);
+      if (counter > 1) {
+        equal(collection, colE);
+      } else {
+        equal(collection, colF);
+      }
+    });
+    var colE = new Backbone.Collection([e]);
+    colE.bind('remove', function(model, collection) {
+      equal(e, model);
+      equal(colE, collection);
+    });
+    var colF = new Backbone.Collection([e]);
+    colF.bind('remove', function(model, collection) {
+      equal(e, model);
+      equal(colF, collection);
+    });
+    equal(colE, e.collection);
+    colF.remove(e);
+    ok(colF.length == 0);
+    ok(colE.length == 1);
+    equal(counter, 1);
+    equal(colE, e.collection);
+    colE.remove(e);
+    equal(null, e.collection);
+    ok(colE.length == 0);
+    equal(counter, 2);
+  });
+
+  test("Collection: model destroy removes from all collections", function() {
+    var e = new Backbone.Model({id: 5, title: 'Othello'});
+    e.sync = function(method, model, options) { options.success({}); };
+    var colE = new Backbone.Collection([e]);
+    var colF = new Backbone.Collection([e]);
+    e.destroy();
+    ok(colE.length == 0);
+    ok(colF.length == 0);
+    equal(undefined, e.collection);
+  });
+
+  test("Colllection: non-persisted model destroy removes from all collections", function() {
+    var e = new Backbone.Model({title: 'Othello'});
+    e.sync = function(method, model, options) { throw "should not be called"; };
+    var colE = new Backbone.Collection([e]);
+    var colF = new Backbone.Collection([e]);
+    e.destroy();
+    ok(colE.length == 0);
+    ok(colF.length == 0);
+    equal(undefined, e.collection);
+  });
+
+  test("Collection: fetch", function() {
+    col.fetch();
+    equal(lastRequest.method, 'read');
+    equal(lastRequest.model, col);
+    equal(lastRequest.options.parse, true);
+
+    col.fetch({parse: false});
+    equal(lastRequest.options.parse, false);
+  });
+
+  test("Collection: create", function() {
+    var model = col.create({label: 'f'}, {wait: true});
+    equal(lastRequest.method, 'create');
+    equal(lastRequest.model, model);
+    equal(model.get('label'), 'f');
+    equal(model.collection, col);
+  });
+
+  test("Collection: create enforces validation", function() {
+    var ValidatingModel = Backbone.Model.extend({
+      validate: function(attrs) {
+        return "fail";
+      }
+    });
+    var ValidatingCollection = Backbone.Collection.extend({
+      model: ValidatingModel
+    });
+    var col = new ValidatingCollection();
+    equal(col.create({"foo":"bar"}), false);
+  });
+
+  test("Collection: a failing create runs the error callback", function() {
+    var ValidatingModel = Backbone.Model.extend({
+      validate: function(attrs) {
+        return "fail";
+      }
+    });
+    var ValidatingCollection = Backbone.Collection.extend({
+      model: ValidatingModel
+    });
+    var flag = false;
+    var callback = function(model, error) { flag = true; };
+    var col = new ValidatingCollection();
+    col.create({"foo":"bar"}, { error: callback });
+    equal(flag, true);
+  });
+
+  test("collection: initialize", function() {
+    var Collection = Backbone.Collection.extend({
+      initialize: function() {
+        this.one = 1;
+      }
+    });
+    var coll = new Collection;
+    equal(coll.one, 1);
+  });
+
+  test("Collection: toJSON", function() {
+    equal(JSON.stringify(col), '[{"id":3,"label":"a"},{"id":2,"label":"b"},{"id":1,"label":"c"},{"id":0,"label":"d"}]');
+  });
+
+  test("Collection: where", function() {
+    var coll = new Backbone.Collection([
+      {a: 1},
+      {a: 1},
+      {a: 1, b: 2},
+      {a: 2, b: 2},
+      {a: 3}
+    ]);
+    equal(coll.where({a: 1}).length, 3);
+    equal(coll.where({a: 2}).length, 1);
+    equal(coll.where({a: 3}).length, 1);
+    equal(coll.where({b: 1}).length, 0);
+    equal(coll.where({b: 2}).length, 2);
+    equal(coll.where({a: 1, b: 2}).length, 1);
+  });
+
+  test("Collection: Underscore methods", function() {
+    equal(col.map(function(model){ return model.get('label'); }).join(' '), 'a b c d');
+    equal(col.any(function(model){ return model.id === 100; }), false);
+    equal(col.any(function(model){ return model.id === 0; }), true);
+    equal(col.indexOf(b), 1);
+    equal(col.size(), 4);
+    equal(col.rest().length, 3);
+    ok(!_.include(col.rest()), a);
+    ok(!_.include(col.rest()), d);
+    ok(!col.isEmpty());
+    ok(!_.include(col.without(d)), d);
+    equal(col.max(function(model){ return model.id; }).id, 3);
+    equal(col.min(function(model){ return model.id; }).id, 0);
+    same(col.chain()
+            .filter(function(o){ return o.id % 2 === 0; })
+            .map(function(o){ return o.id * 2; })
+            .value(),
+         [4, 0]);
+  });
+
+  test("Collection: reset", function() {
+    var resetCount = 0;
+    var models = col.models;
+    col.bind('reset', function() { resetCount += 1; });
+    col.reset([]);
+    equal(resetCount, 1);
+    equal(col.length, 0);
+    equal(col.last(), null);
+    col.reset(models);
+    equal(resetCount, 2);
+    equal(col.length, 4);
+    equal(col.last(), d);
+    col.reset(_.map(models, function(m){ return m.attributes; }));
+    equal(resetCount, 3);
+    equal(col.length, 4);
+    ok(col.last() !== d);
+    ok(_.isEqual(col.last().attributes, d.attributes));
+  });
+
+  test("Collection: reset passes caller options", function() {
+    var Model = Backbone.Model.extend({
+      initialize: function(attrs, options) {
+        this.model_parameter = options.model_parameter;
+      }
+    });
+    var col = new (Backbone.Collection.extend({ model: Model }))();
+    col.reset([{ astring: "green", anumber: 1 }, { astring: "blue", anumber: 2 }], { model_parameter: 'model parameter' });
+    equal(col.length, 2);
+    col.each(function(model) {
+      equal(model.model_parameter, 'model parameter');
+    });
+  });
+
+  test("Collection: trigger custom events on models", function() {
+    var fired = null;
+    a.bind("custom", function() { fired = true; });
+    a.trigger("custom");
+    equal(fired, true);
+  });
+
+  test("Collection: add does not alter arguments", function(){
+    var attrs = {};
+    var models = [attrs];
+    new Backbone.Collection().add(models);
+    equal(models.length, 1);
+    ok(attrs === models[0]);
+  });
+
+  test("#714: access `model.collection` in a brand new model.", 2, function() {
+    var col = new Backbone.Collection;
+    var Model = Backbone.Model.extend({
+      set: function(attrs) {
+        equal(attrs.prop, 'value');
+        equal(this.collection, col);
+        return this;
+      }
+    });
+    col.model = Model;
+    col.create({prop: 'value'});
+  });
+
+  test("#574, remove its own reference to the .models array.", function() {
+    var col = new Backbone.Collection([
+      {id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}, {id: 6}
+    ]);
+    equal(col.length, 6);
+    col.remove(col.models);
+    equal(col.length, 0);
+  });
+
+  test("#861, adding models to a collection which do not pass validation", function() {
+    raises(function() {
+      var Model = Backbone.Model.extend({
+        validate: function(attrs) {
+          if (attrs.id == 3) return "id can't be 3";
+        }
+      });
+
+      var Collection = Backbone.Collection.extend({
+        model: Model
+      });
+
+      var col = new Collection;
+
+      col.add([{id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}, {id: 6}]);
+    }, "Can't add an invalid model to a collection");
+  });
+
+  test("Collection: index with comparator", function() {
+    expect(4);
+    var counter = 0;
+    var col = new Backbone.Collection([{id: 2}, {id: 4}], {
+      comparator: function(model){ return model.id; }
+    }).on('add', function(model, colleciton, options){
+      if (model.id == 1) {
+        equal(options.index, 0);
+        equal(counter++, 0);
+      }
+      if (model.id == 3) {
+        equal(options.index, 2);
+        equal(counter++, 1);
+      }
+    });
+    col.add([{id: 3}, {id: 1}]);
+  });
+
+  test("Collection: throwing during add leaves consistent state", function() {
+    expect(4);
+    var col = new Backbone.Collection();
+    col.bind('test', function() { ok(false); });
+    col.model = Backbone.Model.extend({
+      validate: function(attrs){ if (!attrs.valid) return 'invalid'; }
+    });
+    var model = new col.model({id: 1, valid: true});
+    raises(function() { col.add([model, {id: 2}]); });
+    model.trigger('test');
+    ok(!col.getByCid(model.cid));
+    ok(!col.get(1));
+    equal(col.length, 0);
+  });
+
+  test("Collection: multiple copies of the same model", function() {
+    var col = new Backbone.Collection();
+    var model = new Backbone.Model();
+    col.add([model, model]);
+    equal(col.length, 1);
+    col.add([{id: 1}, {id: 1}]);
+    equal(col.length, 2);
+    equal(col.last().id, 1);
+  });
+
+  test("#964 - collection.get return in consistent", function() {
+    var c = new Backbone.Collection();
+    ok(c.get(null) === undefined);
+    ok(c.get() === undefined);
+  });
+
+  test("#1112 - passing options.model sets collection.model", function() {
+    var Model = Backbone.Model.extend({});
+    var c = new Backbone.Collection([{id: 1}], {model: Model});
+    ok(c.model === Model);
+    ok(c.at(0) instanceof Model);
+  });
+
+});

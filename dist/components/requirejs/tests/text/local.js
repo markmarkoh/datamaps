@@ -1,1 +1,5 @@
-define(["text!./resources/local.html"],function(e){return{localHtml:e}})
+define(['text!./resources/local.html'], function (localHtml) {
+    return {
+        localHtml: localHtml
+    }
+});

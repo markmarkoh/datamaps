@@ -1,1 +1,8 @@
-define(["./first"],function(){return function(e,t,n){n({name:"first",secondName:"second"})}})
+define(['./first'], function () {
+    return function (id, parentRequire, loaded) {
+        loaded({
+            name: 'first',
+            secondName: 'second'
+        });
+    };
+});

@@ -1,1 +1,1 @@
-window.log("two.js script")
+window.log("two.js script");

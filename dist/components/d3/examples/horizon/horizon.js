@@ -1,1 +1,246 @@
-function horizonChart(){function c(c){c.each(function(c,h){var p=d3.select(this),d=2*e+1,v=Infinity,m=-Infinity,g=-Infinity,b,w,E,S=c.map(function(e,t){var n=r.call(this,e,t),s=i.call(this,e,t);return n<v&&(v=n),n>m&&(m=n),-s>g&&(g=-s),s>g&&(g=s),[n,s]}),T=d3.scale.linear().domain([v,m]).range([0,s]),N=d3.scale.linear().domain([0,g]).range([0,o*e]);this.__chart__?(b=this.__chart__.x,w=this.__chart__.y,E=this.__chart__.id):(b=d3.scale.linear().domain([0,Infinity]).range(T.range()),w=d3.scale.linear().domain([0,Infinity]).range(N.range()),E=++u);var C=p.selectAll("defs").data([S]),k=C.enter().append("svg:defs");k.append("svg:clipPath").attr("id","horizon_clip"+E).append("svg:rect").attr("width",s).attr("height",o),C.select("rect").transition().duration(f).attr("width",s).attr("height",o),k.append("svg:path").attr("id","horizon_path"+E).attr("d",a.interpolate(n).x(function(e){return b(e[0])}).y0(o*e).y1(function(t){return o*e-w(t[1])})).transition().duration(f).attr("d",a.x(function(e){return T(e[0])}).y1(function(t){return o*e-N(t[1])})),C.select("path").transition().duration(f).attr("d",a),p.selectAll("g").data([null]).enter().append("svg:g").attr("clip-path","url(#horizon_clip"+E+")");var L=t=="offset"?function(t){return"translate(0,"+(t+(t<0)-e)*o+")"}:function(t){return(t<0?"scale(1,-1)":"")+"translate(0,"+(t-e)*o+")"},A=p.select("g").selectAll("use").data(d3.range(-1,-e-1,-1).concat(d3.range(1,e+1)),Number);A.enter().append("svg:use").attr("xlink:href","#horizon_path"+E).attr("transform",function(e){return L(e+(e>0?1:-1))}).style("fill",l).transition().duration(f).attr("transform",L),A.transition().duration(f).attr("transform",L).style("fill",l),A.exit().transition().duration(f).attr("transform",L).remove(),this.__chart__={x:T,y:N,id:E}}),d3.timer.flush()}var e=1,t="offset",n="linear",r=horizonX,i=horizonY,s=960,o=40,u=0,a=d3.svg.area(),f=0,l=d3.scale.linear().domain([-1,0,1]).range(["#d62728","#fff","#1f77b4"]);return c.duration=function(e){return arguments.length?(f=+e,c):f},c.bands=function(t){return arguments.length?(e=+t,l.domain([-e,0,e]),c):e},c.mode=function(e){return arguments.length?(t=e+"",c):t},c.colors=function(e){return arguments.length?(l.range(e),c):l.range()},c.interpolate=function(e){return arguments.length?(n=e+"",c):n},c.x=function(e){return arguments.length?(r=e,c):r},c.y=function(e){return arguments.length?(i=e,c):i},c.width=function(e){return arguments.length?(s=+e,c):s},c.height=function(e){return arguments.length?(o=+e,c):o},c}function horizonX(e){return e[0]}function horizonY(e){return e[1]}var width=960,height=40,chart=horizonChart().width(width).height(height).bands(5).mode("offset").interpolate("basis"),svg=d3.select("#chart").append("svg").attr("width",width).attr("height",height);d3.json("unemployment.json",function(e){var t=e.rate.reduce(function(e,t){return e+t},0)/e.rate.length;e=e.rate.map(function(n,r){return[Date.UTC(e.year[r],e.month[r]-1),n-t]}),svg.data([e]).call(chart),d3.selectAll("#mode button").data(["offset","mirror"]).on("click",function(e){svg.call(chart.duration(0).mode(e)),d3.selectAll("#mode button").classed("active",function(t){return t==e})}),d3.selectAll("#bands button").data([-1,1]).on("click",function(t){svg.call(chart.duration(1e3).bands(Math.max(1,chart.bands()+t)))})})
+var width = 960,
+    height = 40;
+
+var chart = horizonChart()
+    .width(width)
+    .height(height)
+    .bands(5)
+    .mode("offset")
+    .interpolate("basis");
+
+var svg = d3.select("#chart").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+d3.json("unemployment.json", function(data) {
+
+  // Offset so that positive is above-average and negative is below-average.
+  var mean = data.rate.reduce(function(p, v) { return p + v; }, 0) / data.rate.length;
+
+  // Transpose column values to rows.
+  data = data.rate.map(function(rate, i) {
+    return [Date.UTC(data.year[i], data.month[i] - 1), rate - mean];
+  });
+
+  // Render the chart.
+  svg.data([data]).call(chart);
+
+  // Enable mode buttons.
+  d3.selectAll("#mode button")
+      .data(["offset", "mirror"])
+      .on("click", function(m) {
+        svg.call(chart.duration(0).mode(m));
+        d3.selectAll("#mode button")
+            .classed("active", function(d) { return d == m; });
+      });
+
+  // Enable bands buttons.
+  d3.selectAll("#bands button")
+      .data([-1, 1])
+      .on("click", function bands(db) {
+        svg.call(chart.duration(1000).bands(Math.max(1, chart.bands() + db)));
+      });
+});
+
+// Implements a horizon layout, which is a variation of a single-series
+// area chart where the area is folded into multiple bands. Color is used to
+// encode band, allowing the size of the chart to be reduced significantly
+// without impeding readability. This layout algorithm is based on the work of
+// J. Heer, N. Kong and M. Agrawala in "Sizing the Horizon: The Effects of Chart
+// Size and Layering on the Graphical Perception of Time Series Visualizations",
+// CHI 2009. http://hci.stanford.edu/publications/2009/heer-horizon-chi09.pdf
+function horizonChart() {
+  var bands = 1, // between 1 and 5, typically
+      mode = "offset", // or mirror
+      interpolate = "linear", // or basis, monotone, step-before, etc.
+      x = horizonX,
+      y = horizonY,
+      width = 960,
+      height = 40,
+      nextId = 0,
+      area = d3.svg.area(),
+      duration = 0;
+
+  var color = d3.scale.linear()
+      .domain([-1, 0, 1])
+      .range(["#d62728", "#fff", "#1f77b4"]);
+
+  // For each small multiple…
+  function horizon(g) {
+    g.each(function(d, i) {
+      var g = d3.select(this),
+          n = 2 * bands + 1,
+          xMin = Infinity,
+          xMax = -Infinity,
+          yMax = -Infinity,
+          x0, // old x-scale
+          y0, // old y-scale
+          id; // unique id for paths
+
+      // Compute x- and y-values along with extents.
+      var data = d.map(function(d, i) {
+        var xv = x.call(this, d, i),
+            yv = y.call(this, d, i);
+        if (xv < xMin) xMin = xv;
+        if (xv > xMax) xMax = xv;
+        if (-yv > yMax) yMax = -yv;
+        if (yv > yMax) yMax = yv;
+        return [xv, yv];
+      });
+
+      // Compute the new x- and y-scales.
+      var x1 = d3.scale.linear().domain([xMin, xMax]).range([0, width]),
+          y1 = d3.scale.linear().domain([0, yMax]).range([0, height * bands]);
+
+      // Retrieve the old scales, if this is an update.
+      if (this.__chart__) {
+        x0 = this.__chart__.x;
+        y0 = this.__chart__.y;
+        id = this.__chart__.id;
+      } else {
+        x0 = d3.scale.linear().domain([0, Infinity]).range(x1.range());
+        y0 = d3.scale.linear().domain([0, Infinity]).range(y1.range());
+        id = ++nextId;
+      }
+
+      // We'll use a defs to store the area path and the clip path.
+      var defs = g.selectAll("defs")
+          .data([data]);
+
+      var defsEnter = defs.enter().append("svg:defs");
+
+      // The clip path is a simple rect.
+      defsEnter.append("svg:clipPath")
+          .attr("id", "horizon_clip" + id)
+        .append("svg:rect")
+          .attr("width", width)
+          .attr("height", height);
+
+      defs.select("rect").transition()
+          .duration(duration)
+          .attr("width", width)
+          .attr("height", height);
+
+      // The area path is rendered with our resuable d3.svg.area.
+      defsEnter.append("svg:path")
+          .attr("id", "horizon_path" + id)
+          .attr("d", area
+          .interpolate(interpolate)
+          .x(function(d) { return x0(d[0]); })
+          .y0(height * bands)
+          .y1(function(d) { return height * bands - y0(d[1]); }))
+        .transition()
+          .duration(duration)
+          .attr("d", area
+          .x(function(d) { return x1(d[0]); })
+          .y1(function(d) { return height * bands - y1(d[1]); }));
+
+      defs.select("path").transition()
+          .duration(duration)
+          .attr("d", area);
+
+      // We'll use a container to clip all horizon layers at once.
+      g.selectAll("g")
+          .data([null])
+        .enter().append("svg:g")
+          .attr("clip-path", "url(#horizon_clip" + id + ")");
+
+      // Define the transform function based on the mode.
+      var transform = mode == "offset"
+          ? function(d) { return "translate(0," + (d + (d < 0) - bands) * height + ")"; }
+          : function(d) { return (d < 0 ? "scale(1,-1)" : "") + "translate(0," + (d - bands) * height + ")"; };
+
+      // Instantiate each copy of the path with different transforms.
+      var u = g.select("g").selectAll("use")
+          .data(d3.range(-1, -bands - 1, -1).concat(d3.range(1, bands + 1)), Number);
+
+      // TODO don't fudge the enter transition
+      u.enter().append("svg:use")
+          .attr("xlink:href", "#horizon_path" + id)
+          .attr("transform", function(d) { return transform(d + (d > 0 ? 1 : -1)); })
+          .style("fill", color)
+        .transition()
+          .duration(duration)
+          .attr("transform", transform);
+
+      u.transition()
+          .duration(duration)
+          .attr("transform", transform)
+          .style("fill", color);
+
+      u.exit().transition()
+          .duration(duration)
+          .attr("transform", transform)
+          .remove();
+
+      // Stash the new scales.
+      this.__chart__ = {x: x1, y: y1, id: id};
+    });
+    d3.timer.flush();
+  }
+
+  horizon.duration = function(x) {
+    if (!arguments.length) return duration;
+    duration = +x;
+    return horizon;
+  };
+
+  horizon.bands = function(x) {
+    if (!arguments.length) return bands;
+    bands = +x;
+    color.domain([-bands, 0, bands]);
+    return horizon;
+  };
+
+  horizon.mode = function(x) {
+    if (!arguments.length) return mode;
+    mode = x + "";
+    return horizon;
+  };
+
+  horizon.colors = function(x) {
+    if (!arguments.length) return color.range();
+    color.range(x);
+    return horizon;
+  };
+
+  horizon.interpolate = function(x) {
+    if (!arguments.length) return interpolate;
+    interpolate = x + "";
+    return horizon;
+  };
+
+  horizon.x = function(z) {
+    if (!arguments.length) return x;
+    x = z;
+    return horizon;
+  };
+
+  horizon.y = function(z) {
+    if (!arguments.length) return y;
+    y = z;
+    return horizon;
+  };
+
+  horizon.width = function(x) {
+    if (!arguments.length) return width;
+    width = +x;
+    return horizon;
+  };
+
+  horizon.height = function(x) {
+    if (!arguments.length) return height;
+    height = +x;
+    return horizon;
+  };
+
+  return horizon;
+};
+
+function horizonX(d) {
+  return d[0];
+}
+
+function horizonY(d) {
+  return d[1];
+}

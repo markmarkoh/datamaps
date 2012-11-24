@@ -1,1 +1,3 @@
-define(["i18n!nls/colors"],function(e){return e.blue})
+define(['i18n!nls/colors'], function (colors) {
+   return colors.blue;
+});

@@ -1,1 +1,7 @@
-loadScript("two.js"),one={name:"one"},console.log("Two's name is: "+two.name)
+loadScript("two.js");
+
+one = {
+    name: "one"
+};
+
+console.log("Two's name is: " + two.name);

@@ -1,1 +1,6 @@
-define(["./pane"],function(e){return{name:"dojox/window",paneName:e.name}})
+define(['./pane'], function (pane) {
+    return {
+        name: 'dojox/window',
+        paneName: pane.name
+    };
+});

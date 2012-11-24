@@ -1,1 +1,4 @@
-throw"scriptError throwing"
+
+if (true) {
+    throw "scriptError throwing";
+}

@@ -1,1 +1,8 @@
-define(["bar","foo","./helper"],function(e,t,n){return{name:"baz",barDepVersion:e.version,fooName:t.name,helperName:n.name}})
+define(['bar', 'foo', './helper'], function (bar, foo, helper) {
+    return {
+        name: 'baz',
+        barDepVersion: bar.version,
+        fooName: foo.name,
+        helperName: helper.name
+    };
+});

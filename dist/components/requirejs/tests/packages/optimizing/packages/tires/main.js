@@ -1,1 +1,3 @@
-define({name:"tires"})
+define({
+    name: 'tires'
+});

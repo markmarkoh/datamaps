@@ -1,1 +1,18 @@
-require({baseUrl:requirejs.isBrowser?"./":"./exports/"},["am"],function(e){doh.register("moduleAndExports",[function(n){n.is("am",e.name),n.is("bm",e.bName),n.is("cm",e.cName)}]),doh.run()})
+require({
+        baseUrl: requirejs.isBrowser ? "./" : "./exports/"
+    },
+    ['am'],
+    function(am) {
+        doh.register(
+            "moduleAndExports",
+            [
+                function moduleAndExports(t){
+                    t.is('am', am.name);
+                    t.is('bm', am.bName);
+                    t.is('cm', am.cName);
+                }
+            ]
+        );
+        doh.run();
+    }
+);

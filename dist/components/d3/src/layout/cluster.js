@@ -1,1 +1,79 @@
-function d3_layout_clusterY(e){return 1+d3.max(e,function(e){return e.y})}function d3_layout_clusterX(e){return e.reduce(function(e,t){return e+t.x},0)/e.length}function d3_layout_clusterLeft(e){var t=e.children;return t&&t.length?d3_layout_clusterLeft(t[0]):e}function d3_layout_clusterRight(e){var t=e.children,n;return t&&(n=t.length)?d3_layout_clusterRight(t[n-1]):e}d3.layout.cluster=function(){function r(r,i){var s=e.call(this,r,i),o=s[0],u,a=0,f,l;d3_layout_treeVisitAfter(o,function(e){var n=e.children;n&&n.length?(e.x=d3_layout_clusterX(n),e.y=d3_layout_clusterY(n)):(e.x=u?a+=t(e,u):0,e.y=0,u=e)});var c=d3_layout_clusterLeft(o),h=d3_layout_clusterRight(o),p=c.x-t(c,h)/2,d=h.x+t(h,c)/2;return d3_layout_treeVisitAfter(o,function(e){e.x=(e.x-p)/(d-p)*n[0],e.y=(1-(o.y?e.y/o.y:1))*n[1]}),s}var e=d3.layout.hierarchy().sort(null).value(null),t=d3_layout_treeSeparation,n=[1,1];return r.separation=function(e){return arguments.length?(t=e,r):t},r.size=function(e){return arguments.length?(n=e,r):n},d3_layout_hierarchyRebind(r,e)}
+// Implements a hierarchical layout using the cluster (or dendrogram)
+// algorithm.
+d3.layout.cluster = function() {
+  var hierarchy = d3.layout.hierarchy().sort(null).value(null),
+      separation = d3_layout_treeSeparation,
+      size = [1, 1]; // width, height
+
+  function cluster(d, i) {
+    var nodes = hierarchy.call(this, d, i),
+        root = nodes[0],
+        previousNode,
+        x = 0,
+        kx,
+        ky;
+
+    // First walk, computing the initial x & y values.
+    d3_layout_treeVisitAfter(root, function(node) {
+      var children = node.children;
+      if (children && children.length) {
+        node.x = d3_layout_clusterX(children);
+        node.y = d3_layout_clusterY(children);
+      } else {
+        node.x = previousNode ? x += separation(node, previousNode) : 0;
+        node.y = 0;
+        previousNode = node;
+      }
+    });
+
+    // Compute the left-most, right-most, and depth-most nodes for extents.
+    var left = d3_layout_clusterLeft(root),
+        right = d3_layout_clusterRight(root),
+        x0 = left.x - separation(left, right) / 2,
+        x1 = right.x + separation(right, left) / 2;
+
+    // Second walk, normalizing x & y to the desired size.
+    d3_layout_treeVisitAfter(root, function(node) {
+      node.x = (node.x - x0) / (x1 - x0) * size[0];
+      node.y = (1 - (root.y ? node.y / root.y : 1)) * size[1];
+    });
+
+    return nodes;
+  }
+
+  cluster.separation = function(x) {
+    if (!arguments.length) return separation;
+    separation = x;
+    return cluster;
+  };
+
+  cluster.size = function(x) {
+    if (!arguments.length) return size;
+    size = x;
+    return cluster;
+  };
+
+  return d3_layout_hierarchyRebind(cluster, hierarchy);
+};
+
+function d3_layout_clusterY(children) {
+  return 1 + d3.max(children, function(child) {
+    return child.y;
+  });
+}
+
+function d3_layout_clusterX(children) {
+  return children.reduce(function(x, child) {
+    return x + child.x;
+  }, 0) / children.length;
+}
+
+function d3_layout_clusterLeft(node) {
+  var children = node.children;
+  return children && children.length ? d3_layout_clusterLeft(children[0]) : node;
+}
+
+function d3_layout_clusterRight(node) {
+  var children = node.children, n;
+  return children && (n = children.length) ? d3_layout_clusterRight(children[n - 1]) : node;
+}

@@ -4,4 +4,224 @@
  * see: http://github.com/jrburke/requirejs for details
  */
 
-function mkDir(e){path.existsSync(e)||fs.mkdirSync(e,511)}function mkFullDir(e){var t=e.split("/"),n="",r=!0;t.forEach(function(e){n+=e+"/",r=!1,e&&mkDir(n)})}var fs=require("fs"),path=require("path"),file,prop;file={backSlashRegExp:/\\/g,getLineSeparator:function(){return"/"},exists:function(e){return path.existsSync(e)},parent:function(e){var t=e.split("/");return t.pop(),t.join("/")},absPath:function(e){return path.normalize(fs.realpathSync(e).replace(/\\/g,"/"))},normalize:function(e){return path.normalize(e)},isFile:function(e){return fs.statSync(e).isFile()},isDirectory:function(e){return fs.statSync(e).isDirectory()},getFilteredFileList:function(e,t,n){var r=[],i,s,o,u,a,f,l,c,h,p;i=e,s=t.include||t,o=t.exclude||null;if(path.existsSync(i)){u=fs.readdirSync(i);for(a=0;a<u.length;a++)p=u[a],l=path.join(i,p),f=fs.statSync(l),f.isFile()?(n&&l.indexOf("/")===-1&&(l=l.replace(/\\/g,"/")),c=!0,s&&(c=l.match(s)),c&&o&&(c=!l.match(o)),c&&!p.match(/^\./)&&r.push(l)):f.isDirectory()&&!p.match(/^\./)&&(h=this.getFilteredFileList(l,t,n),r.push.apply(r,h))}return r},copyDir:function(e,t,n,r){n=n||/\w/;var i=file.getFilteredFileList(e,n,!0),s=[],o,u,a;for(o=0;o<i.length;o++)u=i[o],a=u.replace(e,t),file.copyFile(u,a,r)&&s.push(a);return s.length?s:null},copyFile:function(e,t,n){var r;return n&&path.existsSync(t)&&fs.statSync(t).mtime.getTime()>=fs.statSync(e).mtime.getTime()?!1:(r=path.dirname(t),path.existsSync(r)||mkFullDir(r),fs.writeFileSync(t,fs.readFileSync(e,"binary"),"binary"),!0)},readFile:function(e,t){return t==="utf-8"&&(t="utf8"),t||(t="utf8"),fs.readFileSync(e,t)},saveUtf8File:function(e,t){file.saveFile(e,t,"utf8")},saveFile:function(e,t,n){var r;n==="utf-8"&&(n="utf8"),n||(n="utf8"),r=path.dirname(e),path.existsSync(r)||mkFullDir(r),fs.writeFileSync(e,t,n)},deleteFile:function(e){var t,n,r;if(path.existsSync(e)){r=fs.statSync(e);if(r.isDirectory()){t=fs.readdirSync(e);for(n=0;n<t.length;n++)this.deleteFile(path.join(e,t[n]));fs.rmdirSync(e)}else fs.unlinkSync(e)}}};for(prop in file)file.hasOwnProperty(prop)&&(exports[prop]=file[prop])
+/*jslint plusplus: false, octal:false, strict: false */
+/*global require: false, exports: false */
+
+var fs = require('fs'),
+    path = require('path'),
+    file, prop;
+
+function mkDir(dir) {
+    if (!path.existsSync(dir)) {
+        fs.mkdirSync(dir, 0777);
+    }
+}
+
+function mkFullDir(dir) {
+    var parts = dir.split('/'),
+        currDir = '',
+        first = true;
+    parts.forEach(function (part) {
+        //First part may be empty string if path starts with a slash.
+        currDir += part + '/';
+        first = false;
+
+        if (part) {
+            mkDir(currDir);
+        }
+    });
+}
+
+file = {
+    backSlashRegExp: /\\/g,
+    getLineSeparator: function () {
+        return '/';
+    },
+
+    exists: function (fileName) {
+        return path.existsSync(fileName);
+    },
+
+    parent: function (fileName) {
+        var parts = fileName.split('/');
+        parts.pop();
+        return parts.join('/');
+    },
+
+    /**
+     * Gets the absolute file path as a string, normalized
+     * to using front slashes for path separators.
+     * @param {String} fileName
+     */
+    absPath: function (fileName) {
+        return path.normalize(fs.realpathSync(fileName).replace(/\\/g, '/'));
+    },
+
+    normalize: function (fileName) {
+        return path.normalize(fileName);
+    },
+
+    isFile: function (path) {
+        return fs.statSync(path).isFile();
+    },
+
+    isDirectory: function (path) {
+        return fs.statSync(path).isDirectory();
+    },
+
+    getFilteredFileList: function (/*String*/startDir, /*RegExp*/regExpFilters, /*boolean?*/makeUnixPaths) {
+        //summary: Recurses startDir and finds matches to the files that match regExpFilters.include
+        //and do not match regExpFilters.exclude. Or just one regexp can be passed in for regExpFilters,
+        //and it will be treated as the "include" case.
+        //Ignores files/directories that start with a period (.).
+        var files = [], topDir, regExpInclude, regExpExclude, dirFileArray,
+            i, stat, filePath, ok, dirFiles, fileName;
+
+        topDir = startDir;
+
+        regExpInclude = regExpFilters.include || regExpFilters;
+        regExpExclude = regExpFilters.exclude || null;
+
+        if (path.existsSync(topDir)) {
+            dirFileArray = fs.readdirSync(topDir);
+            for (i = 0; i < dirFileArray.length; i++) {
+                fileName = dirFileArray[i];
+                filePath = path.join(topDir, fileName);
+                stat = fs.statSync(filePath);
+                if (stat.isFile()) {
+                    if (makeUnixPaths) {
+                        //Make sure we have a JS string.
+                        if (filePath.indexOf("/") === -1) {
+                            filePath = filePath.replace(/\\/g, "/");
+                        }
+                    }
+
+                    ok = true;
+                    if (regExpInclude) {
+                        ok = filePath.match(regExpInclude);
+                    }
+                    if (ok && regExpExclude) {
+                        ok = !filePath.match(regExpExclude);
+                    }
+
+                    if (ok && !fileName.match(/^\./)) {
+                        files.push(filePath);
+                    }
+                } else if (stat.isDirectory() && !fileName.match(/^\./)) {
+                    dirFiles = this.getFilteredFileList(filePath, regExpFilters, makeUnixPaths);
+                    files.push.apply(files, dirFiles);
+                }
+            }
+        }
+
+        return files; //Array
+    },
+
+    copyDir: function (/*String*/srcDir, /*String*/destDir, /*RegExp?*/regExpFilter, /*boolean?*/onlyCopyNew) {
+        //summary: copies files from srcDir to destDir using the regExpFilter to determine if the
+        //file should be copied. Returns a list file name strings of the destinations that were copied.
+        regExpFilter = regExpFilter || /\w/;
+
+        var fileNames = file.getFilteredFileList(srcDir, regExpFilter, true),
+        copiedFiles = [], i, srcFileName, destFileName;
+
+        for (i = 0; i < fileNames.length; i++) {
+            srcFileName = fileNames[i];
+            destFileName = srcFileName.replace(srcDir, destDir);
+
+            if (file.copyFile(srcFileName, destFileName, onlyCopyNew)) {
+                copiedFiles.push(destFileName);
+            }
+        }
+
+        return copiedFiles.length ? copiedFiles : null; //Array or null
+    },
+
+    copyFile: function (/*String*/srcFileName, /*String*/destFileName, /*boolean?*/onlyCopyNew) {
+        //summary: copies srcFileName to destFileName. If onlyCopyNew is set, it only copies the file if
+        //srcFileName is newer than destFileName. Returns a boolean indicating if the copy occurred.
+        var parentDir;
+
+        //logger.trace("Src filename: " + srcFileName);
+        //logger.trace("Dest filename: " + destFileName);
+
+        //If onlyCopyNew is true, then compare dates and only copy if the src is newer
+        //than dest.
+        if (onlyCopyNew) {
+            if (path.existsSync(destFileName) && fs.statSync(destFileName).mtime.getTime() >= fs.statSync(srcFileName).mtime.getTime()) {
+                return false; //Boolean
+            }
+        }
+
+        //Make sure destination dir exists.
+        parentDir = path.dirname(destFileName);
+        if (!path.existsSync(parentDir)) {
+            mkFullDir(parentDir);
+        }
+
+        fs.writeFileSync(destFileName, fs.readFileSync(srcFileName, 'binary'), 'binary');
+        return true; //Boolean
+    },
+
+    /**
+     * Reads a *text* file.
+     */
+    readFile: function (/*String*/path, /*String?*/encoding) {
+        if (encoding === 'utf-8') {
+            encoding = 'utf8';
+        }
+        if (!encoding) {
+            encoding = 'utf8';
+        }
+
+        return fs.readFileSync(path, encoding);
+    },
+
+    saveUtf8File: function (/*String*/fileName, /*String*/fileContents) {
+        //summary: saves a *text* file using UTF-8 encoding.
+        file.saveFile(fileName, fileContents, "utf8");
+    },
+
+    saveFile: function (/*String*/fileName, /*String*/fileContents, /*String?*/encoding) {
+        //summary: saves a *text* file.
+        var parentDir;
+
+        if (encoding === 'utf-8') {
+            encoding = 'utf8';
+        }
+        if (!encoding) {
+            encoding = 'utf8';
+        }
+
+        //Make sure destination directories exist.
+        parentDir = path.dirname(fileName);
+        if (!path.existsSync(parentDir)) {
+            mkFullDir(parentDir);
+        }
+
+        fs.writeFileSync(fileName, fileContents, encoding);
+    },
+
+    deleteFile: function (/*String*/fileName) {
+        //summary: deletes a file or directory if it exists.
+        var files, i, stat;
+        if (path.existsSync(fileName)) {
+            stat = fs.statSync(fileName);
+            if (stat.isDirectory()) {
+                files = fs.readdirSync(fileName);
+                for (i = 0; i < files.length; i++) {
+                    this.deleteFile(path.join(fileName, files[i]));
+                }
+                fs.rmdirSync(fileName);
+            } else {
+                fs.unlinkSync(fileName);
+            }
+        }
+    }
+};
+
+for (prop in file) {
+    if (file.hasOwnProperty(prop)) {
+        exports[prop] = file[prop];
+    }
+}

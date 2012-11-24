@@ -1,1 +1,5 @@
-define([],function(){return{name:"b"}})
+define(function () {
+    return {
+        name: "b"
+    };
+});

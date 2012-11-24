@@ -1,1 +1,235 @@
-var boid=function(){function e(){function g(t){var i=y(t);n(e),a[0]+=i[0],a[1]+=i[1];if(f){var s=r(f,e,l);a[0]+=s[0],a[1]+=s[1]}return u(a,h),e[0]+=a[0],e[1]+=a[1],e}function y(n){var r=[0,0],o=[0,0],a=[0,0],f=0,h=0,g=0,y=-1,w=n.length;while(++y<w){var E=n[y];if(E===this)continue;var S=E.position(),x=i(e,S);if(x>0){if(x<m){var T=t(s(e.slice(),S));r[0]+=T[0]/x,r[1]+=T[1]/x,f++}if(x<l){var N=E.velocity();o[0]+=N[0],o[1]+=N[1],h++,a[0]+=S[0],a[1]+=S[1],g++}}}return f>0&&(r[0]/=f,r[1]/=f),h>0&&(o[0]/=h,o[1]/=h),u(o,c),g>0?(a[0]/=g,a[1]/=g):a=e.slice(),a=b(a),[r[0]*p+o[0]*d+a[0]*v,r[1]*p+o[1]*d+a[1]*v]}function b(n){var r=s(n,e),i=o(r);if(i>0){t(r);var f=h*(i<100?i/100:1);r[0]*=f,r[1]*=f;var l=s(r,a);u(l,c)}else l=[0,0];return l}var e=[0,0],a=[0,0],f=null,l=50,c=.1,h=1,p=2,d=1,v=1,m=10;return g.position=function(t){return arguments.length?(e=t,g):e},g.velocity=function(e){return arguments.length?(a=e,g):a},g.gravityCenter=function(e){return arguments.length?(f=e,g):f},g.neighborRadius=function(e){return arguments.length?(l=e,g):l},g.maxForce=function(e){return arguments.length?(c=e,g):c},g.maxSpeed=function(e){return arguments.length?(h=e,g):h},g.separationWeight=function(e){return arguments.length?(p=e,g):p},g.alignmentWeight=function(e){return arguments.length?(d=e,g):d},g.cohesionWeight=function(e){return arguments.length?(v=e,g):v},g.desiredSeparation=function(e){return arguments.length?(m=e,g):m},g}function t(e){var t=o(e);return t>0&&(e[0]/=t,e[1]/=t),e}function n(e){e[0]>width?e[0]=0:e[0]<0&&(e[0]=width),e[1]>height?e[1]=0:e[1]<0&&(e[1]=height)}function r(e,n,r){if(e[0]!=null){var i=s(e.slice(),n),u=o(i)-10;if(u>0&&u<r*5)return t(i),i[0]/=u,i[1]/=u,i}return[0,0]}function i(e,t){var n=e[0]-t[0],r=e[1]-t[1];return n>width/2&&(n=width-n),r>height/2&&(r=height-r),Math.sqrt(n*n+r*r)}function s(e,t){return e[0]-=t[0],e[1]-=t[1],e}function o(e){return Math.sqrt(e[0]*e[0]+e[1]*e[1])}function u(e,n){return o(e)>n&&(t(e),e[0]*=n,e[1]*=n),e}return e}()
+// Boid flocking based on http://harry.me/2011/02/17/neat-algorithms---flocking
+var boid = (function() {
+  function boid() {
+    var position = [0, 0],
+        velocity = [0, 0],
+        gravityCenter = null,
+        neighborRadius = 50,
+        maxForce = .1,
+        maxSpeed = 1,
+        separationWeight = 2,
+        alignmentWeight = 1,
+        cohesionWeight = 1,
+        desiredSeparation = 10;
+
+    function boid(neighbors) {
+      var accel = flock(neighbors);
+      d3_ai_boidWrap(position);
+      velocity[0] += accel[0];
+      velocity[1] += accel[1];
+      if (gravityCenter) {
+        var g = d3_ai_boidGravity(gravityCenter, position, neighborRadius);
+        velocity[0] += g[0];
+        velocity[1] += g[1];
+      }
+      d3_ai_boidLimit(velocity, maxSpeed);
+      position[0] += velocity[0];
+      position[1] += velocity[1];
+      return position;
+    }
+
+    function flock(neighbors) {
+      var separation = [0, 0],
+          alignment = [0, 0],
+          cohesion = [0, 0],
+          separationCount = 0,
+          alignmentCount = 0,
+          cohesionCount = 0,
+          i = -1,
+          l = neighbors.length;
+      while (++i < l) {
+        var n = neighbors[i];
+        if (n === this) continue;
+        var npos = n.position(),
+            d = d3_ai_boidDistance(position, npos);
+        if (d > 0) {
+          if (d < desiredSeparation) {
+            var tmp = d3_ai_boidNormalize(d3_ai_boidSubtract(position.slice(), npos));
+            separation[0] += tmp[0] / d;
+            separation[1] += tmp[1] / d;
+            separationCount++;
+          }
+          if (d < neighborRadius) {
+            var nvel = n.velocity();
+            alignment[0] += nvel[0];
+            alignment[1] += nvel[1];
+            alignmentCount++;
+            cohesion[0] += npos[0];
+            cohesion[1] += npos[1];
+            cohesionCount++;
+          }
+        }
+      }
+
+      if (separationCount > 0) {
+        separation[0] /= separationCount;
+        separation[1] /= separationCount;
+      }
+
+      if (alignmentCount > 0) {
+        alignment[0] /= alignmentCount;
+        alignment[1] /= alignmentCount;
+      }
+      d3_ai_boidLimit(alignment, maxForce);
+
+      if (cohesionCount > 0) {
+        cohesion[0] /= cohesionCount;
+        cohesion[1] /= cohesionCount;
+      } else {
+        cohesion = position.slice();
+      }
+      cohesion = steerTo(cohesion);
+
+      return [
+        separation[0] * separationWeight +
+         alignment[0] * alignmentWeight +
+          cohesion[0] * cohesionWeight,
+        separation[1] * separationWeight +
+         alignment[1] * alignmentWeight +
+          cohesion[1] * cohesionWeight
+      ];
+    }
+
+    function steerTo(target) {
+      var desired = d3_ai_boidSubtract(target, position),
+          d = d3_ai_boidMagnitude(desired);
+
+      if (d > 0) {
+        d3_ai_boidNormalize(desired);
+
+        // Two options for desired vector magnitude (1 -- based on distance, 2 -- maxspeed)
+        var mul = maxSpeed * (d < 100 ? d / 100 : 1);
+        desired[0] *= mul;
+        desired[1] *= mul;
+
+        // Steering = Desired minus Velocity
+        var steer = d3_ai_boidSubtract(desired, velocity);
+        d3_ai_boidLimit(steer, maxForce)  // Limit to maximum steering force
+      } else {
+        steer = [0, 0];
+      }
+      return steer;
+    }
+
+    boid.position = function(x) {
+      if (!arguments.length) return position;
+      position = x;
+      return boid;
+    }
+
+    boid.velocity = function(x) {
+      if (!arguments.length) return velocity;
+      velocity = x;
+      return boid;
+    }
+
+    boid.gravityCenter = function(x) {
+      if (!arguments.length) return gravityCenter;
+      gravityCenter = x;
+      return boid;
+    }
+
+    boid.neighborRadius = function(x) {
+      if (!arguments.length) return neighborRadius;
+      neighborRadius = x;
+      return boid;
+    }
+
+    boid.maxForce = function(x) {
+      if (!arguments.length) return maxForce;
+      maxForce = x;
+      return boid;
+    }
+
+    boid.maxSpeed = function(x) {
+      if (!arguments.length) return maxSpeed;
+      maxSpeed = x;
+      return boid;
+    }
+
+    boid.separationWeight = function(x) {
+      if (!arguments.length) return separationWeight;
+      separationWeight = x;
+      return boid;
+    }
+
+    boid.alignmentWeight = function(x) {
+      if (!arguments.length) return alignmentWeight;
+      alignmentWeight = x;
+      return boid;
+    }
+
+    boid.cohesionWeight = function(x) {
+      if (!arguments.length) return cohesionWeight;
+      cohesionWeight = x;
+      return boid;
+    }
+
+    boid.desiredSeparation = function(x) {
+      if (!arguments.length) return desiredSeparation;
+      desiredSeparation = x;
+      return boid;
+    }
+
+    return boid;
+  }
+
+  function d3_ai_boidNormalize(a) {
+    var m = d3_ai_boidMagnitude(a);
+    if (m > 0) {
+      a[0] /= m;
+      a[1] /= m;
+    }
+    return a;
+  }
+
+  function d3_ai_boidWrap(position) {
+    if (position[0] > width) position[0] = 0;
+    else if (position[0] < 0) position[0] = width;
+    if (position[1] > height) position[1] = 0;
+    else if (position[1] < 0) position[1] = height;
+  }
+
+  function d3_ai_boidGravity(center, position, neighborRadius) {
+    if (center[0] != null) {
+      var m = d3_ai_boidSubtract(center.slice(), position),
+          d = d3_ai_boidMagnitude(m) - 10;
+      if (d > 0 && d < neighborRadius * 5) {
+        d3_ai_boidNormalize(m);
+        m[0] /= d;
+        m[1] /= d;
+        return m;
+      }
+    }
+    return [0, 0];
+  }
+
+  function d3_ai_boidDistance(a, b) {
+    var dx = a[0] - b[0],
+        dy = a[1] - b[1];
+    if (dx > width / 2) dx = width - dx;
+    if (dy > height / 2) dy = height - dy;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  function d3_ai_boidSubtract(a, b) {
+    a[0] -= b[0];
+    a[1] -= b[1];
+    return a;
+  }
+
+  function d3_ai_boidMagnitude(v) {
+    return Math.sqrt(v[0] * v[0] + v[1] * v[1]);
+  }
+
+  function d3_ai_boidLimit(a, max) {
+    if (d3_ai_boidMagnitude(a) > max) {
+      d3_ai_boidNormalize(a);
+      a[0] *= max;
+      a[1] *= max;
+    }
+    return a;
+  }
+
+  return boid;
+})();

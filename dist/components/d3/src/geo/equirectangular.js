@@ -1,1 +1,36 @@
-d3.geo.equirectangular=function(){function n(n){var r=n[0]/360,i=-n[1]/360;return[e*r+t[0],e*i+t[1]]}var e=500,t=[480,250];return n.invert=function(n){var r=(n[0]-t[0])/e,i=(n[1]-t[1])/e;return[360*r,-360*i]},n.scale=function(t){return arguments.length?(e=+t,n):e},n.translate=function(e){return arguments.length?(t=[+e[0],+e[1]],n):t},n}
+d3.geo.equirectangular = function() {
+  var scale = 500,
+      translate = [480, 250];
+
+  function equirectangular(coordinates) {
+    var x = coordinates[0] / 360,
+        y = -coordinates[1] / 360;
+    return [
+      scale * x + translate[0],
+      scale * y + translate[1]
+    ];
+  }
+
+  equirectangular.invert = function(coordinates) {
+    var x = (coordinates[0] - translate[0]) / scale,
+        y = (coordinates[1] - translate[1]) / scale;
+    return [
+      360 * x,
+      -360 * y
+    ];
+  };
+
+  equirectangular.scale = function(x) {
+    if (!arguments.length) return scale;
+    scale = +x;
+    return equirectangular;
+  };
+
+  equirectangular.translate = function(x) {
+    if (!arguments.length) return translate;
+    translate = [+x[0], +x[1]];
+    return equirectangular;
+  };
+
+  return equirectangular;
+};

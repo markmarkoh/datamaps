@@ -1,1 +1,9 @@
-define(["require"],function(e){return typeof obj!="undefined"&&obj.require("bad"),{name:"c"}})
+define(function (require) {
+    if (typeof obj !== 'undefined') {
+        obj.require('bad');
+    }
+    return {
+        name: 'c'
+    };
+});
+

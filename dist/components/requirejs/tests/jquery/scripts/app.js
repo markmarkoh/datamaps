@@ -1,1 +1,1 @@
-define(["jquery.alpha","jquery.beta"],function(){})
+define(["jquery.alpha", "jquery.beta"], function() {});

@@ -1,1 +1,54 @@
-function d3_scale_pow(e,t){function i(t){return e(n(t))}var n=d3_scale_powPow(t),r=d3_scale_powPow(1/t);return i.invert=function(t){return r(e.invert(t))},i.domain=function(t){return arguments.length?(e.domain(t.map(n)),i):e.domain().map(r)},i.ticks=function(e){return d3_scale_linearTicks(i.domain(),e)},i.tickFormat=function(e){return d3_scale_linearTickFormat(i.domain(),e)},i.nice=function(){return i.domain(d3_scale_nice(i.domain(),d3_scale_linearNice))},i.exponent=function(e){if(!arguments.length)return t;var s=i.domain();return n=d3_scale_powPow(t=e),r=d3_scale_powPow(1/t),i.domain(s)},i.copy=function(){return d3_scale_pow(e.copy(),t)},d3_scale_linearRebind(i,e)}function d3_scale_powPow(e){return function(t){return t<0?-Math.pow(-t,e):Math.pow(t,e)}}d3.scale.pow=function(){return d3_scale_pow(d3.scale.linear(),1)}
+d3.scale.pow = function() {
+  return d3_scale_pow(d3.scale.linear(), 1);
+};
+
+function d3_scale_pow(linear, exponent) {
+  var powp = d3_scale_powPow(exponent),
+      powb = d3_scale_powPow(1 / exponent);
+
+  function scale(x) {
+    return linear(powp(x));
+  }
+
+  scale.invert = function(x) {
+    return powb(linear.invert(x));
+  };
+
+  scale.domain = function(x) {
+    if (!arguments.length) return linear.domain().map(powb);
+    linear.domain(x.map(powp));
+    return scale;
+  };
+
+  scale.ticks = function(m) {
+    return d3_scale_linearTicks(scale.domain(), m);
+  };
+
+  scale.tickFormat = function(m) {
+    return d3_scale_linearTickFormat(scale.domain(), m);
+  };
+
+  scale.nice = function() {
+    return scale.domain(d3_scale_nice(scale.domain(), d3_scale_linearNice));
+  };
+
+  scale.exponent = function(x) {
+    if (!arguments.length) return exponent;
+    var domain = scale.domain();
+    powp = d3_scale_powPow(exponent = x);
+    powb = d3_scale_powPow(1 / exponent);
+    return scale.domain(domain);
+  };
+
+  scale.copy = function() {
+    return d3_scale_pow(linear.copy(), exponent);
+  };
+
+  return d3_scale_linearRebind(scale, linear);
+}
+
+function d3_scale_powPow(e) {
+  return function(x) {
+    return x < 0 ? -Math.pow(-x, e) : Math.pow(x, e);
+  };
+}

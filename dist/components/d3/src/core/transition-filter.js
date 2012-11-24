@@ -1,1 +1,19 @@
-d3_transitionPrototype.filter=function(e){var t=[],n,r,i;typeof e!="function"&&(e=d3_selection_filter(e));for(var s=0,o=this.length;s<o;s++){t.push(n=[]);for(var r=this[s],u=0,a=r.length;u<a;u++)(i=r[u])&&e.call(i.node,i.node.__data__,u)&&n.push(i)}return d3_transition(t,this.id,this.time).ease(this.ease())}
+d3_transitionPrototype.filter = function(filter) {
+  var subgroups = [],
+      subgroup,
+      group,
+      node;
+
+  if (typeof filter !== "function") filter = d3_selection_filter(filter);
+
+  for (var j = 0, m = this.length; j < m; j++) {
+    subgroups.push(subgroup = []);
+    for (var group = this[j], i = 0, n = group.length; i < n; i++) {
+      if ((node = group[i]) && filter.call(node.node, node.node.__data__, i)) {
+        subgroup.push(node);
+      }
+    }
+  }
+
+  return d3_transition(subgroups, this.id, this.time).ease(this.ease());
+};

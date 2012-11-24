@@ -1,1 +1,4 @@
-define(["b","exports"],function(e,t){t.name="a",t.b=e})
+define(['b', 'exports'], function (b, exports) {
+    exports.name = 'a';
+    exports.b = b;
+});

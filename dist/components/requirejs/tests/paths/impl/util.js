@@ -1,1 +1,3 @@
-define({name:"impl/util"})
+define({
+    name: 'impl/util'
+});

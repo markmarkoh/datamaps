@@ -1,1 +1,7 @@
-define(["require","sub/b"],function(e){var t=e("sub/b");return{name:"a",bName:t.f()}})
+define(function (require) {
+    var b =  require("sub/b");
+    return {
+        name: "a",
+        bName: b.f()
+    };
+});

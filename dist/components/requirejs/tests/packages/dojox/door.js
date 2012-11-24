@@ -1,1 +1,3 @@
-define({name:"dojox/door"})
+define({
+    name: 'dojox/door'
+});

@@ -1,1 +1,4 @@
-define({name:"another/minor"})
+define({
+    name: 'another/minor'
+});
+

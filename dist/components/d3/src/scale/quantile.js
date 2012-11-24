@@ -1,1 +1,43 @@
-function d3_scale_quantile(e,t){function r(){var r=0,s=e.length,o=t.length;n=[];while(++r<o)n[r-1]=d3.quantile(e,r/o);return i}function i(e){return isNaN(e=+e)?NaN:t[d3.bisect(n,e)]}var n;return i.domain=function(t){return arguments.length?(e=t.filter(function(e){return!isNaN(e)}).sort(d3.ascending),r()):e},i.range=function(e){return arguments.length?(t=e,r()):t},i.quantiles=function(){return n},i.copy=function(){return d3_scale_quantile(e,t)},r()}d3.scale.quantile=function(){return d3_scale_quantile([],[])}
+d3.scale.quantile = function() {
+  return d3_scale_quantile([], []);
+};
+
+function d3_scale_quantile(domain, range) {
+  var thresholds;
+
+  function rescale() {
+    var k = 0,
+        n = domain.length,
+        q = range.length;
+    thresholds = [];
+    while (++k < q) thresholds[k - 1] = d3.quantile(domain, k / q);
+    return scale;
+  }
+
+  function scale(x) {
+    if (isNaN(x = +x)) return NaN;
+    return range[d3.bisect(thresholds, x)];
+  }
+
+  scale.domain = function(x) {
+    if (!arguments.length) return domain;
+    domain = x.filter(function(d) { return !isNaN(d); }).sort(d3.ascending);
+    return rescale();
+  };
+
+  scale.range = function(x) {
+    if (!arguments.length) return range;
+    range = x;
+    return rescale();
+  };
+
+  scale.quantiles = function() {
+    return thresholds;
+  };
+
+  scale.copy = function() {
+    return d3_scale_quantile(domain, range); // copy on write!
+  };
+
+  return rescale();
+}

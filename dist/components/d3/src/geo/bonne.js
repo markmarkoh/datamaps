@@ -1,1 +1,70 @@
-d3.geo.bonne=function(){function o(o){var u=o[0]*d3_geo_radians-n,a=o[1]*d3_geo_radians-r;if(i){var f=s+i-a,l=u*Math.cos(a)/f;u=f*Math.sin(l),a=f*Math.cos(l)-s}else u*=Math.cos(a),a*=-1;return[e*u+t[0],e*a+t[1]]}var e=200,t=[480,250],n,r,i,s;return o.invert=function(r){var o=(r[0]-t[0])/e,u=(r[1]-t[1])/e;if(i){var a=s+u,f=Math.sqrt(o*o+a*a);u=s+i-f,o=n+f*Math.atan2(o,a)/Math.cos(u)}else u*=-1,o/=Math.cos(u);return[o/d3_geo_radians,u/d3_geo_radians]},o.parallel=function(e){return arguments.length?(s=1/Math.tan(i=e*d3_geo_radians),o):i/d3_geo_radians},o.origin=function(e){return arguments.length?(n=e[0]*d3_geo_radians,r=e[1]*d3_geo_radians,o):[n/d3_geo_radians,r/d3_geo_radians]},o.scale=function(t){return arguments.length?(e=+t,o):e},o.translate=function(e){return arguments.length?(t=[+e[0],+e[1]],o):t},o.origin([0,0]).parallel(45)}
+d3.geo.bonne = function() {
+  var scale = 200,
+      translate = [480, 250],
+      x0, // origin longitude in radians
+      y0, // origin latitude in radians
+      y1, // parallel latitude in radians
+      c1; // cot(y1)
+
+  function bonne(coordinates) {
+    var x = coordinates[0] * d3_geo_radians - x0,
+        y = coordinates[1] * d3_geo_radians - y0;
+    if (y1) {
+      var p = c1 + y1 - y, E = x * Math.cos(y) / p;
+      x = p * Math.sin(E);
+      y = p * Math.cos(E) - c1;
+    } else {
+      x *= Math.cos(y);
+      y *= -1;
+    }
+    return [
+      scale * x + translate[0],
+      scale * y + translate[1]
+    ];
+  }
+
+  bonne.invert = function(coordinates) {
+    var x = (coordinates[0] - translate[0]) / scale,
+        y = (coordinates[1] - translate[1]) / scale;
+    if (y1) {
+      var c = c1 + y, p = Math.sqrt(x * x + c * c);
+      y = c1 + y1 - p;
+      x = x0 + p * Math.atan2(x, c) / Math.cos(y);
+    } else {
+      y *= -1;
+      x /= Math.cos(y);
+    }
+    return [
+      x / d3_geo_radians,
+      y / d3_geo_radians
+    ];
+  };
+
+  // 90° for Werner, 0° for Sinusoidal
+  bonne.parallel = function(x) {
+    if (!arguments.length) return y1 / d3_geo_radians;
+    c1 = 1 / Math.tan(y1 = x * d3_geo_radians);
+    return bonne;
+  };
+
+  bonne.origin = function(x) {
+    if (!arguments.length) return [x0 / d3_geo_radians, y0 / d3_geo_radians];
+    x0 = x[0] * d3_geo_radians;
+    y0 = x[1] * d3_geo_radians;
+    return bonne;
+  };
+
+  bonne.scale = function(x) {
+    if (!arguments.length) return scale;
+    scale = +x;
+    return bonne;
+  };
+
+  bonne.translate = function(x) {
+    if (!arguments.length) return translate;
+    translate = [+x[0], +x[1]];
+    return bonne;
+  };
+
+  return bonne.origin([0, 0]).parallel(45);
+};

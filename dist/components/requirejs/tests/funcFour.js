@@ -1,1 +1,14 @@
-define("funcFour",["require","funcThree"],function(e){var t=function(e){return"FOUR called with "+e};return t.suffix=function(){return e("funcThree").suffix()},t})
+define("funcFour",
+    ["require", "funcThree"],
+    function (require) {
+        var four = function (arg) {
+            return "FOUR called with " + arg;
+        };
+
+        four.suffix = function () {
+            return require("funcThree").suffix();
+        };
+
+        return four;
+    }
+);

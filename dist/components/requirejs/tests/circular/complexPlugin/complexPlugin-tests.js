@@ -1,1 +1,21 @@
-require({baseUrl:requirejs.isBrowser?"./":"./circular/complexPlugin"},["require","main"],function(e,t){doh.register("circularComplexPlugin",[function(n){n.is("main",t.name),n.is("viewport",t.viewport.name),n.is("viewportTemplate",t.viewport.template),n.is("toolbar",t.viewport.toolbar.name),n.is("toolbarTemplate",t.viewport.toolbar.template),n.is("helper",t.helper.name)}]),doh.run()})
+require({
+        baseUrl: requirejs.isBrowser ? './' : './circular/complexPlugin'
+    },
+    ["require", "main"],
+    function(require, main) {
+        doh.register(
+            "circularComplexPlugin",
+            [
+                function circularComplexPlugin(t) {
+                    t.is("main", main.name);
+                    t.is('viewport', main.viewport.name);
+                    t.is('viewportTemplate', main.viewport.template);
+                    t.is('toolbar', main.viewport.toolbar.name);
+                    t.is('toolbarTemplate', main.viewport.toolbar.template);
+                    t.is('helper', main.helper.name);
+                 }
+            ]
+        );
+        doh.run();
+    }
+);

@@ -1,1 +1,5 @@
-function d3_functor(e){return typeof e=="function"?e:function(){return e}}d3.functor=d3_functor
+function d3_functor(v) {
+  return typeof v === "function" ? v : function() { return v; };
+}
+
+d3.functor = d3_functor;

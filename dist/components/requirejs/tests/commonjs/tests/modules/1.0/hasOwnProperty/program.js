@@ -1,1 +1,7 @@
-define(["require","exports","module","hasOwnProperty","toString","test"],function(e,t,n){var r=e("hasOwnProperty"),i=e("toString"),s=e("test");s.print("DONE","info")})
+define(["require", "exports", "module", "hasOwnProperty","toString","test"], function(require, exports, module) {
+var hasOwnProperty = require('hasOwnProperty');
+var toString = require('toString');
+var test = require('test');
+test.print('DONE', 'info');
+
+});

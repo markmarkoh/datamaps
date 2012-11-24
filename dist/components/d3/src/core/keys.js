@@ -1,1 +1,5 @@
-d3.keys=function(e){var t=[];for(var n in e)t.push(n);return t}
+d3.keys = function(map) {
+  var keys = [];
+  for (var key in map) keys.push(key);
+  return keys;
+};

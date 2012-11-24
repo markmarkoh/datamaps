@@ -1,1 +1,3 @@
-define(["require","exports","module"],function(e,t){this.name="usethis"})
+define(function (require, exports) {
+    this.name = 'usethis';
+});

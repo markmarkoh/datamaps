@@ -1,1 +1,241 @@
-function d3_layout_stackX(e){return e.x}function d3_layout_stackY(e){return e.y}function d3_layout_stackOut(e,t,n){e.y0=t,e.y=n}function d3_layout_stackOrderDefault(e){return d3.range(e.length)}function d3_layout_stackOffsetZero(e){var t=-1,n=e[0].length,r=[];while(++t<n)r[t]=0;return r}function d3_layout_stackMaxIndex(e){var t=1,n=0,r=e[0][1],i,s=e.length;for(;t<s;++t)(i=e[t][1])>r&&(n=t,r=i);return n}function d3_layout_stackReduceSum(e){return e.reduce(d3_layout_stackSum,0)}function d3_layout_stackSum(e,t){return e+t[1]}d3.layout.stack=function(){function o(u,a){var f=u.map(function(t,n){return e.call(o,t,n)}),l=f.map(function(e,t){return e.map(function(e,t){return[i.call(o,e,t),s.call(o,e,t)]})}),c=t.call(o,l,a);f=d3.permute(f,c),l=d3.permute(l,c);var h=n.call(o,l,a),p=f.length,d=f[0].length,v,m,g;for(m=0;m<d;++m){r.call(o,f[0][m],g=h[m],l[0][m][1]);for(v=1;v<p;++v)r.call(o,f[v][m],g+=l[v-1][m][1],l[v][m][1])}return u}var e=d3_identity,t=d3_layout_stackOrderDefault,n=d3_layout_stackOffsetZero,r=d3_layout_stackOut,i=d3_layout_stackX,s=d3_layout_stackY;return o.values=function(t){return arguments.length?(e=t,o):e},o.order=function(e){return arguments.length?(t=typeof e=="function"?e:d3_layout_stackOrders.get(e)||d3_layout_stackOrderDefault,o):t},o.offset=function(e){return arguments.length?(n=typeof e=="function"?e:d3_layout_stackOffsets.get(e)||d3_layout_stackOffsetZero,o):n},o.x=function(e){return arguments.length?(i=e,o):i},o.y=function(e){return arguments.length?(s=e,o):s},o.out=function(e){return arguments.length?(r=e,o):r},o};var d3_layout_stackOrders=d3.map({"inside-out":function(e){var t=e.length,n,r,i=e.map(d3_layout_stackMaxIndex),s=e.map(d3_layout_stackReduceSum),o=d3.range(t).sort(function(e,t){return i[e]-i[t]}),u=0,a=0,f=[],l=[];for(n=0;n<t;++n)r=o[n],u<a?(u+=s[r],f.push(r)):(a+=s[r],l.push(r));return l.reverse().concat(f)},reverse:function(e){return d3.range(e.length).reverse()},"default":d3_layout_stackOrderDefault}),d3_layout_stackOffsets=d3.map({silhouette:function(e){var t=e.length,n=e[0].length,r=[],i=0,s,o,u,a=[];for(o=0;o<n;++o){for(s=0,u=0;s<t;s++)u+=e[s][o][1];u>i&&(i=u),r.push(u)}for(o=0;o<n;++o)a[o]=(i-r[o])/2;return a},wiggle:function(e){var t=e.length,n=e[0],r=n.length,i=0,s,o,u,a,f,l,c,h,p,d=[];d[0]=h=p=0;for(o=1;o<r;++o){for(s=0,a=0;s<t;++s)a+=e[s][o][1];for(s=0,f=0,c=n[o][0]-n[o-1][0];s<t;++s){for(u=0,l=(e[s][o][1]-e[s][o-1][1])/(2*c);u<s;++u)l+=(e[u][o][1]-e[u][o-1][1])/c;f+=l*e[s][o][1]}d[o]=h-=a?f/a*c:0,h<p&&(p=h)}for(o=0;o<r;++o)d[o]-=p;return d},expand:function(e){var t=e.length,n=e[0].length,r=1/t,i,s,o,u=[];for(s=0;s<n;++s){for(i=0,o=0;i<t;i++)o+=e[i][s][1];if(o)for(i=0;i<t;i++)e[i][s][1]/=o;else for(i=0;i<t;i++)e[i][s][1]=r}for(s=0;s<n;++s)u[s]=0;return u},zero:d3_layout_stackOffsetZero})
+// data is two-dimensional array of x,y; we populate y0
+d3.layout.stack = function() {
+  var values = d3_identity,
+      order = d3_layout_stackOrderDefault,
+      offset = d3_layout_stackOffsetZero,
+      out = d3_layout_stackOut,
+      x = d3_layout_stackX,
+      y = d3_layout_stackY;
+
+  function stack(data, index) {
+
+    // Convert series to canonical two-dimensional representation.
+    var series = data.map(function(d, i) {
+      return values.call(stack, d, i);
+    });
+
+    // Convert each series to canonical [[x,y]] representation.
+    var points = series.map(function(d, i) {
+      return d.map(function(v, i) {
+        return [x.call(stack, v, i), y.call(stack, v, i)];
+      });
+    });
+
+    // Compute the order of series, and permute them.
+    var orders = order.call(stack, points, index);
+    series = d3.permute(series, orders);
+    points = d3.permute(points, orders);
+
+    // Compute the baseline…
+    var offsets = offset.call(stack, points, index);
+
+    // And propagate it to other series.
+    var n = series.length,
+        m = series[0].length,
+        i,
+        j,
+        o;
+    for (j = 0; j < m; ++j) {
+      out.call(stack, series[0][j], o = offsets[j], points[0][j][1]);
+      for (i = 1; i < n; ++i) {
+        out.call(stack, series[i][j], o += points[i - 1][j][1], points[i][j][1]);
+      }
+    }
+
+    return data;
+  }
+
+  stack.values = function(x) {
+    if (!arguments.length) return values;
+    values = x;
+    return stack;
+  };
+
+  stack.order = function(x) {
+    if (!arguments.length) return order;
+    order = typeof x === "function" ? x : d3_layout_stackOrders.get(x) || d3_layout_stackOrderDefault;
+    return stack;
+  };
+
+  stack.offset = function(x) {
+    if (!arguments.length) return offset;
+    offset = typeof x === "function" ? x : d3_layout_stackOffsets.get(x) || d3_layout_stackOffsetZero;
+    return stack;
+  };
+
+  stack.x = function(z) {
+    if (!arguments.length) return x;
+    x = z;
+    return stack;
+  };
+
+  stack.y = function(z) {
+    if (!arguments.length) return y;
+    y = z;
+    return stack;
+  };
+
+  stack.out = function(z) {
+    if (!arguments.length) return out;
+    out = z;
+    return stack;
+  };
+
+  return stack;
+}
+
+function d3_layout_stackX(d) {
+  return d.x;
+}
+
+function d3_layout_stackY(d) {
+  return d.y;
+}
+
+function d3_layout_stackOut(d, y0, y) {
+  d.y0 = y0;
+  d.y = y;
+}
+
+var d3_layout_stackOrders = d3.map({
+
+  "inside-out": function(data) {
+    var n = data.length,
+        i,
+        j,
+        max = data.map(d3_layout_stackMaxIndex),
+        sums = data.map(d3_layout_stackReduceSum),
+        index = d3.range(n).sort(function(a, b) { return max[a] - max[b]; }),
+        top = 0,
+        bottom = 0,
+        tops = [],
+        bottoms = [];
+    for (i = 0; i < n; ++i) {
+      j = index[i];
+      if (top < bottom) {
+        top += sums[j];
+        tops.push(j);
+      } else {
+        bottom += sums[j];
+        bottoms.push(j);
+      }
+    }
+    return bottoms.reverse().concat(tops);
+  },
+
+  "reverse": function(data) {
+    return d3.range(data.length).reverse();
+  },
+
+  "default": d3_layout_stackOrderDefault
+
+});
+
+var d3_layout_stackOffsets = d3.map({
+
+  "silhouette": function(data) {
+    var n = data.length,
+        m = data[0].length,
+        sums = [],
+        max = 0,
+        i,
+        j,
+        o,
+        y0 = [];
+    for (j = 0; j < m; ++j) {
+      for (i = 0, o = 0; i < n; i++) o += data[i][j][1];
+      if (o > max) max = o;
+      sums.push(o);
+    }
+    for (j = 0; j < m; ++j) {
+      y0[j] = (max - sums[j]) / 2;
+    }
+    return y0;
+  },
+
+  "wiggle": function(data) {
+    var n = data.length,
+        x = data[0],
+        m = x.length,
+        max = 0,
+        i,
+        j,
+        k,
+        s1,
+        s2,
+        s3,
+        dx,
+        o,
+        o0,
+        y0 = [];
+    y0[0] = o = o0 = 0;
+    for (j = 1; j < m; ++j) {
+      for (i = 0, s1 = 0; i < n; ++i) s1 += data[i][j][1];
+      for (i = 0, s2 = 0, dx = x[j][0] - x[j - 1][0]; i < n; ++i) {
+        for (k = 0, s3 = (data[i][j][1] - data[i][j - 1][1]) / (2 * dx); k < i; ++k) {
+          s3 += (data[k][j][1] - data[k][j - 1][1]) / dx;
+        }
+        s2 += s3 * data[i][j][1];
+      }
+      y0[j] = o -= s1 ? s2 / s1 * dx : 0;
+      if (o < o0) o0 = o;
+    }
+    for (j = 0; j < m; ++j) y0[j] -= o0;
+    return y0;
+  },
+
+  "expand": function(data) {
+    var n = data.length,
+        m = data[0].length,
+        k = 1 / n,
+        i,
+        j,
+        o,
+        y0 = [];
+    for (j = 0; j < m; ++j) {
+      for (i = 0, o = 0; i < n; i++) o += data[i][j][1];
+      if (o) for (i = 0; i < n; i++) data[i][j][1] /= o;
+      else for (i = 0; i < n; i++) data[i][j][1] = k;
+    }
+    for (j = 0; j < m; ++j) y0[j] = 0;
+    return y0;
+  },
+
+  "zero": d3_layout_stackOffsetZero
+
+});
+
+function d3_layout_stackOrderDefault(data) {
+  return d3.range(data.length);
+}
+
+function d3_layout_stackOffsetZero(data) {
+  var j = -1,
+      m = data[0].length,
+      y0 = [];
+  while (++j < m) y0[j] = 0;
+  return y0;
+}
+
+function d3_layout_stackMaxIndex(array) {
+  var i = 1,
+      j = 0,
+      v = array[0][1],
+      k,
+      n = array.length;
+  for (; i < n; ++i) {
+    if ((k = array[i][1]) > v) {
+      j = i;
+      v = k;
+    }
+  }
+  return j;
+}
+
+function d3_layout_stackReduceSum(d) {
+  return d.reduce(d3_layout_stackSum, 0);
+}
+
+function d3_layout_stackSum(p, d) {
+  return p + d[1];
+}

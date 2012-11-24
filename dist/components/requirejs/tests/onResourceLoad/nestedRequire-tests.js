@@ -1,1 +1,44 @@
-function finish(e){doh.is("a",e.name),doh.is("b",e.b.name),doh.is(2,e.ids.length),doh.is("b",e.ids[0]),doh.is("a",e.ids[1]),master.callback(!0)}var doneCount=0,master=new doh.Deferred;requirejs.onResourceLoad=function(e,t,n){require(["a"],function(e){doneCount+=1,e.add(t.id),doneCount===2&&finish(e)})},require({baseUrl:"./"},["a"],function(e,t){doh.register("onResourceLoadNestedRequire",[{name:"onResourceLoadNestedRequire",timeout:5e3,runTest:function(){return master}}]),doh.run()})
+var doneCount = 0;
+var master = new doh.Deferred();
+
+function finish(a) {
+    doh.is('a', a.name);
+    doh.is('b', a.b.name);
+    doh.is(2, a.ids.length);
+    doh.is('b', a.ids[0]);
+    doh.is('a', a.ids[1]);
+    master.callback(true);
+}
+
+requirejs.onResourceLoad = function (context, map, depArray) {
+    require(["a"], function(a) {
+        doneCount += 1;
+        a.add(map.id);
+
+        if (doneCount === 2) {
+            finish(a);
+        }
+    });
+};
+
+require({
+        baseUrl: './'
+    },
+    ['a'],
+    function(a, b) {
+
+        doh.register(
+            "onResourceLoadNestedRequire",
+            [
+                {
+                    name: "onResourceLoadNestedRequire",
+                    timeout: 5000,
+                    runTest: function () {
+                        return master;
+                    }
+                }
+            ]
+        );
+        doh.run();
+    }
+);

@@ -1,1 +1,1 @@
-log("eight.js script")
+log("eight.js script");

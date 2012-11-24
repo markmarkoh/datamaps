@@ -1,1 +1,14 @@
-d3.sum=function(e,t){var n=0,r=e.length,i,s=-1;if(arguments.length===1)while(++s<r)isNaN(i=+e[s])||(n+=i);else while(++s<r)isNaN(i=+t.call(e,e[s],s))||(n+=i);return n}
+d3.sum = function(array, f) {
+  var s = 0,
+      n = array.length,
+      a,
+      i = -1;
+
+  if (arguments.length === 1) {
+    while (++i < n) if (!isNaN(a = +array[i])) s += a;
+  } else {
+    while (++i < n) if (!isNaN(a = +f.call(array, array[i], i))) s += a;
+  }
+
+  return s;
+};

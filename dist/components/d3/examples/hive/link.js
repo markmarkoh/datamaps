@@ -1,1 +1,78 @@
-function link(){function o(n,r){var i=u(e,this,n,r),s=u(t,this,n,r),o;s.a<i.a&&(o=s,s=i,i=o),s.a-i.a>Math.PI&&(i.a+=2*Math.PI);var a=i.a+(s.a-i.a)/3,f=s.a-(s.a-i.a)/3;return i.r0-i.r1||s.r0-s.r1?"M"+Math.cos(i.a)*i.r0+","+Math.sin(i.a)*i.r0+"L"+Math.cos(i.a)*i.r1+","+Math.sin(i.a)*i.r1+"C"+Math.cos(a)*i.r1+","+Math.sin(a)*i.r1+" "+Math.cos(f)*s.r1+","+Math.sin(f)*s.r1+" "+Math.cos(s.a)*s.r1+","+Math.sin(s.a)*s.r1+"L"+Math.cos(s.a)*s.r0+","+Math.sin(s.a)*s.r0+"C"+Math.cos(f)*s.r0+","+Math.sin(f)*s.r0+" "+Math.cos(a)*i.r0+","+Math.sin(a)*i.r0+" "+Math.cos(i.a)*i.r0+","+Math.sin(i.a)*i.r0:"M"+Math.cos(i.a)*i.r0+","+Math.sin(i.a)*i.r0+"C"+Math.cos(a)*i.r1+","+Math.sin(a)*i.r1+" "+Math.cos(f)*s.r1+","+Math.sin(f)*s.r1+" "+Math.cos(s.a)*s.r1+","+Math.sin(s.a)*s.r1}function u(e,t,o,u){var a=e.call(t,o,u),f=+(typeof n=="function"?n.call(t,a,u):n)+s,l=+(typeof r=="function"?r.call(t,a,u):r),c=r===i?l:+(typeof i=="function"?i.call(t,a,u):i);return{r0:l,r1:c,a:f}}var e=function(e){return e.source},t=function(e){return e.target},n=function(e){return e.angle},r=function(e){return e.radius},i=r,s=-Math.PI/2;return o.source=function(t){return arguments.length?(e=t,o):e},o.target=function(e){return arguments.length?(t=e,o):t},o.angle=function(e){return arguments.length?(n=e,o):n},o.radius=function(e){return arguments.length?(r=i=e,o):r},o.startRadius=function(e){return arguments.length?(r=e,o):r},o.endRadius=function(e){return arguments.length?(i=e,o):i},o}
+function link() {
+  var source = function(d) { return d.source; },
+      target = function(d) { return d.target; },
+      angle = function(d) { return d.angle; },
+      startRadius = function(d) { return d.radius; },
+      endRadius = startRadius,
+      arcOffset = -Math.PI / 2;
+
+  function link(d, i) {
+    var s = node(source, this, d, i),
+        t = node(target, this, d, i),
+        x;
+    if (t.a < s.a) x = t, t = s, s = x;
+    if (t.a - s.a > Math.PI) s.a += 2 * Math.PI;
+    var a1 = s.a + (t.a - s.a) / 3,
+        a2 = t.a - (t.a - s.a) / 3;
+    return s.r0 - s.r1 || t.r0 - t.r1
+        ? "M" + Math.cos(s.a) * s.r0 + "," + Math.sin(s.a) * s.r0
+        + "L" + Math.cos(s.a) * s.r1 + "," + Math.sin(s.a) * s.r1
+        + "C" + Math.cos(a1) * s.r1 + "," + Math.sin(a1) * s.r1
+        + " " + Math.cos(a2) * t.r1 + "," + Math.sin(a2) * t.r1
+        + " " + Math.cos(t.a) * t.r1 + "," + Math.sin(t.a) * t.r1
+        + "L" + Math.cos(t.a) * t.r0 + "," + Math.sin(t.a) * t.r0
+        + "C" + Math.cos(a2) * t.r0 + "," + Math.sin(a2) * t.r0
+        + " " + Math.cos(a1) * s.r0 + "," + Math.sin(a1) * s.r0
+        + " " + Math.cos(s.a) * s.r0 + "," + Math.sin(s.a) * s.r0
+        : "M" + Math.cos(s.a) * s.r0 + "," + Math.sin(s.a) * s.r0
+        + "C" + Math.cos(a1) * s.r1 + "," + Math.sin(a1) * s.r1
+        + " " + Math.cos(a2) * t.r1 + "," + Math.sin(a2) * t.r1
+        + " " + Math.cos(t.a) * t.r1 + "," + Math.sin(t.a) * t.r1;
+  }
+
+  function node(method, thiz, d, i) {
+    var node = method.call(thiz, d, i),
+        a = +(typeof angle === "function" ? angle.call(thiz, node, i) : angle) + arcOffset,
+        r0 = +(typeof startRadius === "function" ? startRadius.call(thiz, node, i) : startRadius),
+        r1 = (startRadius === endRadius ? r0 : +(typeof endRadius === "function" ? endRadius.call(thiz, node, i) : endRadius));
+    return {r0: r0, r1: r1, a: a};
+  }
+
+  link.source = function(_) {
+    if (!arguments.length) return source;
+    source = _;
+    return link;
+  };
+
+  link.target = function(_) {
+    if (!arguments.length) return target;
+    target = _;
+    return link;
+  };
+
+  link.angle = function(_) {
+    if (!arguments.length) return angle;
+    angle = _;
+    return link;
+  };
+
+  link.radius = function(_) {
+    if (!arguments.length) return startRadius;
+    startRadius = endRadius = _;
+    return link;
+  };
+
+  link.startRadius = function(_) {
+    if (!arguments.length) return startRadius;
+    startRadius = _;
+    return link;
+  };
+
+  link.endRadius = function(_) {
+    if (!arguments.length) return endRadius;
+    endRadius = _;
+    return link;
+  };
+
+  return link;
+}

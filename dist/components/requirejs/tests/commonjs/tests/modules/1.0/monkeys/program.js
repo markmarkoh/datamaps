@@ -1,1 +1,7 @@
-define(["require","exports","module","a","test"],function(e,t,n){var r=e("a"),i=e("test");i.assert(t.monkey==10,"monkeys permitted"),i.print("DONE","info")})
+define(["require", "exports", "module", "a","test"], function(require, exports, module) {
+var a = require('a');
+var test = require('test');
+test.assert(exports.monkey == 10, 'monkeys permitted');
+test.print('DONE', 'info');
+
+});

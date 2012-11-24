@@ -1,1 +1,13 @@
-define(["bm","cm","module","exports"],function(e,t,n,r){r.name="am",r.bName=e.name,r.cName=t.name})
+define(
+    [
+        'bm',
+        'cm',
+        'module',
+        'exports'
+    ],
+    function (bm, cm, module, exports) {
+        exports.name = 'am';
+        exports.bName = bm.name;
+        exports.cName = cm.name;
+    }
+);

@@ -1,1 +1,3 @@
-define({name:"c1"})
+define({
+    name: 'c1'
+});

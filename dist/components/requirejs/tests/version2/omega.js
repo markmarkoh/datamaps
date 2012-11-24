@@ -1,1 +1,7 @@
-define("omega",[],function(){return{version:2}})
+define("omega",
+  function() {
+    return {
+      version: 2
+    };
+  }
+);

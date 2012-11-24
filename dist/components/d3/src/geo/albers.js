@@ -1,1 +1,126 @@
-d3.geo.albers=function(){function a(e){var t=s*(d3_geo_radians*e[0]-i),a=Math.sqrt(o-2*s*Math.sin(d3_geo_radians*e[1]))/s;return[n*a*Math.sin(t)+r[0],n*(a*Math.cos(t)-u)+r[1]]}function f(){var n=d3_geo_radians*t[0],r=d3_geo_radians*t[1],f=d3_geo_radians*e[1],l=Math.sin(n),c=Math.cos(n);return i=d3_geo_radians*e[0],s=.5*(l+Math.sin(r)),o=c*c+2*s*l,u=Math.sqrt(o-2*s*Math.sin(f))/s,a}var e=[-98,38],t=[29.5,45.5],n=1e3,r=[480,250],i,s,o,u;return a.invert=function(e){var t=(e[0]-r[0])/n,a=(e[1]-r[1])/n,f=u+a,l=Math.atan2(t,f),c=Math.sqrt(t*t+f*f);return[(i+l/s)/d3_geo_radians,Math.asin((o-c*c*s*s)/(2*s))/d3_geo_radians]},a.origin=function(t){return arguments.length?(e=[+t[0],+t[1]],f()):e},a.parallels=function(e){return arguments.length?(t=[+e[0],+e[1]],f()):t},a.scale=function(e){return arguments.length?(n=+e,a):n},a.translate=function(e){return arguments.length?(r=[+e[0],+e[1]],a):r},f()},d3.geo.albersUsa=function(){function i(i){var s=i[0],o=i[1];return(o>50?t:s<-140?n:o<21?r:e)(i)}var e=d3.geo.albers(),t=d3.geo.albers().origin([-160,60]).parallels([55,65]),n=d3.geo.albers().origin([-160,20]).parallels([8,18]),r=d3.geo.albers().origin([-60,10]).parallels([8,18]);return i.scale=function(s){return arguments.length?(e.scale(s),t.scale(s*.6),n.scale(s),r.scale(s*1.5),i.translate(e.translate())):e.scale()},i.translate=function(s){if(!arguments.length)return e.translate();var o=e.scale()/1e3,u=s[0],a=s[1];return e.translate(s),t.translate([u-400*o,a+170*o]),n.translate([u-190*o,a+200*o]),r.translate([u+580*o,a+430*o]),i},i.scale(e.scale())}
+// Derived from Tom Carden's Albers implementation for Protovis.
+// http://gist.github.com/476238
+// http://mathworld.wolfram.com/AlbersEqual-AreaConicProjection.html
+
+d3.geo.albers = function() {
+  var origin = [-98, 38],
+      parallels = [29.5, 45.5],
+      scale = 1000,
+      translate = [480, 250],
+      lng0, // d3_geo_radians * origin[0]
+      n,
+      C,
+      p0;
+
+  function albers(coordinates) {
+    var t = n * (d3_geo_radians * coordinates[0] - lng0),
+        p = Math.sqrt(C - 2 * n * Math.sin(d3_geo_radians * coordinates[1])) / n;
+    return [
+      scale * p * Math.sin(t) + translate[0],
+      scale * (p * Math.cos(t) - p0) + translate[1]
+    ];
+  }
+
+  albers.invert = function(coordinates) {
+    var x = (coordinates[0] - translate[0]) / scale,
+        y = (coordinates[1] - translate[1]) / scale,
+        p0y = p0 + y,
+        t = Math.atan2(x, p0y),
+        p = Math.sqrt(x * x + p0y * p0y);
+    return [
+      (lng0 + t / n) / d3_geo_radians,
+      Math.asin((C - p * p * n * n) / (2 * n)) / d3_geo_radians
+    ];
+  };
+
+  function reload() {
+    var phi1 = d3_geo_radians * parallels[0],
+        phi2 = d3_geo_radians * parallels[1],
+        lat0 = d3_geo_radians * origin[1],
+        s = Math.sin(phi1),
+        c = Math.cos(phi1);
+    lng0 = d3_geo_radians * origin[0];
+    n = .5 * (s + Math.sin(phi2));
+    C = c * c + 2 * n * s;
+    p0 = Math.sqrt(C - 2 * n * Math.sin(lat0)) / n;
+    return albers;
+  }
+
+  albers.origin = function(x) {
+    if (!arguments.length) return origin;
+    origin = [+x[0], +x[1]];
+    return reload();
+  };
+
+  albers.parallels = function(x) {
+    if (!arguments.length) return parallels;
+    parallels = [+x[0], +x[1]];
+    return reload();
+  };
+
+  albers.scale = function(x) {
+    if (!arguments.length) return scale;
+    scale = +x;
+    return albers;
+  };
+
+  albers.translate = function(x) {
+    if (!arguments.length) return translate;
+    translate = [+x[0], +x[1]];
+    return albers;
+  };
+
+  return reload();
+};
+
+// A composite projection for the United States, 960x500. The set of standard
+// parallels for each region comes from USGS, which is published here:
+// http://egsc.usgs.gov/isb/pubs/MapProjections/projections.html#albers
+// TODO allow the composite projection to be rescaled?
+d3.geo.albersUsa = function() {
+  var lower48 = d3.geo.albers();
+
+  var alaska = d3.geo.albers()
+      .origin([-160, 60])
+      .parallels([55, 65]);
+
+  var hawaii = d3.geo.albers()
+      .origin([-160, 20])
+      .parallels([8, 18]);
+
+  var puertoRico = d3.geo.albers()
+      .origin([-60, 10])
+      .parallels([8, 18]);
+
+  function albersUsa(coordinates) {
+    var lon = coordinates[0],
+        lat = coordinates[1];
+    return (lat > 50 ? alaska
+        : lon < -140 ? hawaii
+        : lat < 21 ? puertoRico
+        : lower48)(coordinates);
+  }
+
+  albersUsa.scale = function(x) {
+    if (!arguments.length) return lower48.scale();
+    lower48.scale(x);
+    alaska.scale(x * .6);
+    hawaii.scale(x);
+    puertoRico.scale(x * 1.5);
+    return albersUsa.translate(lower48.translate());
+  };
+
+  albersUsa.translate = function(x) {
+    if (!arguments.length) return lower48.translate();
+    var dz = lower48.scale() / 1000,
+        dx = x[0],
+        dy = x[1];
+    lower48.translate(x);
+    alaska.translate([dx - 400 * dz, dy + 170 * dz]);
+    hawaii.translate([dx - 190 * dz, dy + 200 * dz]);
+    puertoRico.translate([dx + 580 * dz, dy + 430 * dz]);
+    return albersUsa;
+  };
+
+  return albersUsa.scale(lower48.scale());
+};

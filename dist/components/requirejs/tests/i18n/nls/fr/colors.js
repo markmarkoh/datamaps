@@ -1,1 +1,4 @@
-define({red:"rouge",blue:"bleu"})
+define({
+    red: "rouge",
+    blue: "bleu"
+});

@@ -1,1 +1,720 @@
-(function(){function e(e,t){if(!e||!t||e.length!==t.length)return!1;var n=e.length,r=-1;while(++r<n)if(e[r]!==t[r])return!1;return!0}function t(t,n){var r=n.length;if(t>r)return null;var i=[],s=[],o={},u=0,a=0,f,l,c;while(a<t){if(u===r)return null;var h=Math.floor(Math.random()*r);if(h in o)continue;o[h]=1,u++,l=n[h],c=!0;for(f=0;f<a;f++)if(e(l,i[f])){c=!1;break}c&&(i[a]=l,s[a]=h,a++)}return i}function n(e,t,n,r){var i=[],s=e+n,o=t.length,u=-1;while(++u<o)i[u]=(e*t[u]+n*r[u])/s;return i}function r(e){var t=e.length,n=-1;while(++n<t)if(!isFinite(e[n]))return!1;return!0}function i(e){var t=e.length,n=0;while(++n<t)if(e[n-1]>=e[n])return!1;return!0}function s(e){return(e=1-e*e*e)*e*e}function o(e,t,n,r){var i=r[0],s=r[1],o=u(t,s);if(o<e.length&&e[o]-e[n]<e[n]-e[i]){var a=u(t,i);r[0]=a,r[1]=o}}function u(e,t){var n=t+1;while(n<e.length&&e[n]===0)n++;return n}science.stats={},science.stats.bandwidth={nrd0:function(e){var t=Math.sqrt(science.stats.variance(e));return(lo=Math.min(t,science.stats.iqr(e)/1.34))||(lo=t)||(lo=Math.abs(e[1]))||(lo=1),.9*lo*Math.pow(e.length,-0.2)},nrd:function(e){var t=science.stats.iqr(e)/1.34;return 1.06*Math.min(Math.sqrt(science.stats.variance(e)),t)*Math.pow(e.length,-0.2)}},science.stats.distance={euclidean:function(e,t){var n=e.length,r=-1,i=0,s;while(++r<n)s=e[r]-t[r],i+=s*s;return Math.sqrt(i)},manhattan:function(e,t){var n=e.length,r=-1,i=0;while(++r<n)i+=Math.abs(e[r]-t[r]);return i},minkowski:function(e){return function(t,n){var r=t.length,i=-1,s=0;while(++i<r)s+=Math.pow(Math.abs(t[i]-n[i]),e);return Math.pow(s,1/e)}},chebyshev:function(e,t){var n=e.length,r=-1,i=0,s;while(++r<n)s=Math.abs(e[r]-t[r]),s>i&&(i=s);return i},hamming:function(e,t){var n=e.length,r=-1,i=0;while(++r<n)e[r]!==t[r]&&i++;return i},jaccard:function(e,t){var n=e.length,r=-1,i=0;while(++r<n)e[r]===t[r]&&i++;return i/n},braycurtis:function(e,t){var n=e.length,r=-1,i=0,s=0,o,u;while(++r<n)o=e[r],u=t[r],i+=Math.abs(o-u),s+=Math.abs(o+u);return i/s}},science.stats.erf=function(e){var t=.254829592,n=-0.284496736,r=1.421413741,i=-1.453152027,s=1.061405429,o=.3275911,u=e<0?-1:1;e<0&&(u=-1,e=-e);var a=1/(1+o*e);return u*(1-((((s*a+i)*a+r)*a+n)*a+t)*a*Math.exp(-e*e))},science.stats.phi=function(e){return.5*(1+science.stats.erf(e/Math.SQRT2))},science.stats.kernel={uniform:function(e){return e<=1&&e>=-1?.5:0},triangular:function(e){return e<=1&&e>=-1?1-Math.abs(e):0},epanechnikov:function(e){return e<=1&&e>=-1?.75*(1-e*e):0},quartic:function(e){if(e<=1&&e>=-1){var t=1-e*e;return.9375*t*t}return 0},triweight:function(e){if(e<=1&&e>=-1){var t=1-e*e;return 35/32*t*t*t}return 0},gaussian:function(e){return 1/Math.sqrt(2*Math.PI)*Math.exp(-0.5*e*e)},cosine:function(e){return e<=1&&e>=-1?Math.PI/4*Math.cos(Math.PI/2*e):0}},science.stats.kde=function(){function r(r,i){var s=n.call(this,t);return r.map(function(n){var r=-1,i=0,o=t.length;while(++r<o)i+=e((n-t[r])/s);return[n,i/s/o]})}var e=science.stats.kernel.gaussian,t=[],n=science.stats.bandwidth.nrd;return r.kernel=function(t){return arguments.length?(e=t,r):e},r.sample=function(e){return arguments.length?(t=e,r):t},r.bandwidth=function(e){return arguments.length?(n=science.functor(e),r):n},r},science.stats.kmeans=function(){function s(s){var o=s.length,u=[],a=[],f=1,l=0,c=t(i,s),h,p,d,v,m,g,y;while(f&&l<r){d=-1;while(++d<i)a[d]=0;p=-1;while(++p<o){v=s[p],g=Infinity,d=-1;while(++d<i)m=n.call(this,c[d],v),m<g&&(g=m,y=d);a[u[p]=y]++}h=[],p=-1;while(++p<o){v=u[p],m=h[v];if(m==null)h[v]=s[p].slice();else{d=-1;while(++d<m.length)m[d]+=s[p][d]}}d=-1;while(++d<i){v=h[d],m=1/a[d],p=-1;while(++p<v.length)v[p]*=m}f=0,d=-1;while(++d<i)if(!e(h[d],c[d])){f=1;break}c=h,l++}return{assignments:u,centroids:c}}var n=science.stats.distance.euclidean,r=1e3,i=1;return s.k=function(e){return arguments.length?(i=e,s):i},s.distance=function(e){return arguments.length?(n=e,s):n},s},science.stats.hcluster=function(){function r(r){var i=r.length,s=[],o=[],u=[],a=[],f,l,c,h,p,d,v,m;v=-1;while(++v<i){s[v]=0,u[v]=[],m=-1;while(++m<i)u[v][m]=v===m?Infinity:e(r[v],r[m]),u[v][s[v]]>u[v][m]&&(s[v]=m)}v=-1;while(++v<i)a[v]=[],a[v][0]={left:null,right:null,dist:0,centroid:r[v],size:1,depth:0},o[v]=1;for(p=0;p<i-1;p++){f=0;for(v=0;v<i;v++)u[v][s[v]]<u[f][s[f]]&&(f=v);l=s[f],c=a[f][0],h=a[l][0],newCluster={left:c,right:h,dist:u[f][l],centroid:n(c.size,c.centroid,h.size,h.centroid),size:c.size+h.size,depth:1+Math.max(c.depth,h.depth)},a[f].splice(0,0,newCluster),o[f]+=o[l];for(m=0;m<i;m++)switch(t){case"single":u[f][m]>u[l][m]&&(u[m][f]=u[f][m]=u[l][m]);break;case"complete":u[f][m]<u[l][m]&&(u[m][f]=u[f][m]=u[l][m]);break;case"average":u[m][f]=u[f][m]=(o[f]*u[f][m]+o[l]*u[l][m])/(o[f]+o[m])}u[f][f]=Infinity;for(v=0;v<i;v++)u[v][l]=u[l][v]=Infinity;for(m=0;m<i;m++)s[m]==l&&(s[m]=f),u[f][m]<u[f][s[f]]&&(s[f]=m);d=newCluster}return d}var e=science.stats.distance.euclidean,t="simple";return r.distance=function(t){return arguments.length?(e=t,r):e},r},science.stats.iqr=function(e){var t=science.stats.quantiles(e,[.25,.75]);return t[1]-t[0]},science.stats.loess=function(){function u(u,a,f){var l=u.length,c;if(l!==a.length)throw{error:"Mismatched array lengths"};if(l==0)throw{error:"At least one point required."};if(arguments.length<3){f=[],c=-1;while(++c<l)f[c]=1}r(u),r(a),r(f),i(u);if(l==1)return[a[0]];if(l==2)return[a[0],a[1]];var h=Math.floor(e*l);if(h<2)throw{error:"Bandwidth too small."};var p=[],d=[],v=[];c=-1;while(++c<l)p[c]=0,d[c]=0,v[c]=1;var m=-1;while(++m<=t){var g=[0,h-1],y;c=-1;while(++c<l){y=u[c],c>0&&o(u,f,c,g);var b=g[0],w=g[1],E=u[c]-u[b]>u[w]-u[c]?b:w,S=0,x=0,T=0,N=0,C=0,k=Math.abs(1/(u[E]-y));for(var L=b;L<=w;++L){var A=u[L],O=a[L],M=L<c?y-A:A-y,_=s(M*k)*v[L]*f[L],D=A*_;S+=_,x+=D,T+=A*D,N+=O*_,C+=O*D}var P=x/S,H=N/S,B=C/S,j=T/S,F=Math.sqrt(Math.abs(j-P*P))<n?0:(B-P*H)/(j-P*P),I=H-F*P;p[c]=F*y+I,d[c]=Math.abs(a[c]-p[c])}if(m===t)break;var q=d.slice();q.sort();var R=q[Math.floor(l/2)];if(Math.abs(R)<n)break;var U,_;c=-1;while(++c<l)U=d[c]/(6*R),v[c]=U>=1?0:(_=1-U*U)*_}return p}var e=.3,t=2,n=1e-12;return u.bandwidth=function(t){return arguments.length?(e=t,u):t},u.robustnessIterations=function(e){return arguments.length?(t=e,u):e},u.accuracy=function(e){return arguments.length?(n=e,u):e},u},science.stats.mean=function(e){var t=e.length;if(t===0)return NaN;var n=0,r=-1;while(++r<t)n+=(e[r]-n)/(r+1);return n},science.stats.median=function(e){return science.stats.quantiles(e,[.5])[0]},science.stats.mode=function(e){e=e.slice().sort(science.ascending);var t,n=e.length,r=-1,i=r,s=null,o=0,u,a;while(++r<n)(a=e[r])!==s&&((u=r-i)>o&&(o=u,t=s),s=a,i=r);return t},science.stats.quantiles=function(e,t){e=e.slice().sort(science.ascending);var n=e.length-1;return t.map(function(t){if(t===0)return e[0];if(t===1)return e[n];var r=1+t*n,i=Math.floor(r),s=r-i,o=e[i-1];return s===0?o:o+s*(e[i]-o)})},science.stats.variance=function(e){var t=e.length;if(t<1)return NaN;if(t===1)return 0;var n=science.stats.mean(e),r=-1,i=0;while(++r<t){var s=e[r]-n;i+=s*s}return i/(t-1)}})()
+(function(){science.stats = {};
+// Bandwidth selectors for Gaussian kernels.
+// Based on R's implementations in `stats.bw`.
+science.stats.bandwidth = {
+
+  // Silverman, B. W. (1986) Density Estimation. London: Chapman and Hall.
+  nrd0: function(x) {
+    var hi = Math.sqrt(science.stats.variance(x));
+    if (!(lo = Math.min(hi, science.stats.iqr(x) / 1.34)))
+      (lo = hi) || (lo = Math.abs(x[1])) || (lo = 1);
+    return .9 * lo * Math.pow(x.length, -.2);
+  },
+
+  // Scott, D. W. (1992) Multivariate Density Estimation: Theory, Practice, and
+  // Visualization. Wiley.
+  nrd: function(x) {
+    var h = science.stats.iqr(x) / 1.34;
+    return 1.06 * Math.min(Math.sqrt(science.stats.variance(x)), h)
+      * Math.pow(x.length, -1/5);
+  }
+};
+science.stats.distance = {
+  euclidean: function(a, b) {
+    var n = a.length,
+        i = -1,
+        s = 0,
+        x;
+    while (++i < n) {
+      x = a[i] - b[i];
+      s += x * x;
+    }
+    return Math.sqrt(s);
+  },
+  manhattan: function(a, b) {
+    var n = a.length,
+        i = -1,
+        s = 0;
+    while (++i < n) s += Math.abs(a[i] - b[i]);
+    return s;
+  },
+  minkowski: function(p) {
+    return function(a, b) {
+      var n = a.length,
+          i = -1,
+          s = 0;
+      while (++i < n) s += Math.pow(Math.abs(a[i] - b[i]), p);
+      return Math.pow(s, 1 / p);
+    };
+  },
+  chebyshev: function(a, b) {
+    var n = a.length,
+        i = -1,
+        max = 0,
+        x;
+    while (++i < n) {
+      x = Math.abs(a[i] - b[i]);
+      if (x > max) max = x;
+    }
+    return max;
+  },
+  hamming: function(a, b) {
+    var n = a.length,
+        i = -1,
+        d = 0;
+    while (++i < n) if (a[i] !== b[i]) d++;
+    return d;
+  },
+  jaccard: function(a, b) {
+    var n = a.length,
+        i = -1,
+        s = 0;
+    while (++i < n) if (a[i] === b[i]) s++;
+    return s / n;
+  },
+  braycurtis: function(a, b) {
+    var n = a.length,
+        i = -1,
+        s0 = 0,
+        s1 = 0,
+        ai,
+        bi;
+    while (++i < n) {
+      ai = a[i];
+      bi = b[i];
+      s0 += Math.abs(ai - bi);
+      s1 += Math.abs(ai + bi);
+    }
+    return s0 / s1;
+  }
+};
+// Based on implementation in http://picomath.org/.
+science.stats.erf = function(x) {
+  var a1 =  0.254829592,
+      a2 = -0.284496736,
+      a3 =  1.421413741,
+      a4 = -1.453152027,
+      a5 =  1.061405429,
+      p  =  0.3275911;
+
+  // Save the sign of x
+  var sign = x < 0 ? -1 : 1;
+  if (x < 0) {
+    sign = -1;
+    x = -x;
+  }
+
+  // A&S formula 7.1.26
+  var t = 1 / (1 + p * x);
+  return sign * (
+    1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1)
+    * t * Math.exp(-x * x));
+};
+science.stats.phi = function(x) {
+  return .5 * (1 + science.stats.erf(x / Math.SQRT2));
+};
+// See <http://en.wikipedia.org/wiki/Kernel_(statistics)>.
+science.stats.kernel = {
+  uniform: function(u) {
+    if (u <= 1 && u >= -1) return .5;
+    return 0;
+  },
+  triangular: function(u) {
+    if (u <= 1 && u >= -1) return 1 - Math.abs(u);
+    return 0;
+  },
+  epanechnikov: function(u) {
+    if (u <= 1 && u >= -1) return .75 * (1 - u * u);
+    return 0;
+  },
+  quartic: function(u) {
+    if (u <= 1 && u >= -1) {
+      var tmp = 1 - u * u;
+      return (15 / 16) * tmp * tmp;
+    }
+    return 0;
+  },
+  triweight: function(u) {
+    if (u <= 1 && u >= -1) {
+      var tmp = 1 - u * u;
+      return (35 / 32) * tmp * tmp * tmp;
+    }
+    return 0;
+  },
+  gaussian: function(u) {
+    return 1 / Math.sqrt(2 * Math.PI) * Math.exp(-.5 * u * u);
+  },
+  cosine: function(u) {
+    if (u <= 1 && u >= -1) return Math.PI / 4 * Math.cos(Math.PI / 2 * u);
+    return 0;
+  }
+};
+// http://exploringdata.net/den_trac.htm
+science.stats.kde = function() {
+  var kernel = science.stats.kernel.gaussian,
+      sample = [],
+      bandwidth = science.stats.bandwidth.nrd;
+
+  function kde(points, i) {
+    var bw = bandwidth.call(this, sample);
+    return points.map(function(x) {
+      var i = -1,
+          y = 0,
+          n = sample.length;
+      while (++i < n) {
+        y += kernel((x - sample[i]) / bw);
+      }
+      return [x, y / bw / n];
+    });
+  }
+
+  kde.kernel = function(x) {
+    if (!arguments.length) return kernel;
+    kernel = x;
+    return kde;
+  };
+
+  kde.sample = function(x) {
+    if (!arguments.length) return sample;
+    sample = x;
+    return kde;
+  };
+
+  kde.bandwidth = function(x) {
+    if (!arguments.length) return bandwidth;
+    bandwidth = science.functor(x);
+    return kde;
+  };
+
+  return kde;
+};
+// Based on figue implementation by Jean-Yves Delort.
+// http://code.google.com/p/figue/
+science.stats.kmeans = function() {
+  var distance = science.stats.distance.euclidean,
+      maxIterations = 1000,
+      k = 1;
+
+  function kmeans(vectors) {
+    var n = vectors.length,
+        assignments = [],
+        clusterSizes = [],
+        repeat = 1,
+        iterations = 0,
+        centroids = science_stats_kmeansRandom(k, vectors),
+        newCentroids,
+        i,
+        j,
+        x,
+        d,
+        min,
+        best;
+
+    while (repeat && iterations < maxIterations) {
+      // Assignment step.
+      j = -1; while (++j < k) {
+        clusterSizes[j] = 0;
+      }
+
+      i = -1; while (++i < n) {
+        x = vectors[i];
+        min = Infinity;
+        j = -1; while (++j < k) {
+          d = distance.call(this, centroids[j], x);
+          if (d < min) {
+            min = d;
+            best = j;
+          }
+        }
+        clusterSizes[assignments[i] = best]++;
+      }
+
+      // Update centroids step.
+      newCentroids = [];
+      i = -1; while (++i < n) {
+        x = assignments[i];
+        d = newCentroids[x];
+        if (d == null) newCentroids[x] = vectors[i].slice();
+        else {
+          j = -1; while (++j < d.length) {
+            d[j] += vectors[i][j];
+          }
+        }
+      }
+      j = -1; while (++j < k) {
+        x = newCentroids[j];
+        d = 1 / clusterSizes[j];
+        i = -1; while (++i < x.length) x[i] *= d;
+      }
+
+      // Check convergence.
+      repeat = 0;
+      j = -1; while (++j < k) {
+        if (!science_stats_kmeansCompare(newCentroids[j], centroids[j])) {
+          repeat = 1;
+          break;
+        }
+      }
+      centroids = newCentroids;
+      iterations++;
+    }
+    return {assignments: assignments, centroids: centroids};
+  }
+
+  kmeans.k = function(x) {
+    if (!arguments.length) return k;
+    k = x;
+    return kmeans;
+  };
+
+  kmeans.distance = function(x) {
+    if (!arguments.length) return distance;
+    distance = x;
+    return kmeans;
+  };
+
+  return kmeans;
+};
+
+function science_stats_kmeansCompare(a, b) {
+  if (!a || !b || a.length !== b.length) return false;
+  var n = a.length,
+      i = -1;
+  while (++i < n) if (a[i] !== b[i]) return false;
+  return true;
+}
+
+// Returns an array of k distinct vectors randomly selected from the input
+// array of vectors. Returns null if k > n or if there are less than k distinct
+// objects in vectors.
+function science_stats_kmeansRandom(k, vectors) {
+  var n = vectors.length;
+  if (k > n) return null;
+  
+  var selected_vectors = [];
+  var selected_indices = [];
+  var tested_indices = {};
+  var tested = 0;
+  var selected = 0;
+  var i,
+      vector,
+      select;
+
+  while (selected < k) {
+    if (tested === n) return null;
+    
+    var random_index = Math.floor(Math.random() * n);
+    if (random_index in tested_indices) continue;
+    
+    tested_indices[random_index] = 1;
+    tested++;
+    vector = vectors[random_index];
+    select = true;
+    for (i = 0; i < selected; i++) {
+      if (science_stats_kmeansCompare(vector, selected_vectors[i])) {
+        select = false;
+        break;
+      }
+    }
+    if (select) {
+      selected_vectors[selected] = vector;
+      selected_indices[selected] = random_index;
+      selected++;
+    }
+  }
+  return selected_vectors;
+}
+science.stats.hcluster = function() {
+  var distance = science.stats.distance.euclidean,
+      linkage = "simple"; // simple, complete or average
+
+  function hcluster(vectors) {
+    var n = vectors.length,
+        dMin = [],
+        cSize = [],
+        distMatrix = [],
+        clusters = [],
+        c1,
+        c2,
+        c1Cluster,
+        c2Cluster,
+        p,
+        root,
+        i,
+        j;
+
+    // Initialise distance matrix and vector of closest clusters.
+    i = -1; while (++i < n) {
+      dMin[i] = 0;
+      distMatrix[i] = [];
+      j = -1; while (++j < n) {
+        distMatrix[i][j] = i === j ? Infinity : distance(vectors[i] , vectors[j]);
+        if (distMatrix[i][dMin[i]] > distMatrix[i][j]) dMin[i] = j;
+      }
+    }
+
+    // create leaves of the tree
+    i = -1; while (++i < n) {
+      clusters[i] = [];
+      clusters[i][0] = {
+        left: null,
+        right: null,
+        dist: 0,
+        centroid: vectors[i],
+        size: 1,
+        depth: 0
+      };
+      cSize[i] = 1;
+    }
+
+    // Main loop
+    for (p = 0; p < n-1; p++) {
+      // find the closest pair of clusters
+      c1 = 0;
+      for (i = 0; i < n; i++) {
+        if (distMatrix[i][dMin[i]] < distMatrix[c1][dMin[c1]]) c1 = i;
+      }
+      c2 = dMin[c1];
+
+      // create node to store cluster info 
+      c1Cluster = clusters[c1][0];
+      c2Cluster = clusters[c2][0];
+
+      newCluster = {
+        left: c1Cluster,
+        right: c2Cluster,
+        dist: distMatrix[c1][c2],
+        centroid: calculateCentroid(c1Cluster.size, c1Cluster.centroid,
+          c2Cluster.size, c2Cluster.centroid),
+        size: c1Cluster.size + c2Cluster.size,
+        depth: 1 + Math.max(c1Cluster.depth, c2Cluster.depth)
+      };
+      clusters[c1].splice(0, 0, newCluster);
+      cSize[c1] += cSize[c2];
+
+      // overwrite row c1 with respect to the linkage type
+      for (j = 0; j < n; j++) {
+        switch (linkage) {
+          case "single":
+            if (distMatrix[c1][j] > distMatrix[c2][j])
+              distMatrix[j][c1] = distMatrix[c1][j] = distMatrix[c2][j];
+            break;
+          case "complete":
+            if (distMatrix[c1][j] < distMatrix[c2][j])
+              distMatrix[j][c1] = distMatrix[c1][j] = distMatrix[c2][j];
+            break;
+          case "average":
+            distMatrix[j][c1] = distMatrix[c1][j] = (cSize[c1] * distMatrix[c1][j] + cSize[c2] * distMatrix[c2][j]) / (cSize[c1] + cSize[j]);
+            break;
+        }
+      }
+      distMatrix[c1][c1] = Infinity;
+
+      // infinity ­out old row c2 and column c2
+      for (i = 0; i < n; i++)
+        distMatrix[i][c2] = distMatrix[c2][i] = Infinity;
+
+      // update dmin and replace ones that previous pointed to c2 to point to c1
+      for (j = 0; j < n; j++) {
+        if (dMin[j] == c2) dMin[j] = c1;
+        if (distMatrix[c1][j] < distMatrix[c1][dMin[c1]]) dMin[c1] = j;
+      }
+
+      // keep track of the last added cluster
+      root = newCluster;
+    }
+
+    return root;
+  }
+
+  hcluster.distance = function(x) {
+    if (!arguments.length) return distance;
+    distance = x;
+    return hcluster;
+  };
+
+  return hcluster;
+};
+
+function calculateCentroid(c1Size, c1Centroid, c2Size, c2Centroid) {
+  var newCentroid = [],
+      newSize = c1Size + c2Size,
+      n = c1Centroid.length,
+      i = -1;
+  while (++i < n) {
+    newCentroid[i] = (c1Size * c1Centroid[i] + c2Size * c2Centroid[i]) / newSize;
+  }
+  return newCentroid;
+}
+science.stats.iqr = function(x) {
+  var quartiles = science.stats.quantiles(x, [.25, .75]);
+  return quartiles[1] - quartiles[0];
+};
+// Based on org.apache.commons.math.analysis.interpolation.LoessInterpolator
+// from http://commons.apache.org/math/
+science.stats.loess = function() {    
+  var bandwidth = .3,
+      robustnessIters = 2,
+      accuracy = 1e-12;
+
+  function smooth(xval, yval, weights) {
+    var n = xval.length,
+        i;
+
+    if (n !== yval.length) throw {error: "Mismatched array lengths"};
+    if (n == 0) throw {error: "At least one point required."};
+
+    if (arguments.length < 3) {
+      weights = [];
+      i = -1; while (++i < n) weights[i] = 1;
+    }
+
+    science_stats_loessFiniteReal(xval);
+    science_stats_loessFiniteReal(yval);
+    science_stats_loessFiniteReal(weights);
+    science_stats_loessStrictlyIncreasing(xval);
+
+    if (n == 1) return [yval[0]];
+    if (n == 2) return [yval[0], yval[1]];
+
+    var bandwidthInPoints = Math.floor(bandwidth * n);
+
+    if (bandwidthInPoints < 2) throw {error: "Bandwidth too small."};
+
+    var res = [],
+        residuals = [],
+        robustnessWeights = [];
+
+    // Do an initial fit and 'robustnessIters' robustness iterations.
+    // This is equivalent to doing 'robustnessIters+1' robustness iterations
+    // starting with all robustness weights set to 1.
+    i = -1; while (++i < n) {
+      res[i] = 0;
+      residuals[i] = 0;
+      robustnessWeights[i] = 1;
+    }
+
+    var iter = -1;
+    while (++iter <= robustnessIters) {
+      var bandwidthInterval = [0, bandwidthInPoints - 1];
+      // At each x, compute a local weighted linear regression
+      var x;
+      i = -1; while (++i < n) {
+        x = xval[i];
+
+        // Find out the interval of source points on which
+        // a regression is to be made.
+        if (i > 0) {
+          science_stats_loessUpdateBandwidthInterval(xval, weights, i, bandwidthInterval);
+        }
+
+        var ileft = bandwidthInterval[0],
+            iright = bandwidthInterval[1];
+
+        // Compute the point of the bandwidth interval that is
+        // farthest from x
+        var edge = (xval[i] - xval[ileft]) > (xval[iright] - xval[i]) ? ileft : iright;
+
+        // Compute a least-squares linear fit weighted by
+        // the product of robustness weights and the tricube
+        // weight function.
+        // See http://en.wikipedia.org/wiki/Linear_regression
+        // (section "Univariate linear case")
+        // and http://en.wikipedia.org/wiki/Weighted_least_squares
+        // (section "Weighted least squares")
+        var sumWeights = 0,
+            sumX = 0,
+            sumXSquared = 0,
+            sumY = 0,
+            sumXY = 0,
+            denom = Math.abs(1 / (xval[edge] - x));
+
+        for (var k = ileft; k <= iright; ++k) {
+          var xk   = xval[k],
+              yk   = yval[k],
+              dist = k < i ? x - xk : xk - x,
+              w    = science_stats_loessTricube(dist * denom) * robustnessWeights[k] * weights[k],
+              xkw  = xk * w;
+          sumWeights += w;
+          sumX += xkw;
+          sumXSquared += xk * xkw;
+          sumY += yk * w;
+          sumXY += yk * xkw;
+        }
+
+        var meanX = sumX / sumWeights,
+            meanY = sumY / sumWeights,
+            meanXY = sumXY / sumWeights,
+            meanXSquared = sumXSquared / sumWeights;
+
+        var beta = (Math.sqrt(Math.abs(meanXSquared - meanX * meanX)) < accuracy)
+            ? 0 : ((meanXY - meanX * meanY) / (meanXSquared - meanX * meanX));
+
+        var alpha = meanY - beta * meanX;
+
+        res[i] = beta * x + alpha;
+        residuals[i] = Math.abs(yval[i] - res[i]);
+      }
+
+      // No need to recompute the robustness weights at the last
+      // iteration, they won't be needed anymore
+      if (iter === robustnessIters) {
+        break;
+      }
+
+      // Recompute the robustness weights.
+
+      // Find the median residual.
+      var sortedResiduals = residuals.slice();
+      sortedResiduals.sort();
+      var medianResidual = sortedResiduals[Math.floor(n / 2)];
+
+      if (Math.abs(medianResidual) < accuracy)
+        break;
+
+      var arg,
+          w;
+      i = -1; while (++i < n) {
+        arg = residuals[i] / (6 * medianResidual);
+        robustnessWeights[i] = (arg >= 1) ? 0 : ((w = 1 - arg * arg) * w);
+      }
+    }
+
+    return res;
+  }
+
+  smooth.bandwidth = function(x) {
+    if (!arguments.length) return x;
+    bandwidth = x;
+    return smooth;
+  };
+
+  smooth.robustnessIterations = function(x) {
+    if (!arguments.length) return x;
+    robustnessIters = x;
+    return smooth;
+  };
+
+  smooth.accuracy = function(x) {
+    if (!arguments.length) return x;
+    accuracy = x;
+    return smooth;
+  };
+
+  return smooth;
+};
+
+function science_stats_loessFiniteReal(values) {
+  var n = values.length,
+      i = -1;
+
+  while (++i < n) if (!isFinite(values[i])) return false;
+
+  return true;
+}
+
+function science_stats_loessStrictlyIncreasing(xval) {
+  var n = xval.length,
+      i = 0;
+
+  while (++i < n) if (xval[i - 1] >= xval[i]) return false;
+
+  return true;
+}
+
+// Compute the tricube weight function.
+// http://en.wikipedia.org/wiki/Local_regression#Weight_function
+function science_stats_loessTricube(x) {
+  return (x = 1 - x * x * x) * x * x;
+}
+
+// Given an index interval into xval that embraces a certain number of
+// points closest to xval[i-1], update the interval so that it embraces
+// the same number of points closest to xval[i], ignoring zero weights.
+function science_stats_loessUpdateBandwidthInterval(
+  xval, weights, i, bandwidthInterval) {
+
+  var left = bandwidthInterval[0],
+      right = bandwidthInterval[1];
+
+  // The right edge should be adjusted if the next point to the right
+  // is closer to xval[i] than the leftmost point of the current interval
+  var nextRight = science_stats_loessNextNonzero(weights, right);
+  if ((nextRight < xval.length) && (xval[nextRight] - xval[i]) < (xval[i] - xval[left])) {
+    var nextLeft = science_stats_loessNextNonzero(weights, left);
+    bandwidthInterval[0] = nextLeft;
+    bandwidthInterval[1] = nextRight;
+  }
+}
+
+function science_stats_loessNextNonzero(weights, i) {
+  var j = i + 1;
+  while (j < weights.length && weights[j] === 0) j++;
+  return j;
+}
+// Welford's algorithm.
+science.stats.mean = function(x) {
+  var n = x.length;
+  if (n === 0) return NaN;
+  var m = 0,
+      i = -1;
+  while (++i < n) m += (x[i] - m) / (i + 1);
+  return m;
+};
+science.stats.median = function(x) {
+  return science.stats.quantiles(x, [.5])[0];
+};
+science.stats.mode = function(x) {
+  x = x.slice().sort(science.ascending);
+  var mode,
+      n = x.length,
+      i = -1,
+      l = i,
+      last = null,
+      max = 0,
+      tmp,
+      v;
+  while (++i < n) {
+    if ((v = x[i]) !== last) {
+      if ((tmp = i - l) > max) {
+        max = tmp;
+        mode = last;
+      }
+      last = v;
+      l = i;
+    }
+  }
+  return mode;
+};
+// Uses R's quantile algorithm type=7.
+science.stats.quantiles = function(d, quantiles) {
+  d = d.slice().sort(science.ascending);
+  var n_1 = d.length - 1;
+  return quantiles.map(function(q) {
+    if (q === 0) return d[0];
+    else if (q === 1) return d[n_1];
+
+    var index = 1 + q * n_1,
+        lo = Math.floor(index),
+        h = index - lo,
+        a = d[lo - 1];
+
+    return h === 0 ? a : a + h * (d[lo] - a);
+  });
+};
+// Unbiased estimate of a sample's variance.
+// Also known as the sample variance, where the denominator is n - 1.
+science.stats.variance = function(x) {
+  var n = x.length;
+  if (n < 1) return NaN;
+  if (n === 1) return 0;
+  var mean = science.stats.mean(x),
+      i = -1,
+      s = 0;
+  while (++i < n) {
+    var v = x[i] - mean;
+    s += v * v;
+  }
+  return s / (n - 1);
+};
+})()

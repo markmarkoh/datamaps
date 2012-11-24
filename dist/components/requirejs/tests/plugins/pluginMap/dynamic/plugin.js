@@ -1,1 +1,7 @@
-define("plugin",[],{load:function(e,t,n,r){t([e],function(e){n(e)})}})
+define('plugin', [], {
+    load: function (name, req, load, config) {
+        req([name], function (value) {
+            load(value);
+        });
+    }
+});

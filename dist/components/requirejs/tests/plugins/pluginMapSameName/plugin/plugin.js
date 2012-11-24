@@ -1,1 +1,6 @@
-define({load:function(e,t,n,r){n(e)}})
+define({
+    load: function (id, require, load, config) {
+        load(id);
+    }
+});
+

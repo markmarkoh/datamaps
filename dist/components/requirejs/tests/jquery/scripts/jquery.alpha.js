@@ -1,1 +1,3 @@
-$.fn.alpha=function(){return"alpha"}
+$.fn.alpha = function() {
+    return "alpha";
+};

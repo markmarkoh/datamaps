@@ -1,1 +1,3 @@
-define({name:"baz/helper"})
+define({
+    name: "baz/helper"
+});

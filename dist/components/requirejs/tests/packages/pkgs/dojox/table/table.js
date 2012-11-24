@@ -1,1 +1,6 @@
-define(["dojox/chair"],function(e){return{name:"dojox/table",chairName:e.name}})
+define(['dojox/chair'], function (chair) {
+    return {
+        name: 'dojox/table',
+        chairName: chair.name
+    };
+});

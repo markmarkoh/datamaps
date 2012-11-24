@@ -1,1 +1,3 @@
-function d3_identity(e){return e}
+function d3_identity(d) {
+  return d;
+}

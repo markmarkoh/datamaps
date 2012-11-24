@@ -1,1 +1,72 @@
-function stash(e){e.x0=e.x,e.dx0=e.dx}function arcTween(e){var t=d3.interpolate({x:e.x0,dx:e.dx0},e);return function(n){var r=t(n);return e.x0=r.x,e.dx0=r.dx,arc(r)}}var width=960,height=700,radius=Math.min(width,height)/2,color=d3.scale.category20c(),vis=d3.select("#chart").append("svg").attr("width",width).attr("height",height).append("g").attr("transform","translate("+width/2+","+height/2+")"),partition=d3.layout.partition().sort(null).size([2*Math.PI,radius*radius]).value(function(e){return 1}),arc=d3.svg.arc().startAngle(function(e){return e.x}).endAngle(function(e){return e.x+e.dx}).innerRadius(function(e){return Math.sqrt(e.y)}).outerRadius(function(e){return Math.sqrt(e.y+e.dy)});d3.json("../data/flare.json",function(e){var t=vis.data([e]).selectAll("path").data(partition.nodes).enter().append("path").attr("display",function(e){return e.depth?null:"none"}).attr("d",arc).attr("fill-rule","evenodd").style("stroke","#fff").style("fill",function(e){return color((e.children?e:e.parent).name)}).each(stash);d3.select("#size").on("click",function(){t.data(partition.value(function(e){return e.size})).transition().duration(1500).attrTween("d",arcTween),d3.select("#size").classed("active",!0),d3.select("#count").classed("active",!1)}),d3.select("#count").on("click",function(){t.data(partition.value(function(e){return 1})).transition().duration(1500).attrTween("d",arcTween),d3.select("#size").classed("active",!1),d3.select("#count").classed("active",!0)})})
+var width = 960,
+    height = 700,
+    radius = Math.min(width, height) / 2,
+    color = d3.scale.category20c();
+
+var vis = d3.select("#chart").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+  .append("g")
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+var partition = d3.layout.partition()
+    .sort(null)
+    .size([2 * Math.PI, radius * radius])
+    .value(function(d) { return 1; });
+
+var arc = d3.svg.arc()
+    .startAngle(function(d) { return d.x; })
+    .endAngle(function(d) { return d.x + d.dx; })
+    .innerRadius(function(d) { return Math.sqrt(d.y); })
+    .outerRadius(function(d) { return Math.sqrt(d.y + d.dy); });
+
+d3.json("../data/flare.json", function(json) {
+  var path = vis.data([json]).selectAll("path")
+      .data(partition.nodes)
+    .enter().append("path")
+      .attr("display", function(d) { return d.depth ? null : "none"; }) // hide inner ring
+      .attr("d", arc)
+      .attr("fill-rule", "evenodd")
+      .style("stroke", "#fff")
+      .style("fill", function(d) { return color((d.children ? d : d.parent).name); })
+      .each(stash);
+
+  d3.select("#size").on("click", function() {
+    path
+        .data(partition.value(function(d) { return d.size; }))
+      .transition()
+        .duration(1500)
+        .attrTween("d", arcTween);
+
+    d3.select("#size").classed("active", true);
+    d3.select("#count").classed("active", false);
+  });
+
+  d3.select("#count").on("click", function() {
+    path
+        .data(partition.value(function(d) { return 1; }))
+      .transition()
+        .duration(1500)
+        .attrTween("d", arcTween);
+
+    d3.select("#size").classed("active", false);
+    d3.select("#count").classed("active", true);
+  });
+});
+
+// Stash the old values for transition.
+function stash(d) {
+  d.x0 = d.x;
+  d.dx0 = d.dx;
+}
+
+// Interpolate the arcs in data space.
+function arcTween(a) {
+  var i = d3.interpolate({x: a.x0, dx: a.dx0}, a);
+  return function(t) {
+    var b = i(t);
+    a.x0 = b.x;
+    a.dx0 = b.dx;
+    return arc(b);
+  };
+}

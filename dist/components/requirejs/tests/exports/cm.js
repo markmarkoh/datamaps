@@ -1,1 +1,6 @@
-define(["module","exports"],function(e,t){t.name="cm"})
+define([
+    'module',
+    'exports'
+], function (module, exports) {
+    exports.name = 'cm';
+});

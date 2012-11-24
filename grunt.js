@@ -26,6 +26,8 @@ module.exports = function(grunt) {
         },
         optimize: 'uglify',
         optimizeCss: 'none',
+				skipDirOptimize: true,
+				keepBuildDir: true,
         dir: 'dist',
         pragmas: {
           hasDeps: true,

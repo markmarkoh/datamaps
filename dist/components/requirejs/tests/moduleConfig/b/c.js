@@ -1,1 +1,6 @@
-define(["require","exports","module"],function(e,t,n){return{food:n.config().id}})
+define(function (require, exports, module) {
+    return {
+        food: module.config().id
+    };
+});
+

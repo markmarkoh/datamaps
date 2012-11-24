@@ -1,1 +1,30 @@
-define(["exports","./A","./B","./C"],function(e,t,n,r){return e.name="MyClass",e.sayAll=function(){return[e.say(),t.say(),n.say(),r.say()].join(":")},e.say=function(){return[e.name,t.name,n.name,r.name].join(",")},e})
+define(
+    [
+        "exports",
+        "./A",
+        "./B",
+        "./C"
+    ],
+
+    function (exports, A, B, C) {
+
+        exports.name = "MyClass";
+
+        exports.sayAll = function(){
+            return [
+                exports.say(),
+                A.say(),
+                B.say(),
+                C.say()
+            ].join(':');
+        };
+
+        exports.say = function(){
+            return [exports.name, A.name, B.name, C.name].join(',');
+        };
+
+        return exports;
+
+    }
+
+);

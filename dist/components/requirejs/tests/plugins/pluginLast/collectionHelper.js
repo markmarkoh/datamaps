@@ -1,1 +1,7 @@
-define(["component"],function(e){return{name:"collectionHelper",componentName:e.name,componentHtml:e.html}})
+define(['component'], function (component) {
+    return {
+        name: 'collectionHelper',
+        componentName: component.name,
+        componentHtml: component.html
+    };
+});

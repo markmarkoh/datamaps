@@ -1,1 +1,1 @@
-d3.svg.mouse=d3.mouse
+d3.svg.mouse = d3.mouse;

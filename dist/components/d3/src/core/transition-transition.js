@@ -1,1 +1,3 @@
-d3_transitionPrototype.transition=function(){return this.select(d3_this)}
+d3_transitionPrototype.transition = function() {
+  return this.select(d3_this);
+};

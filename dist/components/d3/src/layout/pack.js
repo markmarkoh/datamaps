@@ -1,1 +1,205 @@
-function d3_layout_packSort(e,t){return e.value-t.value}function d3_layout_packInsert(e,t){var n=e._pack_next;e._pack_next=t,t._pack_prev=e,t._pack_next=n,n._pack_prev=t}function d3_layout_packSplice(e,t){e._pack_next=t,t._pack_prev=e}function d3_layout_packIntersects(e,t){var n=t.x-e.x,r=t.y-e.y,i=e.r+t.r;return i*i-n*n-r*r>.001}function d3_layout_packSiblings(e){function p(e){n=Math.min(e.x-e.r,n),r=Math.max(e.x+e.r,r),i=Math.min(e.y-e.r,i),s=Math.max(e.y+e.r,s)}if(!(t=e.children)||!(h=t.length))return;var t,n=Infinity,r=-Infinity,i=Infinity,s=-Infinity,o,u,a,f,l,c,h;t.forEach(d3_layout_packLink),o=t[0],o.x=-o.r,o.y=0,p(o);if(h>1){u=t[1],u.x=u.r,u.y=0,p(u);if(h>2){a=t[2],d3_layout_packPlace(o,u,a),p(a),d3_layout_packInsert(o,a),o._pack_prev=a,d3_layout_packInsert(a,u),u=o._pack_next;for(f=3;f<h;f++){d3_layout_packPlace(o,u,a=t[f]);var d=0,v=1,m=1;for(l=u._pack_next;l!==u;l=l._pack_next,v++)if(d3_layout_packIntersects(l,a)){d=1;break}if(d==1)for(c=o._pack_prev;c!==l._pack_prev;c=c._pack_prev,m++)if(d3_layout_packIntersects(c,a))break;d?(v<m||v==m&&u.r<o.r?d3_layout_packSplice(o,u=l):d3_layout_packSplice(o=c,u),f--):(d3_layout_packInsert(o,a),u=a,p(a))}}}var g=(n+r)/2,y=(i+s)/2,b=0;for(f=0;f<h;f++)a=t[f],a.x-=g,a.y-=y,b=Math.max(b,a.r+Math.sqrt(a.x*a.x+a.y*a.y));e.r=b,t.forEach(d3_layout_packUnlink)}function d3_layout_packLink(e){e._pack_next=e._pack_prev=e}function d3_layout_packUnlink(e){delete e._pack_next,delete e._pack_prev}function d3_layout_packTransform(e,t,n,r){var i=e.children;e.x=t+=r*e.x,e.y=n+=r*e.y,e.r*=r;if(i){var s=-1,o=i.length;while(++s<o)d3_layout_packTransform(i[s],t,n,r)}}function d3_layout_packPlace(e,t,n){var r=e.r+n.r,i=t.x-e.x,s=t.y-e.y;if(r&&(i||s)){var o=t.r+n.r,u=i*i+s*s;o*=o,r*=r;var a=.5+(r-o)/(2*u),f=Math.sqrt(Math.max(0,2*o*(r+u)-(r-=u)*r-o*o))/(2*u);n.x=e.x+a*i+f*s,n.y=e.y+a*s-f*i}else n.x=e.x+r,n.y=e.y}d3.layout.pack=function(){function r(r,i){var s=e.call(this,r,i),o=s[0];o.x=0,o.y=0,d3_layout_treeVisitAfter(o,function(e){e.r=Math.sqrt(e.value)}),d3_layout_treeVisitAfter(o,d3_layout_packSiblings);var u=n[0],a=n[1],f=Math.max(2*o.r/u,2*o.r/a);if(t>0){var l=t*f/2;d3_layout_treeVisitAfter(o,function(e){e.r+=l}),d3_layout_treeVisitAfter(o,d3_layout_packSiblings),d3_layout_treeVisitAfter(o,function(e){e.r-=l}),f=Math.max(2*o.r/u,2*o.r/a)}return d3_layout_packTransform(o,u/2,a/2,1/f),s}var e=d3.layout.hierarchy().sort(d3_layout_packSort),t=0,n=[1,1];return r.size=function(e){return arguments.length?(n=e,r):n},r.padding=function(e){return arguments.length?(t=+e,r):t},d3_layout_hierarchyRebind(r,e)}
+d3.layout.pack = function() {
+  var hierarchy = d3.layout.hierarchy().sort(d3_layout_packSort),
+      padding = 0,
+      size = [1, 1];
+
+  function pack(d, i) {
+    var nodes = hierarchy.call(this, d, i),
+        root = nodes[0];
+
+    // Recursively compute the layout.
+    root.x = 0;
+    root.y = 0;
+    d3_layout_treeVisitAfter(root, function(d) { d.r = Math.sqrt(d.value); });
+    d3_layout_treeVisitAfter(root, d3_layout_packSiblings);
+
+    // Compute the scale factor the initial layout.
+    var w = size[0],
+        h = size[1],
+        k = Math.max(2 * root.r / w, 2 * root.r / h);
+
+    // When padding, recompute the layout using scaled padding.
+    if (padding > 0) {
+      var dr = padding * k / 2;
+      d3_layout_treeVisitAfter(root, function(d) { d.r += dr; });
+      d3_layout_treeVisitAfter(root, d3_layout_packSiblings);
+      d3_layout_treeVisitAfter(root, function(d) { d.r -= dr; });
+      k = Math.max(2 * root.r / w, 2 * root.r / h);
+    }
+
+    // Scale the layout to fit the requested size.
+    d3_layout_packTransform(root, w / 2, h / 2, 1 / k);
+
+    return nodes;
+  }
+
+  pack.size = function(x) {
+    if (!arguments.length) return size;
+    size = x;
+    return pack;
+  };
+
+  pack.padding = function(_) {
+    if (!arguments.length) return padding;
+    padding = +_;
+    return pack;
+  };
+
+  return d3_layout_hierarchyRebind(pack, hierarchy);
+};
+
+function d3_layout_packSort(a, b) {
+  return a.value - b.value;
+}
+
+function d3_layout_packInsert(a, b) {
+  var c = a._pack_next;
+  a._pack_next = b;
+  b._pack_prev = a;
+  b._pack_next = c;
+  c._pack_prev = b;
+}
+
+function d3_layout_packSplice(a, b) {
+  a._pack_next = b;
+  b._pack_prev = a;
+}
+
+function d3_layout_packIntersects(a, b) {
+  var dx = b.x - a.x,
+      dy = b.y - a.y,
+      dr = a.r + b.r;
+  return dr * dr - dx * dx - dy * dy > .001; // within epsilon
+}
+
+function d3_layout_packSiblings(node) {
+  if (!(nodes = node.children) || !(n = nodes.length)) return;
+
+  var nodes,
+      xMin = Infinity,
+      xMax = -Infinity,
+      yMin = Infinity,
+      yMax = -Infinity,
+      a, b, c, i, j, k, n;
+
+  function bound(node) {
+    xMin = Math.min(node.x - node.r, xMin);
+    xMax = Math.max(node.x + node.r, xMax);
+    yMin = Math.min(node.y - node.r, yMin);
+    yMax = Math.max(node.y + node.r, yMax);
+  }
+
+  // Create node links.
+  nodes.forEach(d3_layout_packLink);
+
+  // Create first node.
+  a = nodes[0];
+  a.x = -a.r;
+  a.y = 0;
+  bound(a);
+
+  // Create second node.
+  if (n > 1) {
+    b = nodes[1];
+    b.x = b.r;
+    b.y = 0;
+    bound(b);
+
+    // Create third node and build chain.
+    if (n > 2) {
+      c = nodes[2];
+      d3_layout_packPlace(a, b, c);
+      bound(c);
+      d3_layout_packInsert(a, c);
+      a._pack_prev = c;
+      d3_layout_packInsert(c, b);
+      b = a._pack_next;
+
+      // Now iterate through the rest.
+      for (i = 3; i < n; i++) {
+        d3_layout_packPlace(a, b, c = nodes[i]);
+
+        // Search for the closest intersection.
+        var isect = 0, s1 = 1, s2 = 1;
+        for (j = b._pack_next; j !== b; j = j._pack_next, s1++) {
+          if (d3_layout_packIntersects(j, c)) {
+            isect = 1;
+            break;
+          }
+        }
+        if (isect == 1) {
+          for (k = a._pack_prev; k !== j._pack_prev; k = k._pack_prev, s2++) {
+            if (d3_layout_packIntersects(k, c)) {
+              break;
+            }
+          }
+        }
+
+        // Update node chain.
+        if (isect) {
+          if (s1 < s2 || (s1 == s2 && b.r < a.r)) d3_layout_packSplice(a, b = j);
+          else d3_layout_packSplice(a = k, b);
+          i--;
+        } else {
+          d3_layout_packInsert(a, c);
+          b = c;
+          bound(c);
+        }
+      }
+    }
+  }
+
+  // Re-center the circles and compute the encompassing radius.
+  var cx = (xMin + xMax) / 2,
+      cy = (yMin + yMax) / 2,
+      cr = 0;
+  for (i = 0; i < n; i++) {
+    c = nodes[i];
+    c.x -= cx;
+    c.y -= cy;
+    cr = Math.max(cr, c.r + Math.sqrt(c.x * c.x + c.y * c.y));
+  }
+  node.r = cr;
+
+  // Remove node links.
+  nodes.forEach(d3_layout_packUnlink);
+}
+
+function d3_layout_packLink(node) {
+  node._pack_next = node._pack_prev = node;
+}
+
+function d3_layout_packUnlink(node) {
+  delete node._pack_next;
+  delete node._pack_prev;
+}
+
+function d3_layout_packTransform(node, x, y, k) {
+  var children = node.children;
+  node.x = (x += k * node.x);
+  node.y = (y += k * node.y);
+  node.r *= k;
+  if (children) {
+    var i = -1, n = children.length;
+    while (++i < n) d3_layout_packTransform(children[i], x, y, k);
+  }
+}
+
+function d3_layout_packPlace(a, b, c) {
+  var db = a.r + c.r,
+      dx = b.x - a.x,
+      dy = b.y - a.y;
+  if (db && (dx || dy)) {
+    var da = b.r + c.r,
+        dc = dx * dx + dy * dy;
+    da *= da;
+    db *= db;
+    var x = .5 + (db - da) / (2 * dc),
+        y = Math.sqrt(Math.max(0, 2 * da * (db + dc) - (db -= dc) * db - da * da)) / (2 * dc);
+    c.x = a.x + x * dx + y * dy;
+    c.y = a.y + x * dy - y * dx;
+  } else {
+    c.x = a.x + db;
+    c.y = a.y;
+  }
+}

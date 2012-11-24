@@ -1,1 +1,21 @@
-define("a",{name:"a"}),require(["a","b"],function(e,t){doh.register("requireAsync",[function(r){r.is("a",e.name),r.is("b",t.name)}]),doh.run()}),define("b",{name:"b"})
+define('a', {
+    name: 'a'
+});
+
+require(['a', 'b'], function (a, b) {
+    doh.register(
+        "requireAsync",
+        [
+            function requireAsync(t){
+                t.is('a', a.name);
+                t.is('b', b.name);
+            }
+        ]
+    );
+
+    doh.run();
+});
+
+define('b', {
+    name: 'b'
+});

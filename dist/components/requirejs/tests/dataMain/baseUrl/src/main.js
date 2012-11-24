@@ -1,1 +1,11 @@
-define(["a"],function(e){doh.register("dataMainBaseUrl",[function(n){n.is("a",e.name)}]),doh.run()})
+define(['a'], function (a) {
+    doh.register(
+        "dataMainBaseUrl",
+        [
+            function dataMainBaseUrl(t){
+                t.is("a", a.name);
+            }
+        ]
+    );
+    doh.run();
+});

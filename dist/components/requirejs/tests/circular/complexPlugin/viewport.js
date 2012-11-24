@@ -1,1 +1,7 @@
-define(["require","slowText!viewport.html","toolbar"],function(e){return{name:"viewport",template:e("slowText!viewport.html"),toolbar:e("toolbar")}})
+define(function(require) {
+    return {
+        name: 'viewport',
+        template: require('slowText!viewport.html'),
+        toolbar: require('toolbar')
+    };
+});

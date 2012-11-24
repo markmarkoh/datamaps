@@ -1,1 +1,1 @@
-d3.behavior={}
+d3.behavior = {};

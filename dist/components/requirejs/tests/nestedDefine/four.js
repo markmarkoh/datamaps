@@ -1,1 +1,7 @@
-define(["two","three"],function(e,t){return{name:"four",twoName:e.name,threeName:t.name}})
+define(['two', 'three'], function (two, three) {
+    return {
+        name: 'four',
+        twoName: two.name,
+        threeName: three.name
+    };
+});

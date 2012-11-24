@@ -1,1 +1,5 @@
-var C={name:"c",a:A,b:B}
+var C = {
+    name: 'c',
+    a: A,
+    b: B
+};

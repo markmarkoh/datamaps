@@ -1,1 +1,5 @@
-define(["require","exports","module"],function(){return{name:"b3"}})
+define(["require","exports","module"], function () {
+    return {
+        name: 'b3'
+    };
+});

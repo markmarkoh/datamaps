@@ -1,1 +1,1 @@
-log("three.js script")
+log("three.js script");

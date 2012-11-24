@@ -1,1 +1,6 @@
-define(["./dim"],function(e){return{name:"another/c/sub",dimName:e.name}})
+define(['./dim'], function (dim) {
+    return {
+        name: 'another/c/sub',
+        dimName: dim.name
+    };
+});

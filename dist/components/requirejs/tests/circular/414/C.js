@@ -1,1 +1,20 @@
-define(["exports","./MyClass","./A","./B"],function(e,t,n,r){e.name="C",e.say=function(){return[t.name,n.name,r.name,e.name].join(",")}})
+define(
+    [
+        "exports",
+        "./MyClass",
+        "./A",
+        "./B"
+    ],
+
+    function (exports, MyClass, A, B) {
+
+        exports.name = "C";
+
+        exports.say = function(){
+            return [MyClass.name, A.name, B.name, exports.name].join(',');
+        };
+
+    }
+
+);
+

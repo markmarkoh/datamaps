@@ -1,1 +1,5 @@
-define("employee",["plugin!person"],function(e){return{name:"employed "+e.name}})
+define('employee', ['plugin!person'], function(person) {
+    return {
+        name: 'employed ' + person.name
+    };
+});

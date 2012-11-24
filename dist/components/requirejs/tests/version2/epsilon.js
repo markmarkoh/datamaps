@@ -1,1 +1,3 @@
-epsilon={color:"red"}
+epsilon = {
+  color: "red"
+}

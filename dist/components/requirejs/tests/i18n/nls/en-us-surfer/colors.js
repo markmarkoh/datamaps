@@ -1,1 +1,6 @@
-define({red:"red, dude",black:{opacity:.5}})
+define({
+    red: "red, dude",
+    black: {
+        opacity: 0.5
+    }
+});

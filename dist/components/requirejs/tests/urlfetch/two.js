@@ -1,1 +1,10 @@
-define("one",{name:"one"}),define("two",["one"],function(e){return{name:"two",oneName:"one"}})
+define("one", {
+    name: "one"
+});
+
+define("two", ["one"], function (one) {
+    return {
+        name: "two",
+        oneName: "one"
+    };
+});

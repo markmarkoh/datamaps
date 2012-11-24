@@ -1,1 +1,7 @@
-define(["require","exports","module"],function(e,t,n){n.exports&&(n.exports=function(){return"implicitModule"})})
+define(function (require, exports, module) {
+    if (module.exports) {
+        module.exports = function () {
+            return 'implicitModule';
+        };
+    }
+});

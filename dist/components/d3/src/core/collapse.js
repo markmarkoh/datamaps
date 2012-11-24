@@ -1,1 +1,3 @@
-function d3_collapse(e){return e.trim().replace(/\s+/g," ")}
+function d3_collapse(s) {
+  return s.trim().replace(/\s+/g, " ");
+}

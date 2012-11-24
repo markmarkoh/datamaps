@@ -1,1 +1,15 @@
-define(["require","exports","module"],function(e,t,n){t.foo=function(){return this},t.set=function(e){this.x=e},t.get=function(){return this.x},t.getClosed=function(){return t.x}})
+define(["require", "exports", "module"], function(require, exports, module) {
+exports.foo = function () {
+    return this;
+};
+exports.set = function (x) {
+    this.x = x;
+};
+exports.get = function () {
+    return this.x;
+};
+exports.getClosed = function () {
+    return exports.x;
+};
+
+});

@@ -1,1 +1,4 @@
-var globalFoo={name:"globalFoo"}
+var globalFoo = {
+    name: 'globalFoo'
+};
+

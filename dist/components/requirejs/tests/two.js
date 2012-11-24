@@ -1,1 +1,12 @@
-define("two",["require","one"],function(e,t){return{size:"small",color:"redtwo",doSomething:function(){return e("one").doSomething()}}})
+define("two",
+  ["require", "one"],
+  function(require, one) {
+    return {
+      size: "small",
+      color: "redtwo",
+      doSomething: function() {
+        return require("one").doSomething();
+      }
+    };
+  }
+);

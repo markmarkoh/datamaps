@@ -1,1 +1,3 @@
-define({name:"common"})
+define({
+    name: 'common'
+});

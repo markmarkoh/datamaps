@@ -1,1 +1,49 @@
-d3.json("../data/faithful.json",function(e){data=e;var t=800,n=400,r=d3.scale.linear().domain([30,110]).range([0,t]),i=d3.scale.linear().domain([0,.1]).range([0,n]),s=d3.layout.histogram().frequency(!1).bins(r.ticks(60))(data),o=d3.max(s,function(e){return e.y}),u=science.stats.kde().sample(data),a=d3.select("body").append("svg").attr("width",t).attr("height",n),f=a.selectAll("g.bar").data(s).enter().append("g").attr("class","bar").attr("transform",function(e,t){return"translate("+r(e.x)+","+(n-i(e.y))+")"});f.append("rect").attr("fill","steelblue").attr("width",function(e){return r(e.dx+30)-1}).attr("height",function(e){return i(e.y)});var l=d3.svg.line().x(function(e){return r(e[0])}).y(function(e){return n-i(e[1])});a.selectAll("path").data(d3.values(science.stats.bandwidth)).enter().append("path").attr("d",function(e){return l(u.bandwidth(e)(d3.range(30,110,.1)))})})
+// Based on http://bl.ocks.org/900762 by John Firebaugh
+d3.json("../data/faithful.json", function(faithful) {
+  data = faithful;
+
+  var width = 800,
+      height = 400;
+
+  var x = d3.scale.linear()
+      .domain([30, 110]).range([0, width]);
+
+  var y = d3.scale.linear()
+      .domain([0, .1])
+      .range([0, height]);
+
+  var bins = d3.layout.histogram().frequency(false).bins(x.ticks(60))(data),
+      max = d3.max(bins, function(d) { return d.y; });
+
+  var kde = science.stats.kde()
+      .sample(data);
+
+  var vis = d3.select("body")
+    .append("svg")
+      .attr("width", width)
+      .attr("height", height);
+
+  var bars = vis.selectAll("g.bar")
+      .data(bins)
+    .enter().append("g")
+      .attr("class", "bar")
+      .attr("transform", function(d, i) {
+        return "translate(" + x(d.x) + "," + (height - y(d.y)) + ")";
+      });
+
+  bars.append("rect")
+      .attr("fill", "steelblue")
+      .attr("width", function(d) { return x(d.dx + 30) - 1; })
+      .attr("height", function(d) { return y(d.y); });
+
+  var line = d3.svg.line()
+      .x(function(d) { return x(d[0]); })
+      .y(function(d) { return height - y(d[1]); });
+
+  vis.selectAll("path")
+      .data(d3.values(science.stats.bandwidth))
+    .enter().append("path")
+      .attr("d", function(h) {
+        return line(kde.bandwidth(h)(d3.range(30, 110, .1)));
+      });
+});

@@ -1,1 +1,6 @@
-define(["require","exports","module"],function(e,t,n){t.foo=function(){return 1}})
+define(["require", "exports", "module"], function(require, exports, module) {
+exports.foo = function () {
+    return 1;
+};
+
+});

@@ -1,1 +1,88 @@
-function d3_geom_polygonInside(e,t,n){return(n[0]-t[0])*(e[1]-t[1])<(n[1]-t[1])*(e[0]-t[0])}function d3_geom_polygonIntersect(e,t,n,r){var i=e[0],s=t[0],o=n[0],u=r[0],a=e[1],f=t[1],l=n[1],c=r[1],h=i-o,p=s-i,d=u-o,v=a-l,m=f-a,g=c-l,y=(d*v-g*h)/(g*p-d*m);return[i+y*p,a+y*m]}d3.geom.polygon=function(e){return e.area=function(){var t=0,n=e.length,r=e[n-1][0]*e[0][1],i=e[n-1][1]*e[0][0];while(++t<n)r+=e[t-1][0]*e[t][1],i+=e[t-1][1]*e[t][0];return(i-r)*.5},e.centroid=function(t){var n=-1,r=e.length,i=0,s=0,o,u=e[r-1],a;arguments.length||(t=-1/(6*e.area()));while(++n<r)o=u,u=e[n],a=o[0]*u[1]-u[0]*o[1],i+=(o[0]+u[0])*a,s+=(o[1]+u[1])*a;return[i*t,s*t]},e.clip=function(t){var n,r=-1,i=e.length,s,o,u=e[i-1],a,f,l;while(++r<i){n=t.slice(),t.length=0,a=e[r],f=n[(o=n.length)-1],s=-1;while(++s<o)l=n[s],d3_geom_polygonInside(l,u,a)?(d3_geom_polygonInside(f,u,a)||t.push(d3_geom_polygonIntersect(f,l,u,a)),t.push(l)):d3_geom_polygonInside(f,u,a)&&t.push(d3_geom_polygonIntersect(f,l,u,a)),f=l;u=a}return t},e}
+// Note: requires coordinates to be counterclockwise and convex!
+d3.geom.polygon = function(coordinates) {
+
+  coordinates.area = function() {
+    var i = 0,
+        n = coordinates.length,
+        a = coordinates[n - 1][0] * coordinates[0][1],
+        b = coordinates[n - 1][1] * coordinates[0][0];
+    while (++i < n) {
+      a += coordinates[i - 1][0] * coordinates[i][1];
+      b += coordinates[i - 1][1] * coordinates[i][0];
+    }
+    return (b - a) * .5;
+  };
+
+  coordinates.centroid = function(k) {
+    var i = -1,
+        n = coordinates.length,
+        x = 0,
+        y = 0,
+        a,
+        b = coordinates[n - 1],
+        c;
+    if (!arguments.length) k = -1 / (6 * coordinates.area());
+    while (++i < n) {
+      a = b;
+      b = coordinates[i];
+      c = a[0] * b[1] - b[0] * a[1];
+      x += (a[0] + b[0]) * c;
+      y += (a[1] + b[1]) * c;
+    }
+    return [x * k, y * k];
+  };
+
+  // The Sutherland-Hodgman clipping algorithm.
+  coordinates.clip = function(subject) {
+    var input,
+        i = -1,
+        n = coordinates.length,
+        j,
+        m,
+        a = coordinates[n - 1],
+        b,
+        c,
+        d;
+    while (++i < n) {
+      input = subject.slice();
+      subject.length = 0;
+      b = coordinates[i];
+      c = input[(m = input.length) - 1];
+      j = -1;
+      while (++j < m) {
+        d = input[j];
+        if (d3_geom_polygonInside(d, a, b)) {
+          if (!d3_geom_polygonInside(c, a, b)) {
+            subject.push(d3_geom_polygonIntersect(c, d, a, b));
+          }
+          subject.push(d);
+        } else if (d3_geom_polygonInside(c, a, b)) {
+          subject.push(d3_geom_polygonIntersect(c, d, a, b));
+        }
+        c = d;
+      }
+      a = b;
+    }
+    return subject;
+  };
+
+  return coordinates;
+};
+
+function d3_geom_polygonInside(p, a, b) {
+  return (b[0] - a[0]) * (p[1] - a[1]) < (b[1] - a[1]) * (p[0] - a[0]);
+}
+
+// Intersect two infinite lines cd and ab.
+function d3_geom_polygonIntersect(c, d, a, b) {
+  var x1 = c[0], x2 = d[0], x3 = a[0], x4 = b[0],
+      y1 = c[1], y2 = d[1], y3 = a[1], y4 = b[1],
+      x13 = x1 - x3,
+      x21 = x2 - x1,
+      x43 = x4 - x3,
+      y13 = y1 - y3,
+      y21 = y2 - y1,
+      y43 = y4 - y3,
+      ua = (x43 * y13 - y43 * x13) / (y43 * x21 - x43 * y21);
+  return [x1 + ua * x21, y1 + ua * y21];
+}

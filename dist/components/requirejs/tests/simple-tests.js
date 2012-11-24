@@ -1,1 +1,23 @@
-require({baseUrl:"./"},["require","map","simple","dimple","func"],function(e,t,n,r,i){doh.register("simple",[function(s){s.is("map",t.name),s.is("blue",n.color),s.is("dimple-blue",r.color),s.is("You called a function",i())}]),typeof moreSimpleTests=="undefined"&&doh.run()})
+require({
+        baseUrl: "./"
+    },
+    ["require", "map", "simple", "dimple", "func"],
+    function(require, map, simple, dimple, func) {
+        doh.register(
+            "simple",
+            [
+                function colors(t){
+                    t.is("map", map.name);
+                    t.is("blue", simple.color);
+                    t.is("dimple-blue", dimple.color);
+                    t.is("You called a function", func());
+                }
+            ]
+        );
+
+        //In rhino there is no more simple tests, but in web browser there is.
+        if (typeof moreSimpleTests === 'undefined') {
+            doh.run();
+        }
+    }
+);

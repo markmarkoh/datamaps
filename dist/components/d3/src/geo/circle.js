@@ -1,1 +1,142 @@
-d3.geo.circle=function(){function i(){}function s(e){return r.distance(e)<n}function u(e){var t=-1,i=e.length,s=[],o,u,f,l,c;while(++t<i)c=r.distance(f=e[t]),c<n?(u&&s.push(d3_geo_greatArcInterpolate(u,f)((l-n)/(l-c))),s.push(f),o=u=null):(u=f,!o&&s.length&&(s.push(d3_geo_greatArcInterpolate(s[s.length-1],u)((n-l)/(c-l))),o=u)),l=c;return o=e[0],u=s[0],u&&f[0]===o[0]&&f[1]===o[1]&&(f[0]!==u[0]||f[1]!==u[1])&&s.push(u),a(s)}function a(e){var t=0,n=e.length,i,s,o=n?[e[0]]:e,u,a=r.source();while(++t<n){u=r.source(e[t-1])(e[t]).coordinates;for(i=0,s=u.length;++i<s;)o.push(u[i])}return r.source(a),o}var e=[0,0],t=89.99,n=t*d3_geo_radians,r=d3.geo.greatArc().source(e).target(d3_identity);i.clip=function(t){return typeof e=="function"&&r.source(e.apply(this,arguments)),o(t)||null};var o=d3_geo_type({FeatureCollection:function(e){var t=e.features.map(o).filter(d3_identity);return t&&(e=Object.create(e),e.features=t,e)},Feature:function(e){var t=o(e.geometry);return t&&(e=Object.create(e),e.geometry=t,e)},Point:function(e){return s(e.coordinates)&&e},MultiPoint:function(e){var t=e.coordinates.filter(s);return t.length&&{type:e.type,coordinates:t}},LineString:function(e){var t=u(e.coordinates);return t.length&&(e=Object.create(e),e.coordinates=t,e)},MultiLineString:function(e){var t=e.coordinates.map(u).filter(function(e){return e.length});return t.length&&(e=Object.create(e),e.coordinates=t,e)},Polygon:function(e){var t=e.coordinates.map(u);return t[0].length&&(e=Object.create(e),e.coordinates=t,e)},MultiPolygon:function(e){var t=e.coordinates.map(function(e){return e.map(u)}).filter(function(e){return e[0].length});return t.length&&(e=Object.create(e),e.coordinates=t,e)},GeometryCollection:function(e){var t=e.geometries.map(o).filter(d3_identity);return t.length&&(e=Object.create(e),e.geometries=t,e)}});return i.origin=function(t){return arguments.length?(e=t,typeof e!="function"&&r.source(e),i):e},i.angle=function(e){return arguments.length?(n=(t=+e)*d3_geo_radians,i):t},d3.rebind(i,r,"precision")}
+// TODO breakAtDateLine?
+
+d3.geo.circle = function() {
+  var origin = [0, 0],
+      degrees = 90 - 1e-2,
+      radians = degrees * d3_geo_radians,
+      arc = d3.geo.greatArc().source(origin).target(d3_identity);
+
+  function circle() {
+    // TODO render a circle as a Polygon
+  }
+
+  function visible(point) {
+    return arc.distance(point) < radians;
+  }
+
+  circle.clip = function(d) {
+    if (typeof origin === "function") arc.source(origin.apply(this, arguments));
+    return clipType(d) || null;
+  };
+
+  var clipType = d3_geo_type({
+
+    FeatureCollection: function(o) {
+      var features = o.features.map(clipType).filter(d3_identity);
+      return features && (o = Object.create(o), o.features = features, o);
+    },
+
+    Feature: function(o) {
+      var geometry = clipType(o.geometry);
+      return geometry && (o = Object.create(o), o.geometry = geometry, o);
+    },
+
+    Point: function(o) {
+      return visible(o.coordinates) && o;
+    },
+
+    MultiPoint: function(o) {
+      var coordinates = o.coordinates.filter(visible);
+      return coordinates.length && {
+        type: o.type,
+        coordinates: coordinates
+      };
+    },
+
+    LineString: function(o) {
+      var coordinates = clip(o.coordinates);
+      return coordinates.length && (o = Object.create(o), o.coordinates = coordinates, o);
+    },
+
+    MultiLineString: function(o) {
+      var coordinates = o.coordinates.map(clip).filter(function(d) { return d.length; });
+      return coordinates.length && (o = Object.create(o), o.coordinates = coordinates, o);
+    },
+
+    Polygon: function(o) {
+      var coordinates = o.coordinates.map(clip);
+      return coordinates[0].length && (o = Object.create(o), o.coordinates = coordinates, o);
+    },
+
+    MultiPolygon: function(o) {
+      var coordinates = o.coordinates.map(function(d) { return d.map(clip); }).filter(function(d) { return d[0].length; });
+      return coordinates.length && (o = Object.create(o), o.coordinates = coordinates, o);
+    },
+
+    GeometryCollection: function(o) {
+      var geometries = o.geometries.map(clipType).filter(d3_identity);
+      return geometries.length && (o = Object.create(o), o.geometries = geometries, o);
+    }
+
+  });
+
+  function clip(coordinates) {
+    var i = -1,
+        n = coordinates.length,
+        clipped = [],
+        p0,
+        p1,
+        p2,
+        d0,
+        d1;
+
+    while (++i < n) {
+      d1 = arc.distance(p2 = coordinates[i]);
+      if (d1 < radians) {
+        if (p1) clipped.push(d3_geo_greatArcInterpolate(p1, p2)((d0 - radians) / (d0 - d1)));
+        clipped.push(p2);
+        p0 = p1 = null;
+      } else {
+        p1 = p2;
+        if (!p0 && clipped.length) {
+          clipped.push(d3_geo_greatArcInterpolate(clipped[clipped.length - 1], p1)((radians - d0) / (d1 - d0)));
+          p0 = p1;
+        }
+      }
+      d0 = d1;
+    }
+
+    // Close the clipped polygon if necessary.
+    p0 = coordinates[0];
+    p1 = clipped[0];
+    if (p1 && p2[0] === p0[0] && p2[1] === p0[1] && !(p2[0] === p1[0] && p2[1] === p1[1])) {
+      clipped.push(p1);
+    }
+
+    return resample(clipped);
+  }
+
+  // Resample coordinates, creating great arcs between each.
+  function resample(coordinates) {
+    var i = 0,
+        n = coordinates.length,
+        j,
+        m,
+        resampled = n ? [coordinates[0]] : coordinates,
+        resamples,
+        origin = arc.source();
+
+    while (++i < n) {
+      resamples = arc.source(coordinates[i - 1])(coordinates[i]).coordinates;
+      for (j = 0, m = resamples.length; ++j < m;) resampled.push(resamples[j]);
+    }
+
+    arc.source(origin);
+    return resampled;
+  }
+
+  circle.origin = function(x) {
+    if (!arguments.length) return origin;
+    origin = x;
+    if (typeof origin !== "function") arc.source(origin);
+    return circle;
+  };
+
+  circle.angle = function(x) {
+    if (!arguments.length) return degrees;
+    radians = (degrees = +x) * d3_geo_radians;
+    return circle;
+  };
+
+  return d3.rebind(circle, arc, "precision");
+}

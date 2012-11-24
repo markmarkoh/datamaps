@@ -1,1 +1,5 @@
-define({load:function(e,t,n,r){n("x")}})
+define({
+    load: function (name, req, load, config) {
+        load('x');
+    }
+});

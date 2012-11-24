@@ -1,1 +1,20 @@
-(function(){function e(e){e.fn.gamma=function(){return"gamma"},e(function(){doh.is("gamma",e("body").gamma()),readyFired()})}typeof define!="undefined"&&define.amd?define(["jquery"],e):typeof jQuery!="undefined"&&e(jQuery)})()
+(function () {
+    //Define the plugin.
+    function plugin($) {
+        $.fn.gamma = function() {
+            return 'gamma';
+        };
+
+        $(function () {
+            doh.is('gamma', $('body').gamma());
+            readyFired();
+        });
+    }
+
+    //Register the plugin.
+    if (typeof define !== 'undefined' && define.amd) {
+        define(['jquery'], plugin);
+    } else if (typeof jQuery !== 'undefined') {
+        plugin(jQuery);
+    }
+}());

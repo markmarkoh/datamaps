@@ -1,1 +1,7 @@
-define("beta",[],function(){return{version:2}})
+define("beta",
+  function() {
+    return {
+      version: 2
+    };
+  }
+);

@@ -1,1 +1,3 @@
-define({name:"dojox/table/legs"})
+define({
+    name: 'dojox/table/legs'
+});

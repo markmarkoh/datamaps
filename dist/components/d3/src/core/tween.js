@@ -1,1 +1,27 @@
-function d3_tweenNull(e,t,n){return n!=""&&d3_tweenRemove}function d3_tweenByName(e,t){return d3.tween(e,d3_interpolateByName(t))}d3.tween=function(e,t){function n(n,r,i){var s=e.call(this,n,r);return s==null?i!=""&&d3_tweenRemove:i!=s&&t(i,s+"")}function r(n,r,i){return i!=e&&t(i,e)}return typeof e=="function"?n:e==null?d3_tweenNull:(e+="",r)};var d3_tweenRemove={}
+d3.tween = function(b, interpolate) {
+
+  function tweenFunction(d, i, a) {
+    var v = b.call(this, d, i);
+    return v == null
+        ? a != "" && d3_tweenRemove
+        : a != v && interpolate(a, v + "");
+  }
+
+  function tweenString(d, i, a) {
+    return a != b && interpolate(a, b);
+  }
+
+  return typeof b === "function" ? tweenFunction
+      : b == null ? d3_tweenNull
+      : (b += "", tweenString);
+};
+
+var d3_tweenRemove = {};
+
+function d3_tweenNull(d, i, a) {
+  return a != "" && d3_tweenRemove;
+}
+
+function d3_tweenByName(b, name) {
+  return d3.tween(b, d3_interpolateByName(name));
+}

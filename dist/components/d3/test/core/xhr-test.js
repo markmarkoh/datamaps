@@ -1,1 +1,55 @@
-require("../env");var vows=require("vows"),assert=require("assert"),suite=vows.describe("d3.xhr");suite.addBatch({xhr:{topic:function(){var e=this.callback;return d3.xhr("examples/data/sample.txt",function(t){e(null,t)})},"makes an asynchronous HTTP request":function(e){assert.equal(e._info.url,"examples/data/sample.txt"),assert.isTrue(e._info.async)},"invokes the callback with the request object":function(e){assert.equal(e.responseText,"Hello, world!\n")},"does not override the mime type by default":function(e){assert.isUndefined(e._info.mimeType)},"waits until the request is done":function(e){assert.equal(e.readyState,4),assert.equal(e.status,200)},"":{topic:function(){var e=this.callback;return d3.xhr("examples/data/sample.txt","text/plain",function(t){e(null,t)})},"observes the optional mime type":function(e){assert.equal(e._info.mimeType,"text/plain")}}," ":{topic:function(){var e=this.callback;return d3.xhr("//does/not/exist.txt",function(t){e(null,t)})},"invokes the callback with null when an error occurs":function(e){assert.isNull(e)}}}}),suite.export(module)
+require("../env");
+
+var vows = require("vows"),
+    assert = require("assert");
+
+var suite = vows.describe("d3.xhr");
+
+suite.addBatch({
+  "xhr": {
+    topic: function() {
+      var cb = this.callback;
+      return d3.xhr("examples/data/sample.txt", function(req) {
+        cb(null, req);
+      });
+    },
+    "makes an asynchronous HTTP request": function(req) {
+      assert.equal(req._info.url, "examples/data/sample.txt");
+      assert.isTrue(req._info.async);
+    },
+    "invokes the callback with the request object": function(req) {
+      assert.equal(req.responseText, "Hello, world!\n");
+    },
+    "does not override the mime type by default": function(req) {
+      assert.isUndefined(req._info.mimeType);
+    },
+    "waits until the request is done": function(req) {
+      assert.equal(req.readyState, 4);
+      assert.equal(req.status, 200);
+    },
+    "": {
+      topic: function() {
+        var cb = this.callback;
+        return d3.xhr("examples/data/sample.txt", "text/plain", function(req) {
+          cb(null, req);
+        });
+      },
+      "observes the optional mime type": function(req) {
+        assert.equal(req._info.mimeType, "text/plain");
+      }
+    },
+    " ": {
+      topic: function() {
+        var cb = this.callback;
+        return d3.xhr("//does/not/exist.txt", function(req) {
+          cb(null, req);
+        });
+      },
+      "invokes the callback with null when an error occurs": function(req) {
+        assert.isNull(req);
+      }
+    }
+  }
+});
+
+suite.export(module);

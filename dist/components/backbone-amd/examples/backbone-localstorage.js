@@ -1,1 +1,105 @@
-(function(e,t){typeof define=="function"&&define.amd?define(["underscore","backbone"],function(n,r){return e.Store=t(e,n,r)}):e.Store=t(e,_,Backbone)})(this,function(e,t,n){function r(){return((1+Math.random())*65536|0).toString(16).substring(1)}function i(){return r()+r()+"-"+r()+"-"+r()+"-"+r()+"-"+r()+r()+r()}var s=function(e){this.name=e;var t=localStorage.getItem(this.name);this.data=t&&JSON.parse(t)||{}};return t.extend(s.prototype,{save:function(){localStorage.setItem(this.name,JSON.stringify(this.data))},create:function(e){return e.id||(e.id=e.attributes.id=i()),this.data[e.id]=e,this.save(),e},update:function(e){return this.data[e.id]=e,this.save(),e},find:function(e){return this.data[e.id]},findAll:function(){return t.values(this.data)},destroy:function(e){return delete this.data[e.id],this.save(),e}}),n.sync=function(e,t,n){var r,i=t.localStorage||t.collection.localStorage;switch(e){case"read":r=t.id?i.find(t):i.findAll();break;case"create":r=i.create(t);break;case"update":r=i.update(t);break;case"delete":r=i.destroy(t)}r?n.success(r):n.error("Record not found")},s})
+// A simple module to replace `Backbone.sync` with *localStorage*-based
+// persistence. Models are given GUIDS, and saved into a JSON object. Simple
+// as that.
+
+(function(root, factory) {
+  // Set up Backbone appropriately for the environment.
+  if (typeof define === 'function' && define.amd) {
+    // AMD
+    define(['underscore', 'backbone'], function(_, Backbone) {
+      // Export global even in AMD case in case this script is loaded with others
+      return root.Store = factory(root, _, Backbone);
+    });
+  } else {
+    // Browser globals
+    root.Store = factory(root, _, Backbone);
+  }
+}(this, function(root, _, Backbone) {
+    'use strict';
+
+    // Generate four random hex digits.
+    function S4() {
+        return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+    };
+
+    // Generate a pseudo-GUID by concatenating random hexadecimal.
+    function guid() {
+        return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+    };
+
+    // Our Store is represented by a single JS object in *localStorage*. Create it
+    // with a meaningful name, like the name you'd give a table.
+    var Store = function(name) {
+        this.name = name;
+        var store = localStorage.getItem(this.name);
+        this.data = (store && JSON.parse(store)) || {};
+    };
+
+    _.extend(Store.prototype, {
+
+        // Save the current state of the **Store** to *localStorage*.
+        save: function() {
+            localStorage.setItem(this.name, JSON.stringify(this.data));
+        },
+
+        // Add a model, giving it a (hopefully)-unique GUID, if it doesn't already
+        // have an id of it's own.
+        create: function(model) {
+            if (!model.id) model.id = model.attributes.id = guid();
+            this.data[model.id] = model;
+            this.save();
+            return model;
+        },
+
+        // Update a model by replacing its copy in `this.data`.
+        update: function(model) {
+            this.data[model.id] = model;
+            this.save();
+            return model;
+        },
+
+        // Retrieve a model from `this.data` by id.
+        find: function(model) {
+            return this.data[model.id];
+        },
+
+        // Return the array of all models currently in storage.
+        findAll: function() {
+            return _.values(this.data);
+        },
+
+        // Delete a model from `this.data`, returning it.
+        destroy: function(model) {
+            delete this.data[model.id];
+            this.save();
+            return model;
+        }
+
+    });
+
+    // Override `Backbone.sync` to use delegate to the model or collection's
+    // *localStorage* property, which should be an instance of `Store`.
+    Backbone.sync = function(method, model, options) {
+
+        var resp;
+        var store = model.localStorage || model.collection.localStorage;
+
+        switch (method) {
+            case "read":    resp = model.id ? store.find(model) : store.findAll(); break;
+            case "create":  resp = store.create(model);                            break;
+            case "update":  resp = store.update(model);                            break;
+            case "delete":  resp = store.destroy(model);                           break;
+        }
+
+        if (resp) {
+            options.success(resp);
+        } else {
+            options.error("Record not found");
+        }
+    };
+
+
+    return Store;
+}));
+
+

@@ -1,1 +1,8 @@
-define({addToDom:function(){var e=document.createElement("div");e.id="two",e.setAttribute("data-name","two"),document.getElementsByTagName("body")[0].appendChild(e)}})
+define({
+    addToDom: function () {
+        var div = document.createElement('div');
+        div.id = 'two';
+        div.setAttribute('data-name', 'two');
+        document.getElementsByTagName('body')[0].appendChild(div);
+    }
+});

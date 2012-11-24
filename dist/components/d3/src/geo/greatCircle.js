@@ -1,1 +1,1 @@
-d3.geo.greatCircle=d3.geo.circle
+d3.geo.greatCircle = d3.geo.circle;

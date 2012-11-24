@@ -1,1 +1,37 @@
-var master=new doh.Deferred;doh.register("definedSpecified",[{name:"definedSpecified",timeout:5e3,runTest:function(){return master}}]),doh.run(),require.config({baseUrl:"./"}),define("tests",["require","a","b"],function(e,t,n){doh.is(!0,e.specified("a")),doh.is(!0,e.specified("b")),doh.is(!0,e.defined("a")),doh.is(!0,e.defined("b")),master.callback(!0)}),require(["tests"]),doh.is(!0,require.specified("a")),doh.is(!0,require.specified("b")),doh.is(!1,require.defined("a")),doh.is(!1,require.defined("b"))
+/*global doh */
+var master = new doh.Deferred();
+//Register the test
+doh.register(
+    "definedSpecified",
+    [
+        {
+            name: "definedSpecified",
+            timeout: 5000,
+            runTest: function () {
+                'use strict';
+                return master;
+            }
+        }
+    ]
+);
+doh.run();
+
+require.config({
+    baseUrl: './'
+});
+
+define('tests', ['require', 'a', 'b'], function(require, a, b) {
+    'use strict';
+    doh.is(true, require.specified('a'));
+    doh.is(true, require.specified('b'));
+    doh.is(true, require.defined('a'));
+    doh.is(true, require.defined('b'));
+    master.callback(true);
+});
+
+require(['tests']);
+
+doh.is(true, require.specified('a'));
+doh.is(true, require.specified('b'));
+doh.is(false, require.defined('a'));
+doh.is(false, require.defined('b'));

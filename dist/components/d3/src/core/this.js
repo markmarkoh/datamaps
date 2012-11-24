@@ -1,1 +1,3 @@
-function d3_this(){return this}
+function d3_this() {
+  return this;
+}

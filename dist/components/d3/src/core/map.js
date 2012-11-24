@@ -1,1 +1,48 @@
-function d3_Map(){}d3.map=function(e){var t=new d3_Map;for(var n in e)t.set(n,e[n]);return t},d3_class(d3_Map,{has:function(e){return d3_map_prefix+e in this},get:function(e){return this[d3_map_prefix+e]},set:function(e,t){return this[d3_map_prefix+e]=t},remove:function(e){return e=d3_map_prefix+e,e in this&&delete this[e]},keys:function(){var e=[];return this.forEach(function(t){e.push(t)}),e},values:function(){var e=[];return this.forEach(function(t,n){e.push(n)}),e},entries:function(){var e=[];return this.forEach(function(t,n){e.push({key:t,value:n})}),e},forEach:function(e){for(var t in this)t.charCodeAt(0)===d3_map_prefixCode&&e.call(this,t.substring(1),this[t])}});var d3_map_prefix="\0",d3_map_prefixCode=d3_map_prefix.charCodeAt(0)
+d3.map = function(object) {
+  var map = new d3_Map;
+  for (var key in object) map.set(key, object[key]);
+  return map;
+};
+
+function d3_Map() {}
+
+d3_class(d3_Map, {
+  has: function(key) {
+    return d3_map_prefix + key in this;
+  },
+  get: function(key) {
+    return this[d3_map_prefix + key];
+  },
+  set: function(key, value) {
+    return this[d3_map_prefix + key] = value;
+  },
+  remove: function(key) {
+    key = d3_map_prefix + key;
+    return key in this && delete this[key];
+  },
+  keys: function() {
+    var keys = [];
+    this.forEach(function(key) { keys.push(key); });
+    return keys;
+  },
+  values: function() {
+    var values = [];
+    this.forEach(function(key, value) { values.push(value); });
+    return values;
+  },
+  entries: function() {
+    var entries = [];
+    this.forEach(function(key, value) { entries.push({key: key, value: value}); });
+    return entries;
+  },
+  forEach: function(f) {
+    for (var key in this) {
+      if (key.charCodeAt(0) === d3_map_prefixCode) {
+        f.call(this, key.substring(1), this[key]);
+      }
+    }
+  }
+});
+
+var d3_map_prefix = "\0", // prevent collision with built-ins
+    d3_map_prefixCode = d3_map_prefix.charCodeAt(0);

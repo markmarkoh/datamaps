@@ -1,1 +1,8 @@
-globalCounter+=1,define(["./second"],function(e){return globalCounter+=1,{load:e}})
+globalCounter += 1;
+
+define(['./second'], function (second) {
+    globalCounter += 1;
+    return {
+        load: second
+    };
+});

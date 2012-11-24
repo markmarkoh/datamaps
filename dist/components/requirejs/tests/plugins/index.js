@@ -1,1 +1,37 @@
-(function(){function e(e){var t=e.split("?"),n=parseInt(t[0],10),r=t[1].split(":"),i=r[n];return{index:n,choices:r,choice:i}}define({pluginBuilder:"./indexBuilder",normalize:function(t,n){var r=e(t),s=r.choices;for(i=0;i<s.length;i++)s[i]=n(s[i]);return r.index+"?"+s.join(":")},load:function(t,n,r,i){n([e(t).choice],function(e){r(e)})}})})()
+(function () {
+
+    function parse(name) {
+        var parts = name.split('?'),
+            index = parseInt(parts[0], 10),
+            choices = parts[1].split(':'),
+            choice = choices[index];
+
+        return {
+            index: index,
+            choices: choices,
+            choice: choice
+        };
+    }
+
+    define({
+        pluginBuilder: './indexBuilder',
+        normalize: function (name, normalize) {
+            var parsed = parse(name),
+                choices = parsed.choices;
+
+            //Normalize each path choice.
+            for (i = 0; i < choices.length; i++) {
+                choices[i] = normalize(choices[i]);
+            }
+
+            return parsed.index + '?' + choices.join(':');
+        },
+
+        load: function (name, req, load, config) {
+            req([parse(name).choice], function (value) {
+                load(value);
+            });
+        }
+    });
+
+}());

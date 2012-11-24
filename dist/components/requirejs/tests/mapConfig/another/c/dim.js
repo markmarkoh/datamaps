@@ -1,1 +1,3 @@
-define({name:"another/c/dim"})
+define({
+    name: 'another/c/dim'
+});

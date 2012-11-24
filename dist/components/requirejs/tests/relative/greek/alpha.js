@@ -1,1 +1,7 @@
-define(["require","exports","module","."],function(e,t){t.name="alpha",t.getGreekName=function(){return e(".").name}})
+define(function (require, exports) {
+
+    exports.name = 'alpha';
+    exports.getGreekName = function () {
+        return require('.').name;
+    };
+});

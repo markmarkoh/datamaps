@@ -1,1 +1,100 @@
-function d3_format_precision(e,t){return t-(e?1+Math.floor(Math.log(e+Math.pow(10,1+Math.floor(Math.log(e)/Math.LN10)-t))/Math.LN10):1)}function d3_format_typeDefault(e){return e+""}function d3_format_group(e){var t=e.lastIndexOf("."),n=t>=0?e.substring(t):(t=e.length,""),r=[];while(t>0)r.push(e.substring(t-=3,t+3));return r.reverse().join(",")+n}d3.format=function(e){var t=d3_format_re.exec(e),n=t[1]||" ",r=t[3]||"",i=t[5],s=+t[6],o=t[7],u=t[8],a=t[9],f=1,l="",c=!1;u&&(u=+u.substring(1)),i&&(n="0",o&&(s-=Math.floor((s-1)/4)));switch(a){case"n":o=!0,a="g";break;case"%":f=100,l="%",a="f";break;case"p":f=100,l="%",a="r";break;case"d":c=!0,u=0;break;case"s":f=-1,a="r"}return a=="r"&&!u&&(a="g"),a=d3_format_types.get(a)||d3_format_typeDefault,function(e){if(c&&e%1)return"";var t=e<0&&(e=-e)?"-":r;if(f<0){var h=d3.formatPrefix(e,u);e=h.scale(e),l=h.symbol}else e*=f;e=a(e,u);if(i){var p=e.length+t.length;p<s&&(e=(new Array(s-p+1)).join(n)+e),o&&(e=d3_format_group(e)),e=t+e}else{o&&(e=d3_format_group(e)),e=t+e;var p=e.length;p<s&&(e=(new Array(s-p+1)).join(n)+e)}return e+l}};var d3_format_re=/(?:([^{])?([<>=^]))?([+\- ])?(#)?(0)?([0-9]+)?(,)?(\.[0-9]+)?([a-zA-Z%])?/,d3_format_types=d3.map({g:function(e,t){return e.toPrecision(t)},e:function(e,t){return e.toExponential(t)},f:function(e,t){return e.toFixed(t)},r:function(e,t){return d3.round(e,t=d3_format_precision(e,t)).toFixed(Math.max(0,Math.min(20,t)))}})
+// TODO align
+d3.format = function(specifier) {
+  var match = d3_format_re.exec(specifier),
+      fill = match[1] || " ",
+      sign = match[3] || "",
+      zfill = match[5],
+      width = +match[6],
+      comma = match[7],
+      precision = match[8],
+      type = match[9],
+      scale = 1,
+      suffix = "",
+      integer = false;
+
+  if (precision) precision = +precision.substring(1);
+
+  if (zfill) {
+    fill = "0"; // TODO align = "=";
+    if (comma) width -= Math.floor((width - 1) / 4);
+  }
+
+  switch (type) {
+    case "n": comma = true; type = "g"; break;
+    case "%": scale = 100; suffix = "%"; type = "f"; break;
+    case "p": scale = 100; suffix = "%"; type = "r"; break;
+    case "d": integer = true; precision = 0; break;
+    case "s": scale = -1; type = "r"; break;
+  }
+
+  // If no precision is specified for r, fallback to general notation.
+  if (type == "r" && !precision) type = "g";
+
+  type = d3_format_types.get(type) || d3_format_typeDefault;
+
+  return function(value) {
+
+    // Return the empty string for floats formatted as ints.
+    if (integer && (value % 1)) return "";
+
+    // Convert negative to positive, and record the sign prefix.
+    var negative = value < 0 && (value = -value) ? "-" : sign;
+
+    // Apply the scale, computing it from the value's exponent for si format.
+    if (scale < 0) {
+      var prefix = d3.formatPrefix(value, precision);
+      value = prefix.scale(value);
+      suffix = prefix.symbol;
+    } else {
+      value *= scale;
+    }
+
+    // Convert to the desired precision.
+    value = type(value, precision);
+
+    // If the fill character is 0, the sign and group is applied after the fill.
+    if (zfill) {
+      var length = value.length + negative.length;
+      if (length < width) value = new Array(width - length + 1).join(fill) + value;
+      if (comma) value = d3_format_group(value);
+      value = negative + value;
+    }
+
+    // Otherwise (e.g., space-filling), the sign and group is applied before.
+    else {
+      if (comma) value = d3_format_group(value);
+      value = negative + value;
+      var length = value.length;
+      if (length < width) value = new Array(width - length + 1).join(fill) + value;
+    }
+
+    return value + suffix;
+  };
+};
+
+// [[fill]align][sign][#][0][width][,][.precision][type]
+var d3_format_re = /(?:([^{])?([<>=^]))?([+\- ])?(#)?(0)?([0-9]+)?(,)?(\.[0-9]+)?([a-zA-Z%])?/;
+
+var d3_format_types = d3.map({
+  g: function(x, p) { return x.toPrecision(p); },
+  e: function(x, p) { return x.toExponential(p); },
+  f: function(x, p) { return x.toFixed(p); },
+  r: function(x, p) { return d3.round(x, p = d3_format_precision(x, p)).toFixed(Math.max(0, Math.min(20, p))); }
+});
+
+function d3_format_precision(x, p) {
+  return p - (x ? 1 + Math.floor(Math.log(x + Math.pow(10, 1 + Math.floor(Math.log(x) / Math.LN10) - p)) / Math.LN10) : 1);
+}
+
+function d3_format_typeDefault(x) {
+  return x + "";
+}
+
+// Apply comma grouping for thousands.
+function d3_format_group(value) {
+  var i = value.lastIndexOf("."),
+      f = i >= 0 ? value.substring(i) : (i = value.length, ""),
+      t = [];
+  while (i > 0) t.push(value.substring(i -= 3, i + 3));
+  return t.reverse().join(",") + f;
+}

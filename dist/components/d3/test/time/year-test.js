@@ -1,1 +1,140 @@
-function local(e,t,n,r,i,s,o){var u=new Date;return u.setFullYear(e,t,n),u.setHours(r||0,i||0,s||0,o||0),u}function utc(e,t,n,r,i,s,o){var u=new Date;return u.setUTCFullYear(e,t,n),u.setUTCHours(r||0,i||0,s||0,o||0),u}require("../env");var vows=require("vows"),assert=require("assert"),suite=vows.describe("d3.time.year");suite.addBatch({year:{topic:function(){return d3.time.year},"defaults to floor":function(e){assert.strictEqual(e,e.floor)},floor:{topic:function(e){return e.floor},"returns years":function(e){assert.deepEqual(e(local(2010,11,31,23,59,59)),local(2010,0,1)),assert.deepEqual(e(local(2011,0,1,0,0,0)),local(2011,0,1)),assert.deepEqual(e(local(2011,0,1,0,0,1)),local(2011,0,1))},"correctly handles years in the first century":function(e){assert.deepEqual(e(local(9,10,6,7)),local(9,0,1))}},ceil:{topic:function(e){return e.ceil},"returns years":function(e){assert.deepEqual(e(local(2010,11,31,23,59,59)),local(2011,0,1)),assert.deepEqual(e(local(2011,0,1,0,0,0)),local(2011,0,1)),assert.deepEqual(e(local(2011,0,1,0,0,1)),local(2012,0,1))}},offset:{topic:function(e){return e.offset},"does not modify the passed-in date":function(e){var t=local(2010,11,31,23,59,59,999);e(t,1),assert.deepEqual(t,local(2010,11,31,23,59,59,999))},"does not round the passed-in-date":function(e){assert.deepEqual(e(local(2010,11,31,23,59,59,999),1),local(2011,11,31,23,59,59,999)),assert.deepEqual(e(local(2010,11,31,23,59,59,456),-2),local(2008,11,31,23,59,59,456))},"allows negative offsets":function(e){assert.deepEqual(e(local(2010,11,1),-1),local(2009,11,1)),assert.deepEqual(e(local(2011,0,1),-2),local(2009,0,1)),assert.deepEqual(e(local(2011,0,1),-1),local(2010,0,1))},"allows positive offsets":function(e){assert.deepEqual(e(local(2009,11,1),1),local(2010,11,1)),assert.deepEqual(e(local(2009,0,1),2),local(2011,0,1)),assert.deepEqual(e(local(2010,0,1),1),local(2011,0,1))},"allows zero offset":function(e){assert.deepEqual(e(local(2010,11,31,23,59,59,999),0),local(2010,11,31,23,59,59,999)),assert.deepEqual(e(local(2010,11,31,23,59,58,0),0),local(2010,11,31,23,59,58,0))}},UTC:{topic:function(e){return e.utc},"defaults to floor":function(e){assert.strictEqual(e,e.floor)},floor:{topic:function(e){return e.floor},"returns years":function(e){assert.deepEqual(e(utc(2010,11,31,23,59,59)),utc(2010,0,1)),assert.deepEqual(e(utc(2011,0,1,0,0,0)),utc(2011,0,1)),assert.deepEqual(e(utc(2011,0,1,0,0,1)),utc(2011,0,1))}},ceil:{topic:function(e){return e.ceil},"returns years":function(e){assert.deepEqual(e(utc(2010,11,31,23,59,59)),utc(2011,0,1)),assert.deepEqual(e(utc(2011,0,1,0,0,0)),utc(2011,0,1)),assert.deepEqual(e(utc(2011,0,1,0,0,1)),utc(2012,0,1))}},offset:{topic:function(e){return e.offset},"does not modify the passed-in date":function(e){var t=utc(2010,11,31,23,59,59,999);e(t,1),assert.deepEqual(t,utc(2010,11,31,23,59,59,999))},"does not round the passed-in-date":function(e){assert.deepEqual(e(utc(2010,11,31,23,59,59,999),1),utc(2011,11,31,23,59,59,999)),assert.deepEqual(e(utc(2010,11,31,23,59,59,456),-2),utc(2008,11,31,23,59,59,456))},"allows negative offsets":function(e){assert.deepEqual(e(utc(2010,11,1),-1),utc(2009,11,1)),assert.deepEqual(e(utc(2011,0,1),-2),utc(2009,0,1)),assert.deepEqual(e(utc(2011,0,1),-1),utc(2010,0,1))},"allows positive offsets":function(e){assert.deepEqual(e(utc(2009,11,1),1),utc(2010,11,1)),assert.deepEqual(e(utc(2009,0,1),2),utc(2011,0,1)),assert.deepEqual(e(utc(2010,0,1),1),utc(2011,0,1))},"allows zero offset":function(e){assert.deepEqual(e(utc(2010,11,31,23,59,59,999),0),utc(2010,11,31,23,59,59,999)),assert.deepEqual(e(utc(2010,11,31,23,59,58,0),0),utc(2010,11,31,23,59,58,0))}}}}}),suite.export(module)
+require("../env");
+
+var vows = require("vows"),
+    assert = require("assert");
+
+var suite = vows.describe("d3.time.year");
+
+suite.addBatch({
+  "year": {
+    topic: function() {
+      return d3.time.year;
+    },
+    "defaults to floor": function(interval) {
+      assert.strictEqual(interval, interval.floor);
+    },
+    "floor": {
+      topic: function(interval) {
+        return interval.floor;
+      },
+      "returns years": function(floor) {
+        assert.deepEqual(floor(local(2010, 11, 31, 23, 59, 59)), local(2010, 00, 01));
+        assert.deepEqual(floor(local(2011, 00, 01, 00, 00, 00)), local(2011, 00, 01));
+        assert.deepEqual(floor(local(2011, 00, 01, 00, 00, 01)), local(2011, 00, 01));
+      },
+      "correctly handles years in the first century": function(floor) {
+        assert.deepEqual(floor(local(0011, 10, 06, 07)), local(0011, 00, 01));
+      }
+    },
+    "ceil": {
+      topic: function(interval) {
+        return interval.ceil;
+      },
+      "returns years": function(ceil) {
+        assert.deepEqual(ceil(local(2010, 11, 31, 23, 59, 59)), local(2011, 00, 01));
+        assert.deepEqual(ceil(local(2011, 00, 01, 00, 00, 00)), local(2011, 00, 01));
+        assert.deepEqual(ceil(local(2011, 00, 01, 00, 00, 01)), local(2012, 00, 01));
+      }
+    },
+    "offset": {
+      topic: function(interval) {
+        return interval.offset;
+      },
+      "does not modify the passed-in date": function(offset) {
+        var date = local(2010, 11, 31, 23, 59, 59, 999);
+        offset(date, +1);
+        assert.deepEqual(date, local(2010, 11, 31, 23, 59, 59, 999));
+      },
+      "does not round the passed-in-date": function(offset) {
+        assert.deepEqual(offset(local(2010, 11, 31, 23, 59, 59, 999), +1), local(2011, 11, 31, 23, 59, 59, 999));
+        assert.deepEqual(offset(local(2010, 11, 31, 23, 59, 59, 456), -2), local(2008, 11, 31, 23, 59, 59, 456));
+      },
+      "allows negative offsets": function(offset) {
+        assert.deepEqual(offset(local(2010, 11, 01), -1), local(2009, 11, 01));
+        assert.deepEqual(offset(local(2011, 00, 01), -2), local(2009, 00, 01));
+        assert.deepEqual(offset(local(2011, 00, 01), -1), local(2010, 00, 01));
+      },
+      "allows positive offsets": function(offset) {
+        assert.deepEqual(offset(local(2009, 11, 01), +1), local(2010, 11, 01));
+        assert.deepEqual(offset(local(2009, 00, 01), +2), local(2011, 00, 01));
+        assert.deepEqual(offset(local(2010, 00, 01), +1), local(2011, 00, 01));
+      },
+      "allows zero offset": function(offset) {
+        assert.deepEqual(offset(local(2010, 11, 31, 23, 59, 59, 999), 0), local(2010, 11, 31, 23, 59, 59, 999));
+        assert.deepEqual(offset(local(2010, 11, 31, 23, 59, 58, 000), 0), local(2010, 11, 31, 23, 59, 58, 000));
+      }
+    },
+    "UTC": {
+      topic: function(interval) {
+        return interval.utc;
+      },
+      "defaults to floor": function(interval) {
+        assert.strictEqual(interval, interval.floor);
+      },
+      "floor": {
+        topic: function(interval) {
+          return interval.floor;
+        },
+        "returns years": function(floor) {
+          assert.deepEqual(floor(utc(2010, 11, 31, 23, 59, 59)), utc(2010, 00, 01));
+          assert.deepEqual(floor(utc(2011, 00, 01, 00, 00, 00)), utc(2011, 00, 01));
+          assert.deepEqual(floor(utc(2011, 00, 01, 00, 00, 01)), utc(2011, 00, 01));
+        }
+      },
+      "ceil": {
+        topic: function(interval) {
+          return interval.ceil;
+        },
+        "returns years": function(ceil) {
+          assert.deepEqual(ceil(utc(2010, 11, 31, 23, 59, 59)), utc(2011, 00, 01));
+          assert.deepEqual(ceil(utc(2011, 00, 01, 00, 00, 00)), utc(2011, 00, 01));
+          assert.deepEqual(ceil(utc(2011, 00, 01, 00, 00, 01)), utc(2012, 00, 01));
+        }
+      },
+      "offset": {
+        topic: function(interval) {
+          return interval.offset;
+        },
+        "does not modify the passed-in date": function(offset) {
+          var date = utc(2010, 11, 31, 23, 59, 59, 999);
+          offset(date, +1);
+          assert.deepEqual(date, utc(2010, 11, 31, 23, 59, 59, 999));
+        },
+        "does not round the passed-in-date": function(offset) {
+          assert.deepEqual(offset(utc(2010, 11, 31, 23, 59, 59, 999), +1), utc(2011, 11, 31, 23, 59, 59, 999));
+          assert.deepEqual(offset(utc(2010, 11, 31, 23, 59, 59, 456), -2), utc(2008, 11, 31, 23, 59, 59, 456));
+        },
+        "allows negative offsets": function(offset) {
+          assert.deepEqual(offset(utc(2010, 11, 01), -1), utc(2009, 11, 01));
+          assert.deepEqual(offset(utc(2011, 00, 01), -2), utc(2009, 00, 01));
+          assert.deepEqual(offset(utc(2011, 00, 01), -1), utc(2010, 00, 01));
+        },
+        "allows positive offsets": function(offset) {
+          assert.deepEqual(offset(utc(2009, 11, 01), +1), utc(2010, 11, 01));
+          assert.deepEqual(offset(utc(2009, 00, 01), +2), utc(2011, 00, 01));
+          assert.deepEqual(offset(utc(2010, 00, 01), +1), utc(2011, 00, 01));
+        },
+        "allows zero offset": function(offset) {
+          assert.deepEqual(offset(utc(2010, 11, 31, 23, 59, 59, 999), 0), utc(2010, 11, 31, 23, 59, 59, 999));
+          assert.deepEqual(offset(utc(2010, 11, 31, 23, 59, 58, 000), 0), utc(2010, 11, 31, 23, 59, 58, 000));
+        }
+      }
+    }
+  }
+});
+
+function local(year, month, day, hours, minutes, seconds, milliseconds) {
+  var date = new Date();
+  date.setFullYear(year, month, day);
+  date.setHours(hours || 0, minutes || 0, seconds || 0, milliseconds || 0);
+  return date;
+}
+
+function utc(year, month, day, hours, minutes, seconds, milliseconds) {
+  var date = new Date();
+  date.setUTCFullYear(year, month, day);
+  date.setUTCHours(hours || 0, minutes || 0, seconds || 0, milliseconds || 0);
+  return date;
+}
+
+suite.export(module);

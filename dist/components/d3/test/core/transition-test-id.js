@@ -1,1 +1,19 @@
-require("../env");var assert=require("assert");module.exports={topic:function(){return d3.select("body").append("div").transition()},"has a positive integer id":function(e){var t=e.id;assert.isTrue(t>0),assert.equal(~~t,t)},"increases monotonically across transitions":function(e){var t=d3.select("body").append("div").transition(),n=d3.select("body").append("div").transition();assert.isTrue(n.id>t.id)}}
+require("../env");
+
+var assert = require("assert");
+
+module.exports = {
+  topic: function() {
+    return d3.select("body").append("div").transition();
+  },
+  "has a positive integer id": function(transition) {
+    var id = transition.id;
+    assert.isTrue(id > 0);
+    assert.equal(~~id, id);
+  },
+  "increases monotonically across transitions": function(transition) {
+    var t0 = d3.select("body").append("div").transition(),
+        t1 = d3.select("body").append("div").transition();
+    assert.isTrue(t1.id > t0.id);
+  }
+};

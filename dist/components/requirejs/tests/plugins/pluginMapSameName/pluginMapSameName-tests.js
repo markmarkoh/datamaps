@@ -1,1 +1,19 @@
-require({map:{"*":{plugin:"plugin/plugin"}}},["plugin!foo"],function(e){doh.register("pluginMapSameName",[function(n){n.is("foo",e)}]),doh.run()})
+require({
+    map: {
+        '*': {
+            'plugin': 'plugin/plugin'
+        }
+    }
+}, ['plugin!foo'], function (value) {
+
+    doh.register(
+        'pluginMapSameName',
+        [
+            function pluginMapSameName(t){
+                t.is('foo', value);
+            }
+        ]
+    );
+    doh.run();
+
+});

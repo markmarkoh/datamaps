@@ -1,1 +1,855 @@
-window.dojo&&dojo.provide("doh._browserRunner"),function(){doh.setTimeout=function(e,t){return setTimeout(e,t)};try{var topdog=window.parent==window||!Boolean(window.parent.doh)}catch(e){topdog=!0}if(topdog){var byId=function(e){return document.getElementById(e)},_addOnEvt=function(e,t,n){n||(n=window);var r=t;typeof t=="string"&&(r=n[t]);var i=function(){return r.apply(n,arguments)};window.dojo&&e=="load"?dojo.addOnLoad(i):window.attachEvent?window.attachEvent("on"+e,i):window.addEventListener?window.addEventListener(e,i,!1):document.addEventListener&&document.addEventListener(e,i,!1)},escapeXml=function(e){return e.replace(/&/gm,"&amp;").replace(/</gm,"&lt;").replace(/>/gm,"&gt;").replace(/"/gm,"&quot;")},_logBacklog=[],_loggedMsgLen=0,sendToLogPane=function(e,t){var n="";for(var r=0;r<e.length;r++)n+=" "+e[r];n=escapeXml(n),n=n.replace("	","&nbsp;&nbsp;&nbsp;&nbsp;").replace(" ","&nbsp;").replace("\n","<br>&nbsp;");if(!byId("logBody")){_logBacklog.push(n);return}if(_logBacklog.length&&!t){var i;while(i=_logBacklog.shift())sendToLogPane(i,!0)}var s=byId("logBody"),o=document.createElement("div");o.innerHTML=n,s.appendChild(o),_loggedMsgLen++},findTarget=function(e){while(e&&!e.getAttribute("_target"))e=e.parentNode,e.getAttribute||(e=null);return e};doh._jumpToLog=function(e){var t=findTarget(e?e.target:window.event.srcElement);if(!t)return;var n=Number(t.getAttribute("_target")),r=byId("logBody");if(n>=r.childNodes.length)return;var i=r.childNodes[n];i.scrollIntoView();if(window.dojo){var s=dojo.style(i.parentNode.parentNode,"backgroundColor"),o=dojo.style(t.parentNode,"backgroundColor"),u=dojo.animateProperty({node:i,duration:500,properties:{backgroundColor:{start:o,end:s}},onEnd:function(){i.style.backgroundColor=""}}),a=dojo.animateProperty({node:i,duration:500,properties:{backgroundColor:{start:s,end:o}},onEnd:function(){u.play()}});a.play()}},doh._jumpToSuite=function(e){var t=findTarget(e?e.target:window.event.srcElement);if(!t)return;var n=t.getAttribute("_target"),r=getGroupNode(n);if(!r)return;r.scrollIntoView()},doh._init=function(e){return function(){var t=byId("logBody");if(t){while(t.firstChild)t.removeChild(t.firstChild);_loggedMsgLen=0}this._totalTime=0,this._suiteCount=0,e.apply(doh,arguments)}}(doh._init),doh._setupGroupForRun=function(e){return function(t){var n=doh._groups[t];doh._curTestCount=n.length,doh._curGroupCount=1;var r=getGroupNode(t);r&&r.getElementsByTagName("td")[2].setAttribute("_target",_loggedMsgLen+1),e.apply(doh,arguments)}}(doh._setupGroupForRun),doh._report=function(e){return function(){var t=byId("testList");if(t){var n=t.getElementsByTagName("tfoot");n.length&&t.removeChild(n[0]);var r=t.createTFoot(),i=r.insertRow(-1);i.className="inProgress";var s=i.insertCell(-1);s.colSpan=2,s.innerHTML="Result",s=i.insertCell(-1),s.innerHTML=this._testCount+" tests in "+this._groupCount+" groups /<span class='failure'>"+this._errorCount+"</span> errors, <span class='failure'>"+this._failureCount+"</span> failures",s.setAttribute("_target",_loggedMsgLen+1),i.insertCell(-1).innerHTML=doh._totalTime+"ms"}var o=null,u;if(doh.perfTestResults){window.dojo?(dojo.require("dojox.charting.Chart2D"),dojo.require("dojox.charting.DataChart"),dojo.require("dojox.charting.plot2d.Scatter"),dojo.require("dojox.charting.plot2d.Lines"),dojo.require("dojo.data.ItemFileReadStore"),o=doh._dojoPlotPerfResults):o=doh._asciiPlotPerfResults;try{var a,f=byId("perfTestsBody"),l=[];doh.perfTestResults&&doh.showPerfTestsPage();for(a in doh.perfTestResults){var c=doh.perfTestResults[a],h=document.createElement("h1");h.appendChild(document.createTextNode("Group: "+a)),f.appendChild(h);var p=document.createElement("blockquote");f.appendChild(p);var d;for(d in c){var v=c[d];if(!v)continue;var m=document.createElement("h3");m.appendChild(document.createTextNode("TEST: "+d)),m.style.textDecoration="underline",p.appendChild(m);var g=document.createElement("div");p.appendChild(g);var y="<b>TRIAL SIZE: </b>"+v.trials[0].testIterations+" iterations<br>"+"<b>NUMBER OF TRIALS: </b>"+v.trials.length+"<br>",b,w=[],E=[];for(b=0;b<v.trials.length;b++)w.push(v.trials[b].average),E.push(v.trials[b].executionTime);y+="<b>AVERAGE TRIAL EXECUTION TIME: </b>"+doh.average(E).toFixed(10)+"ms.<br>",y+="<b>MAXIMUM TEST ITERATION TIME: </b>"+doh.max(w).toFixed(10)+"ms.<br>",y+="<b>MINIMUM TEST ITERATION TIME: </b>"+doh.min(w).toFixed(10)+"ms.<br>",y+="<b>AVERAGE TEST ITERATION TIME: </b>"+doh.average(w).toFixed(10)+"ms.<br>",y+="<b>MEDIAN TEST ITERATION TIME: </b>"+doh.median(w).toFixed(10)+"ms.<br>",y+="<b>VARIANCE TEST ITERATION TIME: </b>"+doh.variance(w).toFixed(10)+"ms.<br>",y+="<b>STANDARD DEVIATION ON TEST ITERATION TIME: </b>"+doh.standardDeviation(w).toFixed(10)+"ms.<br>",g.innerHTML=y,g=document.createElement("div"),g.innerHTML="<h3>Average Test Execution Time (in milliseconds, with median line)</h3>",p.appendChild(g),g=document.createElement("div"),dojo.style(g,"width","600px"),dojo.style(g,"height","250px"),p.appendChild(g),l.push({div:g,title:"Average Test Execution Time",data:w}),g=document.createElement("div"),g.innerHTML="<h3>Average Trial Execution Time (in milliseconds, with median line)</h3>",p.appendChild(g),g=document.createElement("div"),dojo.style(g,"width","600px"),dojo.style(g,"height","250px"),p.appendChild(g),l.push({div:g,title:"Average Trial Execution Time",data:E})}}var S=function(){if(l.length){var e=l.shift();o(e.div,e.title,e.data)}doh.setTimeout(S,50)};doh.setTimeout(S,150)}catch(x){doh.debug(x)}}e.apply(doh,arguments)}}(doh._report),this.opera&&opera.postError?doh.debug=function(){var e="";for(var t=0;t<arguments.length;t++)e+=" "+arguments[t];sendToLogPane([e]),opera.postError("DEBUG:"+e)}:window.console?doh.debug=function(){var e="";for(var t=0;t<arguments.length;t++)e+=" "+arguments[t];sendToLogPane([e]),console.log("DEBUG:"+e)}:doh.debug=function(){sendToLogPane.call(window,arguments)};var loaded=!1,groupTemplate=null,testTemplate=null,groupNodes={},_groupTogglers={},_getGroupToggler=function(e,t){if(_groupTogglers[e])return _groupTogglers[e];var n=!0;return _groupTogglers[e]=function(r,i){var s=groupNodes[e].__items,o;if(n||i){n=!1;for(o=0;o<s.length;o++)s[o].style.display="";t.innerHTML="&#9660;"}else{n=!0;for(o=0;o<s.length;o++)s[o].style.display="none";t.innerHTML="&#9658;"}}},addGroupToList=function(e){if(!byId("testList"))return;var t=byId("testList").tBodies[0],n=groupTemplate.cloneNode(!0),r=n.getElementsByTagName("td"),i=r[0];i.onclick=_getGroupToggler(e,i);var s=r[1].getElementsByTagName("input")[0];return s.group=e,s.onclick=function(t){doh._groups[e].skip=!this.checked},r[2].innerHTML="<div class='testGroupName'>"+e+"</div><div style='width:0;'>&nbsp;</div>",r[3].innerHTML="",t.appendChild(n),n},addFixtureToList=function(e,t){if(!testTemplate)return;var n=groupNodes[e];n.__items||(n.__items=[]);var r=testTemplate.cloneNode(!0),i=r.getElementsByTagName("td");i[2].innerHTML=t.name,i[3].innerHTML="";var s=(n.__lastFixture||n.__groupNode).nextSibling;return s?s.parentNode.insertBefore(r,s):n.__groupNode.parentNode.appendChild(r),r.style.display="none",n.__items.push(r),n.__lastFixture=r},getFixtureNode=function(e,t){return groupNodes[e]?groupNodes[e][t.name]:null},getGroupNode=function(e){return groupNodes[e]?groupNodes[e].__groupNode:null},updateBacklog=[];doh._updateTestList=function(e,t,n){if(!loaded){e&&t&&updateBacklog.push([e,t]);return}if(updateBacklog.length&&!n){var r;while(r=updateBacklog.shift())doh._updateTestList(r[0],r[1],!0)}e&&t&&(groupNodes[e]||(groupNodes[e]={__groupNode:addGroupToList(e)}),groupNodes[e][t.name]||(groupNodes[e][t.name]=addFixtureToList(e,t)))},doh._testRegistered=doh._updateTestList,doh._groupStarted=function(e){this._suiteCount==0&&(this._runedSuite=0,this._currentGlobalProgressBarWidth=0,this._suiteCount=this._testCount),doh._inGroup!=e&&(doh._groupTotalTime=0,doh._runed=0,doh._inGroup=e,this._runedSuite++);var t=getGroupNode(e);t&&(t.className="inProgress")},doh._groupFinished=function(e,t){var n=getGroupNode(e);if(n&&doh._inGroup==e){doh._totalTime+=doh._groupTotalTime,n.getElementsByTagName("td")[3].innerHTML=doh._groupTotalTime+"ms",n.getElementsByTagName("td")[2].lastChild.className="",doh._inGroup=null;var r=doh._updateGlobalProgressBar(this._runedSuite/this._groupCount,t,e);n.className=r?"failure":"success",doh._currentGlobalProgressBarWidth=parseInt(this._runedSuite/this._groupCount*1e4)/100}doh._inGroup==e&&this.debug('Total time for GROUP "',e,'" is ',doh._groupTotalTime,"ms")},doh._testStarted=function(e,t){var n=getFixtureNode(e,t);n&&(n.className="inProgress")};var _nameTimes={},_playSound=function(e){if(byId("hiddenAudio")&&byId("audio")&&byId("audio").checked){var t=_nameTimes[e];if(!t||new Date-t>700){_nameTimes[e]=new Date;var n=document.createElement("span");byId("hiddenAudio").appendChild(n),n.innerHTML='<embed src="_sounds/'+e+'.wav" autostart="true" loop="false" hidden="true" width="1" height="1"></embed>'}}};doh._updateGlobalProgressBar=function(e,t,n){var r=byId("progressOuter"),i=r.childNodes[doh._runedSuite-1];i||(i=document.createElement("div"),r.appendChild(i),i.className="success",i.setAttribute("_target",n)),!t&&!i._failure&&(i._failure=!0,i.className="failure",n&&i.setAttribute("title","failed group "+n));var s=parseInt(e*1e4)/100;return i.style.width=s-doh._currentGlobalProgressBarWidth+"%",i._failure},doh._testFinished=function(e,t,n){var r=getFixtureNode(e,t),i=t.endTime-t.startTime;if(r){r.getElementsByTagName("td")[3].innerHTML=i+"ms",r.className=n?"success":"failure",r.getElementsByTagName("td")[2].setAttribute("_target",_loggedMsgLen);if(!n){_playSound("doh");var s=getGroupNode(e);s&&(s.className="failure",_getGroupToggler(e)(null,!0))}}if(doh._inGroup==e){var s=getGroupNode(e);doh._runed++;if(s&&doh._curTestCount){var o=doh._runed/doh._curTestCount,u=this._updateGlobalProgressBar((doh._runedSuite+o-1)/doh._groupCount,n,e),a=s.getElementsByTagName("td")[2].lastChild;a.className=u?"failure":"success",a.style.width=parseInt(o*100)+"%",s.getElementsByTagName("td")[3].innerHTML=parseInt(o*1e4)/100+"%"}}this._groupTotalTime+=i,this.debug(n?"PASSED":"FAILED","test:",t.name,i,"ms")},doh.registerUrl=function(e,t,n){var r=new String(e);this.register(e,{name:t,setUp:function(){doh.currentGroupName=r,doh.currentGroup=this,doh.currentUrl=t,this.d=new doh.Deferred,doh.currentTestDeferred=this.d,doh.showTestPage(),byId("testBody").src=t},timeout:n||1e4,runTest:function(){return this.d},tearDown:function(){doh.currentGroupName=null,doh.currentGroup=null,doh.currentTestDeferred=null,doh.currentUrl=null,doh.showLogPage()}})};var tabzidx=1,_showTab=function(toShow,toHide){var i;for(i=0;i<toHide.length;i++){var node=byId(toHide[i]);node&&(node.style.display="none")}toShow=byId(toShow);if(toShow)with(toShow.style)display="",zIndex=++tabzidx};doh.showTestPage=function(){_showTab("testBody",["logBody","perfTestsBody"])},doh.showLogPage=function(){_showTab("logBody",["testBody","perfTestsBody"])},doh.showPerfTestsPage=function(){_showTab("perfTestsBody",["testBody","logBody"])};var runAll=!0;doh.toggleRunAll=function(){runAll=!runAll;if(!byId("testList"))return;var e=byId("testList").tBodies[0],t=e.getElementsByTagName("input"),n=0,r;while(r=t[n++])r.checked=runAll,doh._groups[r.group].skip=!runAll};var listHeightTimer=null,setListHeight=function(){listHeightTimer&&clearTimeout(listHeightTimer);var e=byId("testList");if(!e)return;listHeightTimer=doh.setTimeout(function(){e.style.display="none",e.style.display=""},10)};_addOnEvt("resize",setListHeight),_addOnEvt("load",setListHeight),_addOnEvt("load",function(){if(loaded)return;loaded=!0,groupTemplate=byId("groupTemplate");if(!groupTemplate)return;groupTemplate.parentNode.removeChild(groupTemplate),groupTemplate.style.display="",testTemplate=byId("testTemplate"),testTemplate.parentNode.removeChild(testTemplate),testTemplate.style.display="",doh._updateTestList()}),_addOnEvt("load",function(){var e=doh._onEnd;doh._onEnd=function(){e.apply(doh,arguments),doh._failureCount==0?(doh.debug("WOOHOO!!"),_playSound("woohoo")):console.debug("doh._failureCount:",doh._failureCount),byId("play")&&n()};if(!byId("play"))return;var t=!1,n=function(){t?(byId("play").style.display=byId("pausedMsg").style.display="",byId("playingMsg").style.display=byId("pause").style.display="none",t=!1):(byId("play").style.display=byId("pausedMsg").style.display="none",byId("playingMsg").style.display=byId("pause").style.display="",t=!0)};doh.run=function(e){return function(){return doh._currentGroup||n(),e.apply(doh,arguments)}}(doh.run);var r=byId("toggleButtons").getElementsByTagName("span"),i,s=0;while(i=r[s++])i.onclick=n;doh._dojoPlotPerfResults=function(e,t,n){var r=doh.median(n),i=[],s;for(s=0;s<n.length;s++)i.push(r);var o={label:"name",items:[{name:t,trials:n},{name:"Median",trials:i}]},u=new dojo.data.ItemFileReadStore({data:o}),a=Math.floor(doh.min(n)),f=Math.ceil(doh.max(n)),l=(f-a)/10;a>0&&(a-=l,a<0&&(a=0),a=Math.floor(a)),f>0&&(f+=l,f=Math.ceil(f)),l=(f-a)/10;var c=new dojox.charting.DataChart(e,{type:dojox.charting.plot2d.Lines,displayRange:n.length,xaxis:{min:1,max:n.length,majorTickStep:Math.ceil((n.length-1)/10),htmlLabels:!1},yaxis:{min:a,max:f,majorTickStep:l,vertical:!0,htmlLabels:!1}});c.setStore(u,{name:"*"},"trials")},doh._asciiPlotPerfResults=function(){}})}else{_doh=window.parent.doh;var _thisGroup=_doh.currentGroupName,_thisUrl=_doh.currentUrl;if(_thisGroup){doh._testRegistered=function(e,t){_doh._updateTestList(_thisGroup,t)},doh._onEnd=function(){_doh._errorCount+=doh._errorCount,_doh._failureCount+=doh._failureCount,_doh._testCount+=doh._testCount,_doh.currentTestDeferred.callback(!0)};var otr=doh._getTestObj;doh._getTestObj=function(){var e=otr.apply(doh,arguments);return e.name=_thisUrl+"::"+arguments[0]+"::"+e.name,e},doh.debug=doh.hitch(_doh,"debug"),doh.registerUrl=doh.hitch(_doh,"registerUrl"),doh._testStarted=function(e,t){_doh._testStarted(_thisGroup,t)},doh._testFinished=function(e,t,n){_doh._testFinished(_thisGroup,t,n);if(doh.perfTestResults)try{gName=e.toString();var r=t.name;while(r.indexOf("::")>=0)r=r.substring(r.indexOf("::")+2,r.length);_doh.perfTestResults||(_doh.perfTestResults={}),_doh.perfTestResults[gName]||(_doh.perfTestResults[gName]={}),_doh.perfTestResults[gName][t.name]=doh.perfTestResults[gName][r]}catch(i){doh.debug(i)}},doh._groupStarted=function(e){this._setParent||(_doh._curTestCount=this._testCount,_doh._curGroupCount=this._groupCount,this._setParent=!0)},doh._report=function(){}}}}()
+if(window["dojo"]){
+	dojo.provide("doh._browserRunner");
+}
+
+// FIXME: need to add prompting for monkey-do testing
+
+(function(){
+
+	doh.setTimeout = function (fn, time) {
+            return setTimeout(fn, time);
+        };
+
+	try{
+		var topdog = (window.parent == window) || !Boolean(window.parent.doh);
+	}catch(e){
+		//can't access window.parent.doh, then consider ourselves as topdog
+		topdog=true;
+	}
+	if(topdog){
+		// we're the top-dog window.
+
+		// borrowed from Dojo, etc.
+		var byId = function(id){
+			return document.getElementById(id);
+		};
+
+		var _addOnEvt = function(	type,		// string
+									refOrName,	// function or string
+									scope){		// object, defaults is window
+
+			if(!scope){ scope = window; }
+
+			var funcRef = refOrName;
+			if(typeof refOrName == "string"){
+				funcRef = scope[refOrName];
+			}
+			var enclosedFunc = function(){ return funcRef.apply(scope, arguments); };
+
+			if((window["dojo"])&&(type == "load")){
+				dojo.addOnLoad(enclosedFunc);
+			}else{
+				if(window["attachEvent"]){
+					window.attachEvent("on"+type, enclosedFunc);
+				}else if(window["addEventListener"]){
+					window.addEventListener(type, enclosedFunc, false);
+				}else if(document["addEventListener"]){
+					document.addEventListener(type, enclosedFunc, false);
+				}
+			}
+		};
+
+		//
+		// Over-ride or implement base runner.js-provided methods
+		//
+		var escapeXml = function(str){
+			//summary:
+			//		Adds escape sequences for special characters in XML: &<>"'
+			//		Optionally skips escapes for single quotes
+			return str.replace(/&/gm, "&amp;").replace(/</gm, "&lt;").replace(/>/gm, "&gt;").replace(/"/gm, "&quot;"); // string
+		};
+
+		var _logBacklog = [], _loggedMsgLen = 0;
+		var sendToLogPane = function(args, skip){
+			var msg = "";
+			for(var x=0; x<args.length; x++){
+				msg += " "+args[x];
+			}
+
+			msg = escapeXml(msg);
+
+			// workarounds for IE. Wheeee!!!
+			msg = msg.replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
+				.replace(" ", "&nbsp;")
+				.replace("\n", "<br>&nbsp;");
+			if(!byId("logBody")){
+				_logBacklog.push(msg);
+				return;
+			}else if(_logBacklog.length && !skip){
+				var tm;
+				while((tm=_logBacklog.shift())){
+					sendToLogPane(tm, true);
+				}
+			}
+			var logBody=byId("logBody");
+			var tn = document.createElement("div");
+			tn.innerHTML = msg;
+			//tn.id="logmsg_"+logBody.childNodes.length;
+			logBody.appendChild(tn);
+			_loggedMsgLen++;
+		}
+
+		var findTarget = function(n){
+			while(n && !n.getAttribute('_target')){
+				n=n.parentNode;
+				if(!n.getAttribute){
+					n=null;
+				}
+			}
+			return n;
+		}
+
+		doh._jumpToLog = function(e){
+			//console.log(e);
+
+			var node = findTarget(e?e.target:window.event.srcElement);
+			if(!node){
+				return;
+			}
+			var _t = Number(node.getAttribute('_target'));
+			var lb = byId("logBody");
+			if(_t>=lb.childNodes.length){
+				return;
+			}
+			var t = lb.childNodes[_t];
+			t.scrollIntoView();
+			if(window.dojo){
+				//t.parentNode.parentNode is <div class="tabBody">, only it has a explicitly set background-color,
+				//all children of it are transparent
+				var bgColor = dojo.style(t.parentNode.parentNode,'backgroundColor');
+				//node.parentNode is the tr which has background-color set explicitly
+				var hicolor = dojo.style(node.parentNode,'backgroundColor');
+				var unhilight = dojo.animateProperty({
+					node: t,
+					duration: 500,
+					properties:
+					{
+						backgroundColor: { start:hicolor, end: bgColor }
+					},
+					onEnd: function(){
+						t.style.backgroundColor="";
+					}
+				});
+				var hilight = dojo.animateProperty({
+					node: t,
+					duration: 500,
+					properties:
+					{
+						backgroundColor: { start:bgColor, end: hicolor }
+					},
+					onEnd: function(){
+						unhilight.play();
+					}
+				});
+				hilight.play();
+			}
+		};
+
+		doh._jumpToSuite = function(e){
+			var node = findTarget(e ? e.target : window.event.srcElement);
+			if(!node){
+				return;
+			}
+			var _g = node.getAttribute('_target');
+			var gn = getGroupNode(_g);
+			if(!gn){
+				return;
+			}
+			gn.scrollIntoView();
+		};
+
+		doh._init = (function(oi){
+			return function(){
+				var lb = byId("logBody");
+				if(lb){
+					// clear the console before each run
+					while(lb.firstChild){
+						lb.removeChild(lb.firstChild);
+					}
+					_loggedMsgLen = 0;
+				}
+				this._totalTime = 0;
+				this._suiteCount = 0;
+				oi.apply(doh, arguments);
+			}
+		})(doh._init);
+
+		doh._setupGroupForRun = (function(os){
+			//overload _setupGroupForRun to record which log line to jump to when a suite is clicked
+			return function(groupName){
+				var tg = doh._groups[groupName];
+				doh._curTestCount = tg.length;
+				doh._curGroupCount = 1;
+				var gn = getGroupNode(groupName);
+				if(gn){
+					//two lines will be added, scroll the second line into view
+					gn.getElementsByTagName("td")[2].setAttribute('_target',_loggedMsgLen+1);
+				}
+				os.apply(doh,arguments);
+			}
+		})(doh._setupGroupForRun);
+
+		doh._report = (function(or){
+			//overload _report to insert a tfoot
+			return function(){
+				var tb = byId("testList");
+				if(tb){
+					var tfoots=tb.getElementsByTagName('tfoot');
+					if(tfoots.length){
+						tb.removeChild(tfoots[0]);
+					}
+					var foot = tb.createTFoot();
+					var row = foot.insertRow(-1);
+					row.className = 'inProgress';
+					var cell=row.insertCell(-1);
+					cell.colSpan=2;
+					cell.innerHTML="Result";
+					cell = row.insertCell(-1);
+					cell.innerHTML=this._testCount+" tests in "+this._groupCount+" groups /<span class='failure'>"+this._errorCount+"</span> errors, <span class='failure'>"+this._failureCount+"</span> failures";
+					cell.setAttribute('_target',_loggedMsgLen+1);
+					row.insertCell(-1).innerHTML=doh._totalTime+"ms";
+				}
+
+				//This location can do the final performance rendering for the results
+				//of any performance tests.
+				var plotResults = null;
+				var standby;
+				if(doh.perfTestResults){
+					if(window.dojo){
+						//If we have dojo and here are perf tests results,
+						//well, we'll use the dojo charting functions
+						dojo.require("dojox.charting.Chart2D");
+						dojo.require("dojox.charting.DataChart");
+						dojo.require("dojox.charting.plot2d.Scatter");
+						dojo.require("dojox.charting.plot2d.Lines");
+						dojo.require("dojo.data.ItemFileReadStore");
+						plotResults = doh._dojoPlotPerfResults;
+					}else{
+						plotResults = doh._asciiPlotPerfResults;
+					}
+					try{
+						var g;
+						var pBody = byId("perfTestsBody");
+						var chartsToRender = [];
+
+						if(doh.perfTestResults){
+							doh.showPerfTestsPage();
+						}
+						for(g in doh.perfTestResults){
+							var grp = doh.perfTestResults[g];
+							var hdr = document.createElement("h1");
+							hdr.appendChild(document.createTextNode("Group: " + g));
+							pBody.appendChild(hdr);
+							var ind = document.createElement("blockquote");
+							pBody.appendChild(ind);
+							var f;
+							for(f in grp){
+								var fResults = grp[f];
+								if(!fResults){ continue; }
+								var fhdr = document.createElement("h3");
+								fhdr.appendChild(document.createTextNode("TEST: " + f));
+								fhdr.style.textDecoration = "underline";
+								ind.appendChild(fhdr);
+								var div = document.createElement("div");
+								ind.appendChild(div);
+
+								//Figure out the basic info
+								var results = "<b>TRIAL SIZE: </b>"  + fResults.trials[0].testIterations + " iterations<br>" +
+									"<b>NUMBER OF TRIALS: </b>" + fResults.trials.length + "<br>";
+
+								//Figure out the average test pass cost.
+								var i;
+								var iAvgArray = [];
+								var tAvgArray = [];
+								for(i = 0; i < fResults.trials.length; i++){
+									iAvgArray.push(fResults.trials[i].average);
+									tAvgArray.push(fResults.trials[i].executionTime);
+								}
+								results += "<b>AVERAGE TRIAL EXECUTION TIME: </b>" + doh.average(tAvgArray).toFixed(10) + "ms.<br>";
+								results += "<b>MAXIMUM TEST ITERATION TIME: </b>" + doh.max(iAvgArray).toFixed(10) + "ms.<br>";
+								results += "<b>MINIMUM TEST ITERATION TIME: </b>" + doh.min(iAvgArray).toFixed(10) + "ms.<br>";
+								results += "<b>AVERAGE TEST ITERATION TIME: </b>" + doh.average(iAvgArray).toFixed(10) + "ms.<br>";
+								results += "<b>MEDIAN TEST ITERATION TIME: </b>" + doh.median(iAvgArray).toFixed(10) + "ms.<br>";
+								results += "<b>VARIANCE TEST ITERATION TIME: </b>" + doh.variance(iAvgArray).toFixed(10) + "ms.<br>";
+								results += "<b>STANDARD DEVIATION ON TEST ITERATION TIME: </b>" + doh.standardDeviation(iAvgArray).toFixed(10) + "ms.<br>";
+
+								//Okay, attach it all in.
+								div.innerHTML = results;
+
+								div = document.createElement("div");
+								div.innerHTML = "<h3>Average Test Execution Time (in milliseconds, with median line)</h3>";
+								ind.appendChild(div);
+								div = document.createElement("div");
+								dojo.style(div, "width", "600px");
+								dojo.style(div, "height", "250px");
+								ind.appendChild(div);
+								chartsToRender.push({
+									div: div,
+									title: "Average Test Execution Time",
+									data: iAvgArray
+								});
+
+								div = document.createElement("div");
+								div.innerHTML = "<h3>Average Trial Execution Time (in milliseconds, with median line)</h3>";
+								ind.appendChild(div);
+								div = document.createElement("div");
+								dojo.style(div, "width", "600px");
+								dojo.style(div, "height", "250px");
+								ind.appendChild(div);
+								chartsToRender.push({
+									div: div,
+									title: "Average Trial Execution Time",
+									data: tAvgArray
+								});
+							}
+						}
+
+						//Lazy-render these to give the browser time and not appear locked.
+						var delayedRenders = function() {
+							if(chartsToRender.length){
+								var chartData = chartsToRender.shift();
+								plotResults(chartData.div, chartData.title, chartData.data);
+							}
+							doh.setTimeout(delayedRenders, 50);
+						};
+						doh.setTimeout(delayedRenders, 150);
+					}catch(e){
+						doh.debug(e);
+					}
+				}
+				or.apply(doh,arguments);
+			}
+		})(doh._report);
+
+		if(this["opera"] && opera.postError){
+			doh.debug = function(){
+				var msg = "";
+				for(var x=0; x<arguments.length; x++){
+					msg += " "+arguments[x];
+				}
+				sendToLogPane([msg]);
+				opera.postError("DEBUG:"+msg);
+			}
+		}else if(window["console"]){
+			doh.debug = function(){
+				var msg = "";
+				for(var x=0; x<arguments.length; x++){
+					msg += " "+arguments[x];
+				}
+				sendToLogPane([msg]);
+				console.log("DEBUG:"+msg);
+			};
+		}else{
+			doh.debug = function(){
+				sendToLogPane.call(window, arguments);
+			}
+		}
+
+		var loaded = false;
+		var groupTemplate = null;
+		var testTemplate = null;
+
+		var groupNodes = {};
+
+		var _groupTogglers = {};
+
+		var _getGroupToggler = function(group, toggle){
+			if(_groupTogglers[group]){ return _groupTogglers[group]; }
+			var rolledUp = true;
+			return (_groupTogglers[group] = function(evt, forceOpen){
+				var nodes = groupNodes[group].__items;
+				var x;
+				if(rolledUp||forceOpen){
+					rolledUp = false;
+					for(x=0; x<nodes.length; x++){
+						nodes[x].style.display = "";
+					}
+					toggle.innerHTML = "&#9660;";
+				}else{
+					rolledUp = true;
+					for(x=0; x<nodes.length; x++){
+						nodes[x].style.display = "none";
+					}
+					toggle.innerHTML = "&#9658;";
+				}
+			});
+		};
+
+		var addGroupToList = function(group){
+			if(!byId("testList")){ return; }
+			var tb = byId("testList").tBodies[0];
+			var tg = groupTemplate.cloneNode(true);
+			var tds = tg.getElementsByTagName("td");
+			var toggle = tds[0];
+			toggle.onclick = _getGroupToggler(group, toggle);
+			var cb = tds[1].getElementsByTagName("input")[0];
+			cb.group = group;
+			cb.onclick = function(evt){
+				doh._groups[group].skip = (!this.checked);
+			}
+			tds[2].innerHTML = "<div class='testGroupName'>"+group+"</div><div style='width:0;'>&nbsp;</div>";
+			tds[3].innerHTML = "";
+
+			tb.appendChild(tg);
+			return tg;
+		}
+
+		var addFixtureToList = function(group, fixture){
+			if(!testTemplate){ return; }
+			var cgn = groupNodes[group];
+			if(!cgn["__items"]){ cgn.__items = []; }
+			var tn = testTemplate.cloneNode(true);
+			var tds = tn.getElementsByTagName("td");
+
+			tds[2].innerHTML = fixture.name;
+			tds[3].innerHTML = "";
+
+			var nn = (cgn.__lastFixture||cgn.__groupNode).nextSibling;
+			if(nn){
+				nn.parentNode.insertBefore(tn, nn);
+			}else{
+				cgn.__groupNode.parentNode.appendChild(tn);
+			}
+			// FIXME: need to make group display toggleable!!
+			tn.style.display = "none";
+			cgn.__items.push(tn);
+			return (cgn.__lastFixture = tn);
+		}
+
+		var getFixtureNode = function(group, fixture){
+			if(groupNodes[group]){
+				return groupNodes[group][fixture.name];
+			}
+			return null;
+		}
+
+		var getGroupNode = function(group){
+			if(groupNodes[group]){
+				return groupNodes[group].__groupNode;
+			}
+			return null;
+		}
+
+		var updateBacklog = [];
+		doh._updateTestList = function(group, fixture, unwindingBacklog){
+			if(!loaded){
+				if(group && fixture){
+					updateBacklog.push([group, fixture]);
+				}
+				return;
+			}else if(updateBacklog.length && !unwindingBacklog){
+				var tr;
+				while((tr=updateBacklog.shift())){
+					doh._updateTestList(tr[0], tr[1], true);
+				}
+			}
+			if(group && fixture){
+				if(!groupNodes[group]){
+					groupNodes[group] = {
+						"__groupNode": addGroupToList(group)
+					};
+				}
+				if(!groupNodes[group][fixture.name]){
+					groupNodes[group][fixture.name] = addFixtureToList(group, fixture)
+				}
+			}
+		}
+
+		doh._testRegistered = doh._updateTestList;
+
+		doh._groupStarted = function(group){
+			if(this._suiteCount == 0){
+				this._runedSuite = 0;
+				this._currentGlobalProgressBarWidth = 0;
+				this._suiteCount = this._testCount;
+			}
+			// console.debug("_groupStarted", group);
+			if(doh._inGroup != group){
+				doh._groupTotalTime = 0;
+				doh._runed = 0;
+				doh._inGroup = group;
+				this._runedSuite++;
+			}
+			var gn = getGroupNode(group);
+			if(gn){
+				gn.className = "inProgress";
+			}
+		}
+
+		doh._groupFinished = function(group, success){
+			// console.debug("_groupFinished", group);
+			var gn = getGroupNode(group);
+			if(gn && doh._inGroup == group){
+				doh._totalTime += doh._groupTotalTime;
+				gn.getElementsByTagName("td")[3].innerHTML = doh._groupTotalTime+"ms";
+				gn.getElementsByTagName("td")[2].lastChild.className = "";
+				doh._inGroup = null;
+				//doh._runedSuite++;
+				var failure = doh._updateGlobalProgressBar(this._runedSuite/this._groupCount,success,group);
+				gn.className = failure ? "failure" : "success";
+				//doh._runedSuite--;
+				doh._currentGlobalProgressBarWidth = parseInt(this._runedSuite/this._groupCount*10000)/100;
+				//byId("progressOuter").style.width = parseInt(this._runedSuite/this._suiteCount*100)+"%";
+			}
+			if(doh._inGroup == group){
+				this.debug("Total time for GROUP \"",group,"\" is ",doh._groupTotalTime,"ms");
+			}
+		}
+
+		doh._testStarted = function(group, fixture){
+			// console.debug("_testStarted", group, fixture.name);
+			var fn = getFixtureNode(group, fixture);
+			if(fn){
+				fn.className = "inProgress";
+			}
+		}
+
+		var _nameTimes = {};
+		var _playSound = function(name){
+			if(byId("hiddenAudio") && byId("audio") && byId("audio").checked){
+				// console.debug("playing:", name);
+				var nt = _nameTimes[name];
+				// only play sounds once every second or so
+				if((!nt)||(((new Date)-nt) > 700)){
+					_nameTimes[name] = new Date();
+					var tc = document.createElement("span");
+					byId("hiddenAudio").appendChild(tc);
+					tc.innerHTML = '<embed src="_sounds/'+name+'.wav" autostart="true" loop="false" hidden="true" width="1" height="1"></embed>';
+				}
+			}
+		}
+
+		doh._updateGlobalProgressBar = function(p,success,group){
+			var outerContainer=byId("progressOuter");
+
+			var gdiv=outerContainer.childNodes[doh._runedSuite-1];
+			if(!gdiv){
+				gdiv=document.createElement('div');
+				outerContainer.appendChild(gdiv);
+				gdiv.className='success';
+				gdiv.setAttribute('_target',group);
+			}
+			if(!success && !gdiv._failure){
+				gdiv._failure=true;
+				gdiv.className='failure';
+				if(group){
+					gdiv.setAttribute('title','failed group '+group);
+				}
+			}
+			var tp=parseInt(p*10000)/100;
+			gdiv.style.width = (tp-doh._currentGlobalProgressBarWidth)+"%";
+			return gdiv._failure;
+		}
+		doh._testFinished = function(group, fixture, success){
+			var fn = getFixtureNode(group, fixture);
+			var elapsed = fixture.endTime-fixture.startTime;
+			if(fn){
+				fn.getElementsByTagName("td")[3].innerHTML = elapsed+"ms";
+				fn.className = (success) ? "success" : "failure";
+				fn.getElementsByTagName("td")[2].setAttribute('_target', _loggedMsgLen);
+				if(!success){
+					_playSound("doh");
+					var gn = getGroupNode(group);
+					if(gn){
+						gn.className = "failure";
+						_getGroupToggler(group)(null, true);
+					}
+				}
+			}
+			if(doh._inGroup == group){
+				var gn = getGroupNode(group);
+				doh._runed++;
+				if(gn && doh._curTestCount){
+					var p = doh._runed/doh._curTestCount;
+					var groupfail = this._updateGlobalProgressBar((doh._runedSuite+p-1)/doh._groupCount,success,group);
+
+					var pbar = gn.getElementsByTagName("td")[2].lastChild;
+					pbar.className = groupfail?"failure":"success";
+					pbar.style.width = parseInt(p*100)+"%";
+					gn.getElementsByTagName("td")[3].innerHTML = parseInt(p*10000)/100+"%";
+				}
+			}
+			this._groupTotalTime += elapsed;
+			this.debug((success ? "PASSED" : "FAILED"), "test:", fixture.name, elapsed, 'ms');
+		}
+
+		// FIXME: move implementation to _browserRunner?
+		doh.registerUrl = function(	/*String*/ group,
+										/*String*/ url,
+										/*Integer*/ timeout){
+			var tg = new String(group);
+			this.register(group, {
+				name: url,
+				setUp: function(){
+					doh.currentGroupName = tg;
+					doh.currentGroup = this;
+					doh.currentUrl = url;
+					this.d = new doh.Deferred();
+					doh.currentTestDeferred = this.d;
+					doh.showTestPage();
+					byId("testBody").src = url;
+				},
+				timeout: timeout||10000, // 10s
+				// timeout: timeout||1000, // 10s
+				runTest: function(){
+					// FIXME: implement calling into the url's groups here!!
+					return this.d;
+				},
+				tearDown: function(){
+					doh.currentGroupName = null;
+					doh.currentGroup = null;
+					doh.currentTestDeferred = null;
+					doh.currentUrl = null;
+					// this.d.errback(false);
+					// byId("testBody").src = "about:blank";
+					doh.showLogPage();
+				}
+			});
+		}
+
+		//
+		// Utility code for runner.html
+		//
+		// var isSafari = navigator.appVersion.indexOf("Safari") >= 0;
+		var tabzidx = 1;
+		var _showTab = function(toShow, toHide){
+			// FIXME: I don't like hiding things this way.
+			var i;
+			for(i = 0; i < toHide.length; i++){
+				var node = byId(toHide[i]);
+				if(node){
+					node.style.display="none";
+				}
+			}
+			toShow = byId(toShow);
+			if(toShow){
+				with(toShow.style){
+					display = "";
+					zIndex = ++tabzidx;
+				}
+			}
+		}
+
+		doh.showTestPage = function(){
+			_showTab("testBody", ["logBody", "perfTestsBody"]);
+		}
+
+		doh.showLogPage = function(){
+			_showTab("logBody", ["testBody", "perfTestsBody"]);
+		}
+
+		doh.showPerfTestsPage = function(){
+			_showTab("perfTestsBody", ["testBody", "logBody"]);
+		}
+
+		var runAll = true;
+		doh.toggleRunAll = function(){
+			// would be easier w/ query...sigh
+			runAll = !runAll;
+			if(!byId("testList")){ return; }
+			var tb = byId("testList").tBodies[0];
+			var inputs = tb.getElementsByTagName("input");
+			var x=0; var tn;
+			while((tn=inputs[x++])){
+				tn.checked = runAll;
+				doh._groups[tn.group].skip = (!runAll);
+			}
+		}
+
+		var listHeightTimer = null;
+		var setListHeight = function(){
+			if(listHeightTimer){
+				clearTimeout(listHeightTimer);
+			}
+			var tl = byId("testList");
+			if(!tl){ return; }
+			listHeightTimer = doh.setTimeout(function(){
+				tl.style.display = "none";
+				tl.style.display = "";
+
+			}, 10);
+		}
+
+		_addOnEvt("resize", setListHeight);
+		_addOnEvt("load", setListHeight);
+		_addOnEvt("load", function(){
+			if(loaded){ return; }
+			loaded = true;
+			groupTemplate = byId("groupTemplate");
+			if(!groupTemplate){
+				// make sure we've got an ammenable DOM structure
+				return;
+			}
+			groupTemplate.parentNode.removeChild(groupTemplate);
+			groupTemplate.style.display = "";
+			testTemplate = byId("testTemplate");
+			testTemplate.parentNode.removeChild(testTemplate);
+			testTemplate.style.display = "";
+			doh._updateTestList();
+		});
+
+		_addOnEvt("load",
+			function(){
+				// let robot code run if it gets to this first
+				var __onEnd = doh._onEnd;
+				doh._onEnd = function(){
+					__onEnd.apply(doh, arguments);
+					if(doh._failureCount == 0){
+						doh.debug("WOOHOO!!");
+						_playSound("woohoo");
+					}else{
+						console.debug("doh._failureCount:", doh._failureCount);
+					}
+					if(byId("play")){
+						toggleRunning();
+					}
+				}
+				if(!byId("play")){
+					// make sure we've got an amenable DOM structure
+					return;
+				}
+				var isRunning = false;
+				var toggleRunning = function(){
+					// ugg, this would be so much better w/ dojo.query()
+					if(isRunning){
+						byId("play").style.display = byId("pausedMsg").style.display = "";
+						byId("playingMsg").style.display = byId("pause").style.display = "none";
+						isRunning = false;
+					}else{
+						byId("play").style.display = byId("pausedMsg").style.display = "none";
+						byId("playingMsg").style.display = byId("pause").style.display = "";
+						isRunning = true;
+					}
+				}
+				doh.run = (function(oldRun){
+					return function(){
+						if(!doh._currentGroup){
+							toggleRunning();
+						}
+						return oldRun.apply(doh, arguments);
+					}
+				})(doh.run);
+				var btns = byId("toggleButtons").getElementsByTagName("span");
+				var node; var idx=0;
+				while((node=btns[idx++])){
+					node.onclick = toggleRunning;
+				}
+
+				//Performance report generating functions!
+				doh._dojoPlotPerfResults = function(div, name, dataArray) {
+					var median = doh.median(dataArray);
+					var medarray = [];
+
+					var i;
+					for(i = 0; i < dataArray.length; i++){
+						medarray.push(median);
+					}
+
+					var data = {
+						label: "name",
+						items: [
+							{name: name, trials: dataArray},
+							{name: "Median", trials: medarray}
+						]
+					};
+					var ifs = new dojo.data.ItemFileReadStore({data: data});
+
+					var min = Math.floor(doh.min(dataArray));
+					var max = Math.ceil(doh.max(dataArray));
+					var step = (max - min)/10;
+
+					//Lets try to pad out the bottom and top a bit
+					//Then recalc the step.
+					if(min > 0){
+						min = min - step;
+						if(min < 0){
+							min = 0;
+						}
+						min = Math.floor(min);
+					}
+					if(max > 0){
+						max = max + step;
+						max = Math.ceil(max);
+					}
+					step = (max - min)/10;
+
+					var chart = new dojox.charting.DataChart(div, {
+						type: dojox.charting.plot2d.Lines,
+						displayRange:dataArray.length,
+						xaxis: {min: 1, max: dataArray.length, majorTickStep: Math.ceil((dataArray.length - 1)/10), htmlLabels: false},
+						yaxis: {min: min, max: max, majorTickStep: step, vertical: true, htmlLabels: false}
+					});
+					chart.setStore(ifs, {name:"*"}, "trials");
+				};
+
+				doh._asciiPlotPerfResults = function(){
+					//TODO:  Implement!
+				};
+			}
+		);
+	}else{
+		// we're in an iframe environment. Time to mix it up a bit.
+
+		_doh = window.parent.doh;
+		var _thisGroup = _doh.currentGroupName;
+		var _thisUrl = _doh.currentUrl;
+		if(_thisGroup){
+			doh._testRegistered = function(group, tObj){
+				_doh._updateTestList(_thisGroup, tObj);
+			}
+			doh._onEnd = function(){
+				_doh._errorCount += doh._errorCount;
+				_doh._failureCount += doh._failureCount;
+				_doh._testCount += doh._testCount;
+				// should we be really adding raw group counts?
+				//_doh._groupCount += doh._groupCount;
+				_doh.currentTestDeferred.callback(true);
+			}
+			var otr = doh._getTestObj;
+			doh._getTestObj = function(){
+				var tObj = otr.apply(doh, arguments);
+				tObj.name = _thisUrl+"::"+arguments[0]+"::"+tObj.name;
+				return tObj;
+			}
+			doh.debug = doh.hitch(_doh, "debug");
+			doh.registerUrl = doh.hitch(_doh, "registerUrl");
+			doh._testStarted = function(group, fixture){
+				_doh._testStarted(_thisGroup, fixture);
+			}
+			doh._testFinished = function(g, f, s){
+				_doh._testFinished(_thisGroup, f, s);
+
+				//Okay, there may be performance info we need to filter back
+				//to the parent, so do that here.
+				if(doh.perfTestResults){
+					try{
+						gName = g.toString();
+						var localFName = f.name;
+						while(localFName.indexOf("::") >= 0){
+							localFName = localFName.substring(localFName.indexOf("::") + 2, localFName.length);
+						}
+						if(!_doh.perfTestResults){
+							_doh.perfTestResults = {};
+						}
+						if(!_doh.perfTestResults[gName]){
+							_doh.perfTestResults[gName] = {};
+						}
+						_doh.perfTestResults[gName][f.name] = doh.perfTestResults[gName][localFName];
+					}catch (e){
+						doh.debug(e);
+					}
+				}
+			}
+			doh._groupStarted = function(g){
+				if(!this._setParent){
+					_doh._curTestCount = this._testCount;
+					_doh._curGroupCount = this._groupCount;
+					this._setParent = true;
+				}
+			}
+			doh._report = function(){
+			};
+		}
+	}
+
+})();

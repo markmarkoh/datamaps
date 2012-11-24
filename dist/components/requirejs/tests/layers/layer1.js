@@ -1,1 +1,31 @@
-define("alpha",["beta","gamma"],function(e,t){return{name:"alpha",betaName:e.name}}),define("beta",["gamma"],function(e){return{name:"beta",gammaName:e.name}}),define("gamma",["epsilon"],function(e){return{name:"gamma",epsilonName:e.name}})
+//Example layer file.
+
+define("alpha",
+    ["beta", "gamma"],
+    function (beta, gamma) {
+        return {
+            name: "alpha",
+            betaName: beta.name
+        };
+    }
+);
+
+define("beta",
+    ["gamma"],
+    function (gamma) {
+        return {
+            name: "beta",
+            gammaName: gamma.name
+        };
+    }
+);
+
+define("gamma",
+    ["epsilon"],
+    function (epsilon) {
+        return {
+            name: "gamma",
+            epsilonName: epsilon.name
+        };
+    }
+);

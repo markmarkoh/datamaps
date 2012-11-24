@@ -1,1 +1,6 @@
-define(["require","exports","module","./b/3"],function(e,t,n,r){return{name:"two",b3:r}})
+define(["require","exports","module","./b/3"], function (r, e, m, b3) {
+    return {
+        name: 'two',
+        b3: b3
+    };
+})

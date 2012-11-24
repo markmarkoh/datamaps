@@ -1,1 +1,409 @@
-function d3_voronoi_tessellate(e,t){var n={list:e.map(function(e,t){return{index:t,x:e[0],y:e[1]}}).sort(function(e,t){return e.y<t.y?-1:e.y>t.y?1:e.x<t.x?-1:e.x>t.x?1:0}),bottomSite:null},r={list:[],leftEnd:null,rightEnd:null,init:function(){r.leftEnd=r.createHalfEdge(null,"l"),r.rightEnd=r.createHalfEdge(null,"l"),r.leftEnd.r=r.rightEnd,r.rightEnd.l=r.leftEnd,r.list.unshift(r.leftEnd,r.rightEnd)},createHalfEdge:function(e,t){return{edge:e,side:t,vertex:null,l:null,r:null}},insert:function(e,t){t.l=e,t.r=e.r,e.r.l=t,e.r=t},leftBound:function(e){var t=r.leftEnd;do t=t.r;while(t!=r.rightEnd&&i.rightOf(t,e));return t=t.l,t},del:function(e){e.l.r=e.r,e.r.l=e.l,e.edge=null},right:function(e){return e.r},left:function(e){return e.l},leftRegion:function(e){return e.edge==null?n.bottomSite:e.edge.region[e.side]},rightRegion:function(e){return e.edge==null?n.bottomSite:e.edge.region[d3_voronoi_opposite[e.side]]}},i={bisect:function(e,t){var n={region:{l:e,r:t},ep:{l:null,r:null}},r=t.x-e.x,i=t.y-e.y,s=r>0?r:-r,o=i>0?i:-i;return n.c=e.x*r+e.y*i+(r*r+i*i)*.5,s>o?(n.a=1,n.b=i/r,n.c/=r):(n.b=1,n.a=r/i,n.c/=i),n},intersect:function(e,t){var n=e.edge,r=t.edge;if(!n||!r||n.region.r==r.region.r)return null;var i=n.a*r.b-n.b*r.a;if(Math.abs(i)<1e-10)return null;var s=(n.c*r.b-r.c*n.b)/i,o=(r.c*n.a-n.c*r.a)/i,u=n.region.r,a=r.region.r,f,l;u.y<a.y||u.y==a.y&&u.x<a.x?(f=e,l=n):(f=t,l=r);var c=s>=l.region.r.x;return c&&f.side==="l"||!c&&f.side==="r"?null:{x:s,y:o}},rightOf:function(e,t){var n=e.edge,r=n.region.r,i=t.x>r.x;if(i&&e.side==="l")return 1;if(!i&&e.side==="r")return 0;if(n.a===1){var s=t.y-r.y,o=t.x-r.x,u=0,a=0;!i&&n.b<0||i&&n.b>=0?a=u=s>=n.b*o:(a=t.x+t.y*n.b>n.c,n.b<0&&(a=!a),a||(u=1));if(!u){var f=r.x-n.region.l.x;a=n.b*(o*o-s*s)<f*s*(1+2*o/f+n.b*n.b),n.b<0&&(a=!a)}}else{var l=n.c-n.a*t.x,c=t.y-l,h=t.x-r.x,p=l-r.y;a=c*c>h*h+p*p}return e.side==="l"?a:!a},endPoint:function(e,n,r){e.ep[n]=r;if(!e.ep[d3_voronoi_opposite[n]])return;t(e)},distance:function(e,t){var n=e.x-t.x,r=e.y-t.y;return Math.sqrt(n*n+r*r)}},s={list:[],insert:function(e,t,n){e.vertex=t,e.ystar=t.y+n;for(var r=0,i=s.list,o=i.length;r<o;r++){var u=i[r];if(e.ystar>u.ystar||e.ystar==u.ystar&&t.x>u.vertex.x)continue;break}i.splice(r,0,e)},del:function(e){for(var t=0,n=s.list,r=n.length;t<r&&n[t]!=e;++t);n.splice(t,1)},empty:function(){return s.list.length===0},nextEvent:function(e){for(var t=0,n=s.list,r=n.length;t<r;++t)if(n[t]==e)return n[t+1];return null},min:function(){var e=s.list[0];return{x:e.vertex.x,y:e.ystar}},extractMin:function(){return s.list.shift()}};r.init(),n.bottomSite=n.list.shift();var o=n.list.shift(),u,a,f,l,c,h,p,d,v,m,g,y,b;for(;;){s.empty()||(u=s.min());if(o&&(s.empty()||o.y<u.y||o.y==u.y&&o.x<u.x))a=r.leftBound(o),f=r.right(a),p=r.rightRegion(a),y=i.bisect(p,o),h=r.createHalfEdge(y,"l"),r.insert(a,h),m=i.intersect(a,h),m&&(s.del(a),s.insert(a,m,i.distance(m,o))),a=h,h=r.createHalfEdge(y,"r"),r.insert(a,h),m=i.intersect(h,f),m&&s.insert(h,m,i.distance(m,o)),o=n.list.shift();else{if(!!s.empty())break;a=s.extractMin(),l=r.left(a),f=r.right(a),c=r.right(f),p=r.leftRegion(a),d=r.rightRegion(f),g=a.vertex,i.endPoint(a.edge,a.side,g),i.endPoint(f.edge,f.side,g),r.del(a),s.del(f),r.del(f),b="l",p.y>d.y&&(v=p,p=d,d=v,b="r"),y=i.bisect(p,d),h=r.createHalfEdge(y,b),r.insert(l,h),i.endPoint(y,d3_voronoi_opposite[b],g),m=i.intersect(l,h),m&&(s.del(l),s.insert(l,m,i.distance(m,p))),m=i.intersect(h,c),m&&s.insert(h,m,i.distance(m,p))}}for(a=r.right(r.leftEnd);a!=r.rightEnd;a=r.right(a))t(a.edge)}d3.geom.voronoi=function(e){var t=e.map(function(){return[]});return d3_voronoi_tessellate(e,function(e){var n,r,i,s,o,u;e.a===1&&e.b>=0?(n=e.ep.r,r=e.ep.l):(n=e.ep.l,r=e.ep.r),e.a===1?(o=n?n.y:-1e6,i=e.c-e.b*o,u=r?r.y:1e6,s=e.c-e.b*u):(i=n?n.x:-1e6,o=e.c-e.a*i,s=r?r.x:1e6,u=e.c-e.a*s);var a=[i,o],f=[s,u];t[e.region.l.index].push(a,f),t[e.region.r.index].push(a,f)}),t.map(function(t,n){var r=e[n][0],i=e[n][1];return t.forEach(function(e){e.angle=Math.atan2(e[0]-r,e[1]-i)}),t.sort(function(e,t){return e.angle-t.angle}).filter(function(e,n){return!n||e.angle-t[n-1].angle>1e-10})})};var d3_voronoi_opposite={l:"r",r:"l"}
+// Adapted from Nicolas Garcia Belmonte's JIT implementation:
+// http://blog.thejit.org/2010/02/12/voronoi-tessellation/
+// http://blog.thejit.org/assets/voronoijs/voronoi.js
+// See lib/jit/LICENSE for details.
+
+// Notes:
+//
+// This implementation does not clip the returned polygons, so if you want to
+// clip them to a particular shape you will need to do that either in SVG or by
+// post-processing with d3.geom.polygon's clip method.
+//
+// If any vertices are coincident or have NaN positions, the behavior of this
+// method is undefined. Most likely invalid polygons will be returned. You
+// should filter invalid points, and consolidate coincident points, before
+// computing the tessellation.
+
+/**
+ * @param vertices [[x1, y1], [x2, y2], …]
+ * @returns polygons [[[x1, y1], [x2, y2], …], …]
+ */
+d3.geom.voronoi = function(vertices) {
+  var polygons = vertices.map(function() { return []; });
+
+  d3_voronoi_tessellate(vertices, function(e) {
+    var s1,
+        s2,
+        x1,
+        x2,
+        y1,
+        y2;
+    if (e.a === 1 && e.b >= 0) {
+      s1 = e.ep.r;
+      s2 = e.ep.l;
+    } else {
+      s1 = e.ep.l;
+      s2 = e.ep.r;
+    }
+    if (e.a === 1) {
+      y1 = s1 ? s1.y : -1e6;
+      x1 = e.c - e.b * y1;
+      y2 = s2 ? s2.y : 1e6;
+      x2 = e.c - e.b * y2;
+    } else {
+      x1 = s1 ? s1.x : -1e6;
+      y1 = e.c - e.a * x1;
+      x2 = s2 ? s2.x : 1e6;
+      y2 = e.c - e.a * x2;
+    }
+    var v1 = [x1, y1],
+        v2 = [x2, y2];
+    polygons[e.region.l.index].push(v1, v2);
+    polygons[e.region.r.index].push(v1, v2);
+  });
+
+  // Reconnect the polygon segments into counterclockwise loops.
+  return polygons.map(function(polygon, i) {
+    var cx = vertices[i][0],
+        cy = vertices[i][1];
+    polygon.forEach(function(v) {
+      v.angle = Math.atan2(v[0] - cx, v[1] - cy);
+    });
+    return polygon.sort(function(a, b) {
+      return a.angle - b.angle;
+    }).filter(function(d, i) {
+      return !i || (d.angle - polygon[i - 1].angle > 1e-10);
+    });
+  });
+};
+
+var d3_voronoi_opposite = {"l": "r", "r": "l"};
+
+function d3_voronoi_tessellate(vertices, callback) {
+
+  var Sites = {
+    list: vertices
+      .map(function(v, i) {
+        return {
+          index: i,
+          x: v[0],
+          y: v[1]
+        };
+      })
+      .sort(function(a, b) {
+        return a.y < b.y ? -1
+          : a.y > b.y ? 1
+          : a.x < b.x ? -1
+          : a.x > b.x ? 1
+          : 0;
+      }),
+    bottomSite: null
+  };
+
+  var EdgeList = {
+    list: [],
+    leftEnd: null,
+    rightEnd: null,
+
+    init: function() {
+      EdgeList.leftEnd = EdgeList.createHalfEdge(null, "l");
+      EdgeList.rightEnd = EdgeList.createHalfEdge(null, "l");
+      EdgeList.leftEnd.r = EdgeList.rightEnd;
+      EdgeList.rightEnd.l = EdgeList.leftEnd;
+      EdgeList.list.unshift(EdgeList.leftEnd, EdgeList.rightEnd);
+    },
+
+    createHalfEdge: function(edge, side) {
+      return {
+        edge: edge,
+        side: side,
+        vertex: null,
+        "l": null,
+        "r": null
+      };
+    },
+
+    insert: function(lb, he) {
+      he.l = lb;
+      he.r = lb.r;
+      lb.r.l = he;
+      lb.r = he;
+    },
+
+    leftBound: function(p) {
+      var he = EdgeList.leftEnd;
+      do {
+        he = he.r;
+      } while (he != EdgeList.rightEnd && Geom.rightOf(he, p));
+      he = he.l;
+      return he;
+    },
+
+    del: function(he) {
+      he.l.r = he.r;
+      he.r.l = he.l;
+      he.edge = null;
+    },
+
+    right: function(he) {
+      return he.r;
+    },
+
+    left: function(he) {
+      return he.l;
+    },
+
+    leftRegion: function(he) {
+      return he.edge == null
+          ? Sites.bottomSite
+          : he.edge.region[he.side];
+    },
+
+    rightRegion: function(he) {
+      return he.edge == null
+          ? Sites.bottomSite
+          : he.edge.region[d3_voronoi_opposite[he.side]];
+    }
+  };
+
+  var Geom = {
+
+    bisect: function(s1, s2) {
+      var newEdge = {
+        region: {"l": s1, "r": s2},
+        ep: {"l": null, "r": null}
+      };
+
+      var dx = s2.x - s1.x,
+          dy = s2.y - s1.y,
+          adx = dx > 0 ? dx : -dx,
+          ady = dy > 0 ? dy : -dy;
+
+      newEdge.c = s1.x * dx + s1.y * dy
+          + (dx * dx + dy * dy) * .5;
+
+      if (adx > ady) {
+        newEdge.a = 1;
+        newEdge.b = dy / dx;
+        newEdge.c /= dx;
+      } else {
+        newEdge.b = 1;
+        newEdge.a = dx / dy;
+        newEdge.c /= dy;
+      }
+
+      return newEdge;
+    },
+
+    intersect: function(el1, el2) {
+      var e1 = el1.edge,
+          e2 = el2.edge;
+      if (!e1 || !e2 || (e1.region.r == e2.region.r)) {
+        return null;
+      }
+      var d = (e1.a * e2.b) - (e1.b * e2.a);
+      if (Math.abs(d) < 1e-10) {
+        return null;
+      }
+      var xint = (e1.c * e2.b - e2.c * e1.b) / d,
+          yint = (e2.c * e1.a - e1.c * e2.a) / d,
+          e1r = e1.region.r,
+          e2r = e2.region.r,
+          el,
+          e;
+      if ((e1r.y < e2r.y) ||
+         (e1r.y == e2r.y && e1r.x < e2r.x)) {
+        el = el1;
+        e = e1;
+      } else {
+        el = el2;
+        e = e2;
+      }
+      var rightOfSite = (xint >= e.region.r.x);
+      if ((rightOfSite && (el.side === "l")) ||
+        (!rightOfSite && (el.side === "r"))) {
+        return null;
+      }
+      return {
+        x: xint,
+        y: yint
+      };
+    },
+
+    rightOf: function(he, p) {
+      var e = he.edge,
+          topsite = e.region.r,
+          rightOfSite = (p.x > topsite.x);
+
+      if (rightOfSite && (he.side === "l")) {
+        return 1;
+      }
+      if (!rightOfSite && (he.side === "r")) {
+        return 0;
+      }
+      if (e.a === 1) {
+        var dyp = p.y - topsite.y,
+            dxp = p.x - topsite.x,
+            fast = 0,
+            above = 0;
+
+        if ((!rightOfSite && (e.b < 0)) ||
+          (rightOfSite && (e.b >= 0))) {
+          above = fast = (dyp >= e.b * dxp);
+        } else {
+          above = ((p.x + p.y * e.b) > e.c);
+          if (e.b < 0) {
+            above = !above;
+          }
+          if (!above) {
+            fast = 1;
+          }
+        }
+        if (!fast) {
+          var dxs = topsite.x - e.region.l.x;
+          above = (e.b * (dxp * dxp - dyp * dyp)) <
+            (dxs * dyp * (1 + 2 * dxp / dxs + e.b * e.b));
+
+          if (e.b < 0) {
+            above = !above;
+          }
+        }
+      } else /* e.b == 1 */ {
+        var yl = e.c - e.a * p.x,
+            t1 = p.y - yl,
+            t2 = p.x - topsite.x,
+            t3 = yl - topsite.y;
+
+        above = (t1 * t1) > (t2 * t2 + t3 * t3);
+      }
+      return he.side === "l" ? above : !above;
+    },
+
+    endPoint: function(edge, side, site) {
+      edge.ep[side] = site;
+      if (!edge.ep[d3_voronoi_opposite[side]]) return;
+      callback(edge);
+    },
+
+    distance: function(s, t) {
+      var dx = s.x - t.x,
+          dy = s.y - t.y;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+  };
+
+  var EventQueue = {
+    list: [],
+
+    insert: function(he, site, offset) {
+      he.vertex = site;
+      he.ystar = site.y + offset;
+      for (var i=0, list=EventQueue.list, l=list.length; i<l; i++) {
+        var next = list[i];
+        if (he.ystar > next.ystar ||
+          (he.ystar == next.ystar &&
+          site.x > next.vertex.x)) {
+          continue;
+        } else {
+          break;
+        }
+      }
+      list.splice(i, 0, he);
+    },
+
+    del: function(he) {
+      for (var i=0, ls=EventQueue.list, l=ls.length; i<l && (ls[i] != he); ++i) {}
+      ls.splice(i, 1);
+    },
+
+    empty: function() { return EventQueue.list.length === 0; },
+
+    nextEvent: function(he) {
+      for (var i=0, ls=EventQueue.list, l=ls.length; i<l; ++i) {
+        if (ls[i] == he) return ls[i+1];
+      }
+      return null;
+    },
+
+    min: function() {
+      var elem = EventQueue.list[0];
+      return {
+        x: elem.vertex.x,
+        y: elem.ystar
+      };
+    },
+
+    extractMin: function() {
+      return EventQueue.list.shift();
+    }
+  };
+
+  EdgeList.init();
+  Sites.bottomSite = Sites.list.shift();
+
+  var newSite = Sites.list.shift(), newIntStar;
+  var lbnd, rbnd, llbnd, rrbnd, bisector;
+  var bot, top, temp, p, v;
+  var e, pm;
+
+  while (true) {
+    if (!EventQueue.empty()) {
+      newIntStar = EventQueue.min();
+    }
+    if (newSite && (EventQueue.empty()
+      || newSite.y < newIntStar.y
+      || (newSite.y == newIntStar.y
+      && newSite.x < newIntStar.x))) { //new site is smallest
+      lbnd = EdgeList.leftBound(newSite);
+      rbnd = EdgeList.right(lbnd);
+      bot = EdgeList.rightRegion(lbnd);
+      e = Geom.bisect(bot, newSite);
+      bisector = EdgeList.createHalfEdge(e, "l");
+      EdgeList.insert(lbnd, bisector);
+      p = Geom.intersect(lbnd, bisector);
+      if (p) {
+        EventQueue.del(lbnd);
+        EventQueue.insert(lbnd, p, Geom.distance(p, newSite));
+      }
+      lbnd = bisector;
+      bisector = EdgeList.createHalfEdge(e, "r");
+      EdgeList.insert(lbnd, bisector);
+      p = Geom.intersect(bisector, rbnd);
+      if (p) {
+        EventQueue.insert(bisector, p, Geom.distance(p, newSite));
+      }
+      newSite = Sites.list.shift();
+    } else if (!EventQueue.empty()) { //intersection is smallest
+      lbnd = EventQueue.extractMin();
+      llbnd = EdgeList.left(lbnd);
+      rbnd = EdgeList.right(lbnd);
+      rrbnd = EdgeList.right(rbnd);
+      bot = EdgeList.leftRegion(lbnd);
+      top = EdgeList.rightRegion(rbnd);
+      v = lbnd.vertex;
+      Geom.endPoint(lbnd.edge, lbnd.side, v);
+      Geom.endPoint(rbnd.edge, rbnd.side, v);
+      EdgeList.del(lbnd);
+      EventQueue.del(rbnd);
+      EdgeList.del(rbnd);
+      pm = "l";
+      if (bot.y > top.y) {
+        temp = bot;
+        bot = top;
+        top = temp;
+        pm = "r";
+      }
+      e = Geom.bisect(bot, top);
+      bisector = EdgeList.createHalfEdge(e, pm);
+      EdgeList.insert(llbnd, bisector);
+      Geom.endPoint(e, d3_voronoi_opposite[pm], v);
+      p = Geom.intersect(llbnd, bisector);
+      if (p) {
+        EventQueue.del(llbnd);
+        EventQueue.insert(llbnd, p, Geom.distance(p, bot));
+      }
+      p = Geom.intersect(bisector, rrbnd);
+      if (p) {
+        EventQueue.insert(bisector, p, Geom.distance(p, bot));
+      }
+    } else {
+      break;
+    }
+  }//end while
+
+  for (lbnd = EdgeList.right(EdgeList.leftEnd);
+      lbnd != EdgeList.rightEnd;
+      lbnd = EdgeList.right(lbnd)) {
+    callback(lbnd.edge);
+  }
+}

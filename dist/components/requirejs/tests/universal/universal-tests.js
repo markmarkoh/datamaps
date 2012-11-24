@@ -1,1 +1,15 @@
-require({baseUrl:requirejs.isBrowser?"./":"./universal/"},["spell"],function(e){doh.register("universal",[function(n){n.is("spell",e.name),n.is("newt",e.newtName),n.is("tail",e.tailName),n.is("eye",e.eyeName)}]),doh.run()})
+require({baseUrl: requirejs.isBrowser ? "./" : "./universal/"}, ["spell"], function(spell) {
+    doh.register(
+        "universal",
+        [
+            function universal(t){
+                t.is('spell', spell.name);
+                t.is('newt', spell.newtName);
+                t.is('tail', spell.tailName);
+                t.is('eye', spell.eyeName);
+            }
+        ]
+    );
+
+    doh.run();
+});

@@ -1,1 +1,61 @@
-function d3_hsl(e,t,n){return new d3_Hsl(e,t,n)}function d3_Hsl(e,t,n){this.h=e,this.s=t,this.l=n}function d3_hsl_rgb(e,t,n){function s(e){return e>360?e-=360:e<0&&(e+=360),e<60?r+(i-r)*e/60:e<180?i:e<240?r+(i-r)*(240-e)/60:r}function o(e){return Math.round(s(e)*255)}var r,i;return e%=360,e<0&&(e+=360),t=t<0?0:t>1?1:t,n=n<0?0:n>1?1:n,i=n<=.5?n*(1+t):n+t-n*t,r=2*n-i,d3_rgb(o(e+120),o(e),o(e-120))}d3.hsl=function(e,t,n){return arguments.length===1?e instanceof d3_Hsl?d3_hsl(e.h,e.s,e.l):d3_rgb_parse(""+e,d3_rgb_hsl,d3_hsl):d3_hsl(+e,+t,+n)};var d3_hslPrototype=d3_Hsl.prototype=new d3_Color;d3_hslPrototype.brighter=function(e){return e=Math.pow(.7,arguments.length?e:1),d3_hsl(this.h,this.s,this.l/e)},d3_hslPrototype.darker=function(e){return e=Math.pow(.7,arguments.length?e:1),d3_hsl(this.h,this.s,e*this.l)},d3_hslPrototype.rgb=function(){return d3_hsl_rgb(this.h,this.s,this.l)}
+d3.hsl = function(h, s, l) {
+  return arguments.length === 1
+      ? (h instanceof d3_Hsl ? d3_hsl(h.h, h.s, h.l)
+      : d3_rgb_parse("" + h, d3_rgb_hsl, d3_hsl))
+      : d3_hsl(+h, +s, +l);
+};
+
+function d3_hsl(h, s, l) {
+  return new d3_Hsl(h, s, l);
+}
+
+function d3_Hsl(h, s, l) {
+  this.h = h;
+  this.s = s;
+  this.l = l;
+}
+
+var d3_hslPrototype = d3_Hsl.prototype = new d3_Color;
+
+d3_hslPrototype.brighter = function(k) {
+  k = Math.pow(0.7, arguments.length ? k : 1);
+  return d3_hsl(this.h, this.s, this.l / k);
+};
+
+d3_hslPrototype.darker = function(k) {
+  k = Math.pow(0.7, arguments.length ? k : 1);
+  return d3_hsl(this.h, this.s, k * this.l);
+};
+
+d3_hslPrototype.rgb = function() {
+  return d3_hsl_rgb(this.h, this.s, this.l);
+};
+
+function d3_hsl_rgb(h, s, l) {
+  var m1,
+      m2;
+
+  /* Some simple corrections for h, s and l. */
+  h = h % 360; if (h < 0) h += 360;
+  s = s < 0 ? 0 : s > 1 ? 1 : s;
+  l = l < 0 ? 0 : l > 1 ? 1 : l;
+
+  /* From FvD 13.37, CSS Color Module Level 3 */
+  m2 = l <= .5 ? l * (1 + s) : l + s - l * s;
+  m1 = 2 * l - m2;
+
+  function v(h) {
+    if (h > 360) h -= 360;
+    else if (h < 0) h += 360;
+    if (h < 60) return m1 + (m2 - m1) * h / 60;
+    if (h < 180) return m2;
+    if (h < 240) return m1 + (m2 - m1) * (240 - h) / 60;
+    return m1;
+  }
+
+  function vv(h) {
+    return Math.round(v(h) * 255);
+  }
+
+  return d3_rgb(vv(h + 120), vv(h), vv(h - 120));
+}

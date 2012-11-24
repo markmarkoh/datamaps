@@ -1,1 +1,10 @@
-d3.html=function(e,t){d3.text(e,"text/html",function(e){if(e!=null){var n=document.createRange();n.selectNode(document.body),e=n.createContextualFragment(e)}t(e)})}
+d3.html = function(url, callback) {
+  d3.text(url, "text/html", function(text) {
+    if (text != null) { // Treat empty string as valid HTML.
+      var range = document.createRange();
+      range.selectNode(document.body);
+      text = range.createContextualFragment(text);
+    }
+    callback(text);
+  });
+};

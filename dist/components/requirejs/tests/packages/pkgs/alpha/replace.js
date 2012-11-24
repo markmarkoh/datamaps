@@ -1,1 +1,3 @@
-define({name:"alpha/replace"})
+define({
+    name: 'alpha/replace'
+});

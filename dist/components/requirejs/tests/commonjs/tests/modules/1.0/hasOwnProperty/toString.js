@@ -1,1 +1,3 @@
-define(["require","exports","module"],function(e,t,n){})
+define(["require", "exports", "module"], function(require, exports, module) {
+
+});

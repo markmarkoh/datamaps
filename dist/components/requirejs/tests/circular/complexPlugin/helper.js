@@ -1,1 +1,6 @@
-define(["require","exports","module","main"],function(e,t){var n=e("main");t.name="helper"})
+define(function (require, exports) {
+    //Create circular dependency here
+    var main = require('main');
+
+    exports.name = 'helper';
+});

@@ -1,1 +1,28 @@
-$(document).ready(function(e){e(window).bind("load resize",function(){var t=e(window).height();e("#wrapper, #grid, #navBg").css({"min-height":t}),e("#content").css({"min-height":t-168})}),e("#grid").hide(),e(document.documentElement).keyup(function(t){t.keyCode==71&&e("#grid").fadeToggle(100)}),e(window).bind("load resize",function(){var t=e(window).height(),n=e("#nav").outerHeight();e("#nav").css("position",t<n?"":"fixed")})})
+$(document).ready(function($) {
+
+    // set panel min-height to full browser height
+    $(window).bind("load resize", function(){
+        var h = $(window).height();
+        $("#wrapper, #grid, #navBg").css({ "min-height" : (h) });
+        $("#content").css({ "min-height" : (h-168) });
+    });
+
+    // toggle grid
+
+    $("#grid").hide();
+
+    $(document.documentElement).keyup(function (event) {
+        if (event.keyCode == 71) {
+            $("#grid").fadeToggle(100);
+        }
+    });
+
+    // if window is larger than #nav then #nav == fixed, if #nav is larger than window #nav == relative
+    $(window).bind("load resize", function(){
+        var w = $(window).height();
+        var h = $("#nav").outerHeight();
+        $("#nav").css("position",(w < h) ? "" : "fixed");
+    });
+
+    // done!
+});

@@ -8,6 +8,1216 @@
  * or GPL (GPL-LICENSE.txt) licenses.
  */
 
+(function(window) {
+
+var defined = {
+	setTimeout: typeof window.setTimeout !== "undefined",
+	sessionStorage: (function() {
+		try {
+			return !!sessionStorage.getItem;
+		} catch(e) {
+			return false;
+		}
+	})()
+};
+
+var	testId = 0,
+	toString = Object.prototype.toString,
+	hasOwn = Object.prototype.hasOwnProperty;
+
+var Test = function(name, testName, expected, testEnvironmentArg, async, callback) {
+	this.name = name;
+	this.testName = testName;
+	this.expected = expected;
+	this.testEnvironmentArg = testEnvironmentArg;
+	this.async = async;
+	this.callback = callback;
+	this.assertions = [];
+};
+Test.prototype = {
+	init: function() {
+		var tests = id("qunit-tests");
+		if (tests) {
+			var b = document.createElement("strong");
+				b.innerHTML = "Running " + this.name;
+			var li = document.createElement("li");
+				li.appendChild( b );
+				li.className = "running";
+				li.id = this.id = "test-output" + testId++;
+			tests.appendChild( li );
+		}
+	},
+	setup: function() {
+		if (this.module != config.previousModule) {
+			if ( config.previousModule ) {
+				runLoggingCallbacks('moduleDone', QUnit, {
+					name: config.previousModule,
+					failed: config.moduleStats.bad,
+					passed: config.moduleStats.all - config.moduleStats.bad,
+					total: config.moduleStats.all
+				} );
+			}
+			config.previousModule = this.module;
+			config.moduleStats = { all: 0, bad: 0 };
+			runLoggingCallbacks( 'moduleStart', QUnit, {
+				name: this.module
+			} );
+		}
+
+		config.current = this;
+		this.testEnvironment = extend({
+			setup: function() {},
+			teardown: function() {}
+		}, this.moduleTestEnvironment);
+		if (this.testEnvironmentArg) {
+			extend(this.testEnvironment, this.testEnvironmentArg);
+		}
+
+		runLoggingCallbacks( 'testStart', QUnit, {
+			name: this.testName,
+			module: this.module
+		});
+
+		// allow utility functions to access the current test environment
+		// TODO why??
+		QUnit.current_testEnvironment = this.testEnvironment;
+
+		try {
+			if ( !config.pollution ) {
+				saveGlobal();
+			}
+
+			this.testEnvironment.setup.call(this.testEnvironment);
+		} catch(e) {
+			QUnit.ok( false, "Setup failed on " + this.testName + ": " + e.message );
+		}
+	},
+	run: function() {
+		config.current = this;
+		if ( this.async ) {
+			QUnit.stop();
+		}
+
+		if ( config.notrycatch ) {
+			this.callback.call(this.testEnvironment);
+			return;
+		}
+		try {
+			this.callback.call(this.testEnvironment);
+		} catch(e) {
+			fail("Test " + this.testName + " died, exception and test follows", e, this.callback);
+			QUnit.ok( false, "Died on test #" + (this.assertions.length + 1) + ": " + e.message + " - " + QUnit.jsDump.parse(e) );
+			// else next test will carry the responsibility
+			saveGlobal();
+
+			// Restart the tests if they're blocking
+			if ( config.blocking ) {
+				start();
+			}
+		}
+	},
+	teardown: function() {
+		config.current = this;
+		try {
+			this.testEnvironment.teardown.call(this.testEnvironment);
+			checkPollution();
+		} catch(e) {
+			QUnit.ok( false, "Teardown failed on " + this.testName + ": " + e.message );
+		}
+	},
+	finish: function() {
+		config.current = this;
+		if ( this.expected != null && this.expected != this.assertions.length ) {
+			QUnit.ok( false, "Expected " + this.expected + " assertions, but " + this.assertions.length + " were run" );
+		}
+
+		var good = 0, bad = 0,
+			tests = id("qunit-tests");
+
+		config.stats.all += this.assertions.length;
+		config.moduleStats.all += this.assertions.length;
+
+		if ( tests ) {
+			var ol = document.createElement("ol");
+
+			for ( var i = 0; i < this.assertions.length; i++ ) {
+				var assertion = this.assertions[i];
+
+				var li = document.createElement("li");
+				li.className = assertion.result ? "pass" : "fail";
+				li.innerHTML = assertion.message || (assertion.result ? "okay" : "failed");
+				ol.appendChild( li );
+
+				if ( assertion.result ) {
+					good++;
+				} else {
+					bad++;
+					config.stats.bad++;
+					config.moduleStats.bad++;
+				}
+			}
+
+			// store result when possible
+			if ( QUnit.config.reorder && defined.sessionStorage ) {
+				if (bad) {
+					sessionStorage.setItem("qunit-" + this.module + "-" + this.testName, bad);
+				} else {
+					sessionStorage.removeItem("qunit-" + this.module + "-" + this.testName);
+				}
+			}
+
+			if (bad == 0) {
+				ol.style.display = "none";
+			}
+
+			var b = document.createElement("strong");
+			b.innerHTML = this.name + " <b class='counts'>(<b class='failed'>" + bad + "</b>, <b class='passed'>" + good + "</b>, " + this.assertions.length + ")</b>";
+
+			var a = document.createElement("a");
+			a.innerHTML = "Rerun";
+			a.href = QUnit.url({ filter: getText([b]).replace(/\([^)]+\)$/, "").replace(/(^\s*|\s*$)/g, "") });
+
+			addEvent(b, "click", function() {
+				var next = b.nextSibling.nextSibling,
+					display = next.style.display;
+				next.style.display = display === "none" ? "block" : "none";
+			});
+
+			addEvent(b, "dblclick", function(e) {
+				var target = e && e.target ? e.target : window.event.srcElement;
+				if ( target.nodeName.toLowerCase() == "span" || target.nodeName.toLowerCase() == "b" ) {
+					target = target.parentNode;
+				}
+				if ( window.location && target.nodeName.toLowerCase() === "strong" ) {
+					window.location = QUnit.url({ filter: getText([target]).replace(/\([^)]+\)$/, "").replace(/(^\s*|\s*$)/g, "") });
+				}
+			});
+
+			var li = id(this.id);
+			li.className = bad ? "fail" : "pass";
+			li.removeChild( li.firstChild );
+			li.appendChild( b );
+			li.appendChild( a );
+			li.appendChild( ol );
+
+		} else {
+			for ( var i = 0; i < this.assertions.length; i++ ) {
+				if ( !this.assertions[i].result ) {
+					bad++;
+					config.stats.bad++;
+					config.moduleStats.bad++;
+				}
+			}
+		}
+
+		try {
+			QUnit.reset();
+		} catch(e) {
+			fail("reset() failed, following Test " + this.testName + ", exception and reset fn follows", e, QUnit.reset);
+		}
+
+		runLoggingCallbacks( 'testDone', QUnit, {
+			name: this.testName,
+			module: this.module,
+			failed: bad,
+			passed: this.assertions.length - bad,
+			total: this.assertions.length
+		} );
+	},
+
+	queue: function() {
+		var test = this;
+		synchronize(function() {
+			test.init();
+		});
+		function run() {
+			// each of these can by async
+			synchronize(function() {
+				test.setup();
+			});
+			synchronize(function() {
+				test.run();
+			});
+			synchronize(function() {
+				test.teardown();
+			});
+			synchronize(function() {
+				test.finish();
+			});
+		}
+		// defer when previous test run passed, if storage is available
+		var bad = QUnit.config.reorder && defined.sessionStorage && +sessionStorage.getItem("qunit-" + this.module + "-" + this.testName);
+		if (bad) {
+			run();
+		} else {
+			synchronize(run, true);
+		};
+	}
+
+};
+
+var QUnit = {
+
+	// call on start of module test to prepend name to all tests
+	module: function(name, testEnvironment) {
+		config.currentModule = name;
+		config.currentModuleTestEnviroment = testEnvironment;
+	},
+
+	asyncTest: function(testName, expected, callback) {
+		if ( arguments.length === 2 ) {
+			callback = expected;
+			expected = null;
+		}
+
+		QUnit.test(testName, expected, callback, true);
+	},
+
+	test: function(testName, expected, callback, async) {
+		var name = '<span class="test-name">' + testName + '</span>', testEnvironmentArg;
+
+		if ( arguments.length === 2 ) {
+			callback = expected;
+			expected = null;
+		}
+		// is 2nd argument a testEnvironment?
+		if ( expected && typeof expected === 'object') {
+			testEnvironmentArg = expected;
+			expected = null;
+		}
+
+		if ( config.currentModule ) {
+			name = '<span class="module-name">' + config.currentModule + "</span>: " + name;
+		}
+
+		if ( !validTest(config.currentModule + ": " + testName) ) {
+			return;
+		}
+
+		var test = new Test(name, testName, expected, testEnvironmentArg, async, callback);
+		test.module = config.currentModule;
+		test.moduleTestEnvironment = config.currentModuleTestEnviroment;
+		test.queue();
+	},
+
+	/**
+	 * Specify the number of expected assertions to gurantee that failed test (no assertions are run at all) don't slip through.
+	 */
+	expect: function(asserts) {
+		config.current.expected = asserts;
+	},
+
+	/**
+	 * Asserts true.
+	 * @example ok( "asdfasdf".length > 5, "There must be at least 5 chars" );
+	 */
+	ok: function(a, msg) {
+		a = !!a;
+		var details = {
+			result: a,
+			message: msg
+		};
+		msg = escapeInnerText(msg);
+		runLoggingCallbacks( 'log', QUnit, details );
+		config.current.assertions.push({
+			result: a,
+			message: msg
+		});
+	},
+
+	/**
+	 * Checks that the first two arguments are equal, with an optional message.
+	 * Prints out both actual and expected values.
+	 *
+	 * Prefered to ok( actual == expected, message )
+	 *
+	 * @example equal( format("Received {0} bytes.", 2), "Received 2 bytes." );
+	 *
+	 * @param Object actual
+	 * @param Object expected
+	 * @param String message (optional)
+	 */
+	equal: function(actual, expected, message) {
+		QUnit.push(expected == actual, actual, expected, message);
+	},
+
+	notEqual: function(actual, expected, message) {
+		QUnit.push(expected != actual, actual, expected, message);
+	},
+
+	deepEqual: function(actual, expected, message) {
+		QUnit.push(QUnit.equiv(actual, expected), actual, expected, message);
+	},
+
+	notDeepEqual: function(actual, expected, message) {
+		QUnit.push(!QUnit.equiv(actual, expected), actual, expected, message);
+	},
+
+	strictEqual: function(actual, expected, message) {
+		QUnit.push(expected === actual, actual, expected, message);
+	},
+
+	notStrictEqual: function(actual, expected, message) {
+		QUnit.push(expected !== actual, actual, expected, message);
+	},
+
+	raises: function(block, expected, message) {
+		var actual, ok = false;
+
+		if (typeof expected === 'string') {
+			message = expected;
+			expected = null;
+		}
+
+		try {
+			block();
+		} catch (e) {
+			actual = e;
+		}
+
+		if (actual) {
+			// we don't want to validate thrown error
+			if (!expected) {
+				ok = true;
+			// expected is a regexp
+			} else if (QUnit.objectType(expected) === "regexp") {
+				ok = expected.test(actual);
+			// expected is a constructor
+			} else if (actual instanceof expected) {
+				ok = true;
+			// expected is a validation function which returns true is validation passed
+			} else if (expected.call({}, actual) === true) {
+				ok = true;
+			}
+		}
+
+		QUnit.ok(ok, message);
+	},
+
+	start: function(count) {
+		config.semaphore -= count || 1;
+		if (config.semaphore > 0) {
+			// don't start until equal number of stop-calls
+			return;
+		}
+		if (config.semaphore < 0) {
+			// ignore if start is called more often then stop
+			config.semaphore = 0;
+		}
+		// A slight delay, to avoid any current callbacks
+		if ( defined.setTimeout ) {
+			window.setTimeout(function() {
+				if (config.semaphore > 0) {
+					return;
+				}
+				if ( config.timeout ) {
+					clearTimeout(config.timeout);
+				}
+
+				config.blocking = false;
+				process(true);
+			}, 13);
+		} else {
+			config.blocking = false;
+			process(true);
+		}
+	},
+
+	stop: function(count) {
+		config.semaphore += count || 1;
+		config.blocking = true;
+
+		if ( config.testTimeout && defined.setTimeout ) {
+			clearTimeout(config.timeout);
+			config.timeout = window.setTimeout(function() {
+				QUnit.ok( false, "Test timed out" );
+				config.semaphore = 1;
+				QUnit.start();
+			}, config.testTimeout);
+		}
+	}
+};
+
+//We want access to the constructor's prototype
+(function() {
+	function F(){};
+	F.prototype = QUnit;
+	QUnit = new F();
+	//Make F QUnit's constructor so that we can add to the prototype later
+	QUnit.constructor = F;
+})();
+
+// Backwards compatibility, deprecated
+QUnit.equals = QUnit.equal;
+QUnit.same = QUnit.deepEqual;
+
+// Maintain internal state
+var config = {
+	// The queue of tests to run
+	queue: [],
+
+	// block until document ready
+	blocking: true,
+
+	// when enabled, show only failing tests
+	// gets persisted through sessionStorage and can be changed in UI via checkbox
+	hidepassed: false,
+
+	// by default, run previously failed tests first
+	// very useful in combination with "Hide passed tests" checked
+	reorder: true,
+
+	// by default, modify document.title when suite is done
+	altertitle: true,
+
+	urlConfig: ['noglobals', 'notrycatch'],
+
+	//logging callback queues
+	begin: [],
+	done: [],
+	log: [],
+	testStart: [],
+	testDone: [],
+	moduleStart: [],
+	moduleDone: []
+};
+
+// Load paramaters
+(function() {
+	var location = window.location || { search: "", protocol: "file:" },
+		params = location.search.slice( 1 ).split( "&" ),
+		length = params.length,
+		urlParams = {},
+		current;
+
+	if ( params[ 0 ] ) {
+		for ( var i = 0; i < length; i++ ) {
+			current = params[ i ].split( "=" );
+			current[ 0 ] = decodeURIComponent( current[ 0 ] );
+			// allow just a key to turn on a flag, e.g., test.html?noglobals
+			current[ 1 ] = current[ 1 ] ? decodeURIComponent( current[ 1 ] ) : true;
+			urlParams[ current[ 0 ] ] = current[ 1 ];
+		}
+	}
+
+	QUnit.urlParams = urlParams;
+	config.filter = urlParams.filter;
+
+	// Figure out if we're running the tests from a server or not
+	QUnit.isLocal = !!(location.protocol === 'file:');
+})();
+
+// Expose the API as global variables, unless an 'exports'
+// object exists, in that case we assume we're in CommonJS
+if ( typeof exports === "undefined" || typeof require === "undefined" ) {
+	extend(window, QUnit);
+	window.QUnit = QUnit;
+} else {
+	extend(exports, QUnit);
+	exports.QUnit = QUnit;
+}
+
+// define these after exposing globals to keep them in these QUnit namespace only
+extend(QUnit, {
+	config: config,
+
+	// Initialize the configuration options
+	init: function() {
+		extend(config, {
+			stats: { all: 0, bad: 0 },
+			moduleStats: { all: 0, bad: 0 },
+			started: +new Date,
+			updateRate: 1000,
+			blocking: false,
+			autostart: true,
+			autorun: false,
+			filter: "",
+			queue: [],
+			semaphore: 0
+		});
+
+		var tests = id( "qunit-tests" ),
+			banner = id( "qunit-banner" ),
+			result = id( "qunit-testresult" );
+
+		if ( tests ) {
+			tests.innerHTML = "";
+		}
+
+		if ( banner ) {
+			banner.className = "";
+		}
+
+		if ( result ) {
+			result.parentNode.removeChild( result );
+		}
+
+		if ( tests ) {
+			result = document.createElement( "p" );
+			result.id = "qunit-testresult";
+			result.className = "result";
+			tests.parentNode.insertBefore( result, tests );
+			result.innerHTML = 'Running...<br/>&nbsp;';
+		}
+	},
+
+	/**
+	 * Resets the test setup. Useful for tests that modify the DOM.
+	 *
+	 * If jQuery is available, uses jQuery's html(), otherwise just innerHTML.
+	 */
+	reset: function() {
+		if ( window.jQuery ) {
+			jQuery( "#qunit-fixture" ).html( config.fixture );
+		} else {
+			var main = id( 'qunit-fixture' );
+			if ( main ) {
+				main.innerHTML = config.fixture;
+			}
+		}
+	},
+
+	/**
+	 * Trigger an event on an element.
+	 *
+	 * @example triggerEvent( document.body, "click" );
+	 *
+	 * @param DOMElement elem
+	 * @param String type
+	 */
+	triggerEvent: function( elem, type, event ) {
+		if ( document.createEvent ) {
+			event = document.createEvent("MouseEvents");
+			event.initMouseEvent(type, true, true, elem.ownerDocument.defaultView,
+				0, 0, 0, 0, 0, false, false, false, false, 0, null);
+			elem.dispatchEvent( event );
+
+		} else if ( elem.fireEvent ) {
+			elem.fireEvent("on"+type);
+		}
+	},
+
+	// Safe object type checking
+	is: function( type, obj ) {
+		return QUnit.objectType( obj ) == type;
+	},
+
+	objectType: function( obj ) {
+		if (typeof obj === "undefined") {
+				return "undefined";
+
+		// consider: typeof null === object
+		}
+		if (obj === null) {
+				return "null";
+		}
+
+		var type = toString.call( obj ).match(/^\[object\s(.*)\]$/)[1] || '';
+
+		switch (type) {
+				case 'Number':
+						if (isNaN(obj)) {
+								return "nan";
+						} else {
+								return "number";
+						}
+				case 'String':
+				case 'Boolean':
+				case 'Array':
+				case 'Date':
+				case 'RegExp':
+				case 'Function':
+						return type.toLowerCase();
+		}
+		if (typeof obj === "object") {
+				return "object";
+		}
+		return undefined;
+	},
+
+	push: function(result, actual, expected, message) {
+		var details = {
+			result: result,
+			message: message,
+			actual: actual,
+			expected: expected
+		};
+
+		message = escapeInnerText(message) || (result ? "okay" : "failed");
+		message = '<span class="test-message">' + message + "</span>";
+		expected = escapeInnerText(QUnit.jsDump.parse(expected));
+		actual = escapeInnerText(QUnit.jsDump.parse(actual));
+		var output = message + '<table><tr class="test-expected"><th>Expected: </th><td><pre>' + expected + '</pre></td></tr>';
+		if (actual != expected) {
+			output += '<tr class="test-actual"><th>Result: </th><td><pre>' + actual + '</pre></td></tr>';
+			output += '<tr class="test-diff"><th>Diff: </th><td><pre>' + QUnit.diff(expected, actual) +'</pre></td></tr>';
+		}
+		if (!result) {
+			var source = sourceFromStacktrace();
+			if (source) {
+				details.source = source;
+				output += '<tr class="test-source"><th>Source: </th><td><pre>' + escapeInnerText(source) + '</pre></td></tr>';
+			}
+		}
+		output += "</table>";
+
+		runLoggingCallbacks( 'log', QUnit, details );
+
+		config.current.assertions.push({
+			result: !!result,
+			message: output
+		});
+	},
+
+	url: function( params ) {
+		params = extend( extend( {}, QUnit.urlParams ), params );
+		var querystring = "?",
+			key;
+		for ( key in params ) {
+			if ( !hasOwn.call( params, key ) ) {
+				continue;
+			}
+			querystring += encodeURIComponent( key ) + "=" +
+				encodeURIComponent( params[ key ] ) + "&";
+		}
+		return window.location.pathname + querystring.slice( 0, -1 );
+	},
+
+	extend: extend,
+	id: id,
+	addEvent: addEvent
+});
+
+//QUnit.constructor is set to the empty F() above so that we can add to it's prototype later
+//Doing this allows us to tell if the following methods have been overwritten on the actual
+//QUnit object, which is a deprecated way of using the callbacks.
+extend(QUnit.constructor.prototype, {
+	// Logging callbacks; all receive a single argument with the listed properties
+	// run test/logs.html for any related changes
+	begin: registerLoggingCallback('begin'),
+	// done: { failed, passed, total, runtime }
+	done: registerLoggingCallback('done'),
+	// log: { result, actual, expected, message }
+	log: registerLoggingCallback('log'),
+	// testStart: { name }
+	testStart: registerLoggingCallback('testStart'),
+	// testDone: { name, failed, passed, total }
+	testDone: registerLoggingCallback('testDone'),
+	// moduleStart: { name }
+	moduleStart: registerLoggingCallback('moduleStart'),
+	// moduleDone: { name, failed, passed, total }
+	moduleDone: registerLoggingCallback('moduleDone')
+});
+
+if ( typeof document === "undefined" || document.readyState === "complete" ) {
+	config.autorun = true;
+}
+
+QUnit.load = function() {
+	runLoggingCallbacks( 'begin', QUnit, {} );
+
+	// Initialize the config, saving the execution queue
+	var oldconfig = extend({}, config);
+	QUnit.init();
+	extend(config, oldconfig);
+
+	config.blocking = false;
+
+	var urlConfigHtml = '', len = config.urlConfig.length;
+	for ( var i = 0, val; i < len, val = config.urlConfig[i]; i++ ) {
+		config[val] = QUnit.urlParams[val];
+		urlConfigHtml += '<label><input name="' + val + '" type="checkbox"' + ( config[val] ? ' checked="checked"' : '' ) + '>' + val + '</label>';
+	}
+
+	var userAgent = id("qunit-userAgent");
+	if ( userAgent ) {
+		userAgent.innerHTML = navigator.userAgent;
+	}
+	var banner = id("qunit-header");
+	if ( banner ) {
+		banner.innerHTML = '<a href="' + QUnit.url({ filter: undefined }) + '"> ' + banner.innerHTML + '</a> ' + urlConfigHtml;
+		addEvent( banner, "change", function( event ) {
+			var params = {};
+			params[ event.target.name ] = event.target.checked ? true : undefined;
+			window.location = QUnit.url( params );
+		});
+	}
+
+	var toolbar = id("qunit-testrunner-toolbar");
+	if ( toolbar ) {
+		var filter = document.createElement("input");
+		filter.type = "checkbox";
+		filter.id = "qunit-filter-pass";
+		addEvent( filter, "click", function() {
+			var ol = document.getElementById("qunit-tests");
+			if ( filter.checked ) {
+				ol.className = ol.className + " hidepass";
+			} else {
+				var tmp = " " + ol.className.replace( /[\n\t\r]/g, " " ) + " ";
+				ol.className = tmp.replace(/ hidepass /, " ");
+			}
+			if ( defined.sessionStorage ) {
+				if (filter.checked) {
+					sessionStorage.setItem("qunit-filter-passed-tests", "true");
+				} else {
+					sessionStorage.removeItem("qunit-filter-passed-tests");
+				}
+			}
+		});
+		if ( config.hidepassed || defined.sessionStorage && sessionStorage.getItem("qunit-filter-passed-tests") ) {
+			filter.checked = true;
+			var ol = document.getElementById("qunit-tests");
+			ol.className = ol.className + " hidepass";
+		}
+		toolbar.appendChild( filter );
+
+		var label = document.createElement("label");
+		label.setAttribute("for", "qunit-filter-pass");
+		label.innerHTML = "Hide passed tests";
+		toolbar.appendChild( label );
+	}
+
+	var main = id('qunit-fixture');
+	if ( main ) {
+		config.fixture = main.innerHTML;
+	}
+
+	if (config.autostart) {
+		QUnit.start();
+	}
+};
+
+addEvent(window, "load", QUnit.load);
+
+// addEvent(window, "error") gives us a useless event object
+window.onerror = function( message, file, line ) {
+	if ( QUnit.config.current ) {
+		ok( false, message + ", " + file + ":" + line );
+	} else {
+		test( "global failure", function() {
+			ok( false, message + ", " + file + ":" + line );
+		});
+	}
+};
+
+function done() {
+	config.autorun = true;
+
+	// Log the last module results
+	if ( config.currentModule ) {
+		runLoggingCallbacks( 'moduleDone', QUnit, {
+			name: config.currentModule,
+			failed: config.moduleStats.bad,
+			passed: config.moduleStats.all - config.moduleStats.bad,
+			total: config.moduleStats.all
+		} );
+	}
+
+	var banner = id("qunit-banner"),
+		tests = id("qunit-tests"),
+		runtime = +new Date - config.started,
+		passed = config.stats.all - config.stats.bad,
+		html = [
+			'Tests completed in ',
+			runtime,
+			' milliseconds.<br/>',
+			'<span class="passed">',
+			passed,
+			'</span> tests of <span class="total">',
+			config.stats.all,
+			'</span> passed, <span class="failed">',
+			config.stats.bad,
+			'</span> failed.'
+		].join('');
+
+	if ( banner ) {
+		banner.className = (config.stats.bad ? "qunit-fail" : "qunit-pass");
+	}
+
+	if ( tests ) {
+		id( "qunit-testresult" ).innerHTML = html;
+	}
+
+	if ( config.altertitle && typeof document !== "undefined" && document.title ) {
+		// show ✖ for good, ✔ for bad suite result in title
+		// use escape sequences in case file gets loaded with non-utf-8-charset
+		document.title = [
+			(config.stats.bad ? "\u2716" : "\u2714"),
+			document.title.replace(/^[\u2714\u2716] /i, "")
+		].join(" ");
+	}
+
+	runLoggingCallbacks( 'done', QUnit, {
+		failed: config.stats.bad,
+		passed: passed,
+		total: config.stats.all,
+		runtime: runtime
+	} );
+}
+
+function validTest( name ) {
+	var filter = config.filter,
+		run = false;
+
+	if ( !filter ) {
+		return true;
+	}
+
+	var not = filter.charAt( 0 ) === "!";
+	if ( not ) {
+		filter = filter.slice( 1 );
+	}
+
+	if ( name.indexOf( filter ) !== -1 ) {
+		return !not;
+	}
+
+	if ( not ) {
+		run = true;
+	}
+
+	return run;
+}
+
+// so far supports only Firefox, Chrome and Opera (buggy)
+// could be extended in the future to use something like https://github.com/csnover/TraceKit
+function sourceFromStacktrace() {
+	try {
+		throw new Error();
+	} catch ( e ) {
+		if (e.stacktrace) {
+			// Opera
+			return e.stacktrace.split("\n")[6];
+		} else if (e.stack) {
+			// Firefox, Chrome
+			return e.stack.split("\n")[4];
+		} else if (e.sourceURL) {
+			// Safari, PhantomJS
+			// TODO sourceURL points at the 'throw new Error' line above, useless
+			//return e.sourceURL + ":" + e.line;
+		}
+	}
+}
+
+function escapeInnerText(s) {
+	if (!s) {
+		return "";
+	}
+	s = s + "";
+	return s.replace(/[\&<>]/g, function(s) {
+		switch(s) {
+			case "&": return "&amp;";
+			case "<": return "&lt;";
+			case ">": return "&gt;";
+			default: return s;
+		}
+	});
+}
+
+function synchronize( callback, last ) {
+	config.queue.push( callback );
+
+	if ( config.autorun && !config.blocking ) {
+		process(last);
+	}
+}
+
+function process( last ) {
+	var start = new Date().getTime();
+	config.depth = config.depth ? config.depth + 1 : 1;
+
+	while ( config.queue.length && !config.blocking ) {
+		if ( !defined.setTimeout || config.updateRate <= 0 || ( ( new Date().getTime() - start ) < config.updateRate ) ) {
+			config.queue.shift()();
+		} else {
+			window.setTimeout( function(){
+				process( last );
+			}, 13 );
+			break;
+		}
+	}
+	config.depth--;
+	if ( last && !config.blocking && !config.queue.length && config.depth === 0 ) {
+		done();
+	}
+}
+
+function saveGlobal() {
+	config.pollution = [];
+
+	if ( config.noglobals ) {
+		for ( var key in window ) {
+			if ( !hasOwn.call( window, key ) ) {
+				continue;
+			}
+			config.pollution.push( key );
+		}
+	}
+}
+
+function checkPollution( name ) {
+	var old = config.pollution;
+	saveGlobal();
+
+	var newGlobals = diff( config.pollution, old );
+	if ( newGlobals.length > 0 ) {
+		ok( false, "Introduced global variable(s): " + newGlobals.join(", ") );
+	}
+
+	var deletedGlobals = diff( old, config.pollution );
+	if ( deletedGlobals.length > 0 ) {
+		ok( false, "Deleted global variable(s): " + deletedGlobals.join(", ") );
+	}
+}
+
+// returns a new Array with the elements that are in a but not in b
+function diff( a, b ) {
+	var result = a.slice();
+	for ( var i = 0; i < result.length; i++ ) {
+		for ( var j = 0; j < b.length; j++ ) {
+			if ( result[i] === b[j] ) {
+				result.splice(i, 1);
+				i--;
+				break;
+			}
+		}
+	}
+	return result;
+}
+
+function fail(message, exception, callback) {
+	if ( typeof console !== "undefined" && console.error && console.warn ) {
+		console.error(message);
+		console.error(exception);
+		console.warn(callback.toString());
+
+	} else if ( window.opera && opera.postError ) {
+		opera.postError(message, exception, callback.toString);
+	}
+}
+
+function extend(a, b) {
+	for ( var prop in b ) {
+		if ( b[prop] === undefined ) {
+			delete a[prop];
+		} else {
+			a[prop] = b[prop];
+		}
+	}
+
+	return a;
+}
+
+function addEvent(elem, type, fn) {
+	if ( elem.addEventListener ) {
+		elem.addEventListener( type, fn, false );
+	} else if ( elem.attachEvent ) {
+		elem.attachEvent( "on" + type, fn );
+	} else {
+		fn();
+	}
+}
+
+function id(name) {
+	return !!(typeof document !== "undefined" && document && document.getElementById) &&
+		document.getElementById( name );
+}
+
+function registerLoggingCallback(key){
+	return function(callback){
+		config[key].push( callback );
+	};
+}
+
+// Supports deprecated method of completely overwriting logging callbacks
+function runLoggingCallbacks(key, scope, args) {
+	//debugger;
+	var callbacks;
+	if ( QUnit.hasOwnProperty(key) ) {
+		QUnit[key].call(scope, args);
+	} else {
+		callbacks = config[key];
+		for( var i = 0; i < callbacks.length; i++ ) {
+			callbacks[i].call( scope, args );
+		}
+	}
+}
+
+// Test for equality any JavaScript type.
+// Author: Philippe Rathé <prathe@gmail.com>
+QUnit.equiv = function () {
+
+	var innerEquiv; // the real equiv function
+	var callers = []; // stack to decide between skip/abort functions
+	var parents = []; // stack to avoiding loops from circular referencing
+
+	// Call the o related callback with the given arguments.
+	function bindCallbacks(o, callbacks, args) {
+		var prop = QUnit.objectType(o);
+		if (prop) {
+			if (QUnit.objectType(callbacks[prop]) === "function") {
+				return callbacks[prop].apply(callbacks, args);
+			} else {
+				return callbacks[prop]; // or undefined
+			}
+		}
+	}
+
+	var callbacks = function () {
+
+		// for string, boolean, number and null
+		function useStrictEquality(b, a) {
+			if (b instanceof a.constructor || a instanceof b.constructor) {
+				// to catch short annotaion VS 'new' annotation of a
+				// declaration
+				// e.g. var i = 1;
+				// var j = new Number(1);
+				return a == b;
+			} else {
+				return a === b;
+			}
+		}
+
+		return {
+			"string" : useStrictEquality,
+			"boolean" : useStrictEquality,
+			"number" : useStrictEquality,
+			"null" : useStrictEquality,
+			"undefined" : useStrictEquality,
+
+			"nan" : function(b) {
+				return isNaN(b);
+			},
+
+			"date" : function(b, a) {
+				return QUnit.objectType(b) === "date"
+						&& a.valueOf() === b.valueOf();
+			},
+
+			"regexp" : function(b, a) {
+				return QUnit.objectType(b) === "regexp"
+						&& a.source === b.source && // the regex itself
+						a.global === b.global && // and its modifers
+													// (gmi) ...
+						a.ignoreCase === b.ignoreCase
+						&& a.multiline === b.multiline;
+			},
+
+			// - skip when the property is a method of an instance (OOP)
+			// - abort otherwise,
+			// initial === would have catch identical references anyway
+			"function" : function() {
+				var caller = callers[callers.length - 1];
+				return caller !== Object && typeof caller !== "undefined";
+			},
+
+			"array" : function(b, a) {
+				var i, j, loop;
+				var len;
+
+				// b could be an object literal here
+				if (!(QUnit.objectType(b) === "array")) {
+					return false;
+				}
+
+				len = a.length;
+				if (len !== b.length) { // safe and faster
+					return false;
+				}
+
+				// track reference to avoid circular references
+				parents.push(a);
+				for (i = 0; i < len; i++) {
+					loop = false;
+					for (j = 0; j < parents.length; j++) {
+						if (parents[j] === a[i]) {
+							loop = true;// dont rewalk array
+						}
+					}
+					if (!loop && !innerEquiv(a[i], b[i])) {
+						parents.pop();
+						return false;
+					}
+				}
+				parents.pop();
+				return true;
+			},
+
+			"object" : function(b, a) {
+				var i, j, loop;
+				var eq = true; // unless we can proove it
+				var aProperties = [], bProperties = []; // collection of
+														// strings
+
+				// comparing constructors is more strict than using
+				// instanceof
+				if (a.constructor !== b.constructor) {
+					return false;
+				}
+
+				// stack constructor before traversing properties
+				callers.push(a.constructor);
+				// track reference to avoid circular references
+				parents.push(a);
+
+				for (i in a) { // be strict: don't ensures hasOwnProperty
+								// and go deep
+					loop = false;
+					for (j = 0; j < parents.length; j++) {
+						if (parents[j] === a[i])
+							loop = true; // don't go down the same path
+											// twice
+					}
+					aProperties.push(i); // collect a's properties
+
+					if (!loop && !innerEquiv(a[i], b[i])) {
+						eq = false;
+						break;
+					}
+				}
+
+				callers.pop(); // unstack, we are done
+				parents.pop();
+
+				for (i in b) {
+					bProperties.push(i); // collect b's properties
+				}
+
+				// Ensures identical properties name
+				return eq
+						&& innerEquiv(aProperties.sort(), bProperties
+								.sort());
+			}
+		};
+	}();
+
+	innerEquiv = function() { // can take multiple arguments
+		var args = Array.prototype.slice.apply(arguments);
+		if (args.length < 2) {
+			return true; // end transition
+		}
+
+		return (function(a, b) {
+			if (a === b) {
+				return true; // catch the most you can
+			} else if (a === null || b === null || typeof a === "undefined"
+					|| typeof b === "undefined"
+					|| QUnit.objectType(a) !== QUnit.objectType(b)) {
+				return false; // don't lose time with error prone cases
+			} else {
+				return bindCallbacks(a, callbacks, [ b, a ]);
+			}
+
+			// apply transition with (1..n) arguments
+		})(args[0], args[1])
+				&& arguments.callee.apply(this, args.splice(1,
+						args.length - 1));
+	};
+
+	return innerEquiv;
+
+}();
+
 /**
  * jsDump Copyright (c) 2008 Ariel Flesler - aflesler(at)gmail(dot)com |
  * http://flesler.blogspot.com Licensed under BSD
@@ -18,6 +1228,219 @@
  * @author Ariel Flesler
  * @link {http://flesler.blogspot.com/2008/05/jsdump-pretty-dump-of-any-javascript.html}
  */
+QUnit.jsDump = (function() {
+	function quote( str ) {
+		return '"' + str.toString().replace(/"/g, '\\"') + '"';
+	};
+	function literal( o ) {
+		return o + '';
+	};
+	function join( pre, arr, post ) {
+		var s = jsDump.separator(),
+			base = jsDump.indent(),
+			inner = jsDump.indent(1);
+		if ( arr.join )
+			arr = arr.join( ',' + s + inner );
+		if ( !arr )
+			return pre + post;
+		return [ pre, inner + arr, base + post ].join(s);
+	};
+	function array( arr, stack ) {
+		var i = arr.length, ret = Array(i);
+		this.up();
+		while ( i-- )
+			ret[i] = this.parse( arr[i] , undefined , stack);
+		this.down();
+		return join( '[', ret, ']' );
+	};
+
+	var reName = /^function (\w+)/;
+
+	var jsDump = {
+		parse:function( obj, type, stack ) { //type is used mostly internally, you can fix a (custom)type in advance
+			stack = stack || [ ];
+			var parser = this.parsers[ type || this.typeOf(obj) ];
+			type = typeof parser;
+			var inStack = inArray(obj, stack);
+			if (inStack != -1) {
+				return 'recursion('+(inStack - stack.length)+')';
+			}
+			//else
+			if (type == 'function')  {
+					stack.push(obj);
+					var res = parser.call( this, obj, stack );
+					stack.pop();
+					return res;
+			}
+			// else
+			return (type == 'string') ? parser : this.parsers.error;
+		},
+		typeOf:function( obj ) {
+			var type;
+			if ( obj === null ) {
+				type = "null";
+			} else if (typeof obj === "undefined") {
+				type = "undefined";
+			} else if (QUnit.is("RegExp", obj)) {
+				type = "regexp";
+			} else if (QUnit.is("Date", obj)) {
+				type = "date";
+			} else if (QUnit.is("Function", obj)) {
+				type = "function";
+			} else if (typeof obj.setInterval !== undefined && typeof obj.document !== "undefined" && typeof obj.nodeType === "undefined") {
+				type = "window";
+			} else if (obj.nodeType === 9) {
+				type = "document";
+			} else if (obj.nodeType) {
+				type = "node";
+			} else if (
+				// native arrays
+				toString.call( obj ) === "[object Array]" ||
+				// NodeList objects
+				( typeof obj.length === "number" && typeof obj.item !== "undefined" && ( obj.length ? obj.item(0) === obj[0] : ( obj.item( 0 ) === null && typeof obj[0] === "undefined" ) ) )
+			) {
+				type = "array";
+			} else {
+				type = typeof obj;
+			}
+			return type;
+		},
+		separator:function() {
+			return this.multiline ?	this.HTML ? '<br />' : '\n' : this.HTML ? '&nbsp;' : ' ';
+		},
+		indent:function( extra ) {// extra can be a number, shortcut for increasing-calling-decreasing
+			if ( !this.multiline )
+				return '';
+			var chr = this.indentChar;
+			if ( this.HTML )
+				chr = chr.replace(/\t/g,'   ').replace(/ /g,'&nbsp;');
+			return Array( this._depth_ + (extra||0) ).join(chr);
+		},
+		up:function( a ) {
+			this._depth_ += a || 1;
+		},
+		down:function( a ) {
+			this._depth_ -= a || 1;
+		},
+		setParser:function( name, parser ) {
+			this.parsers[name] = parser;
+		},
+		// The next 3 are exposed so you can use them
+		quote:quote,
+		literal:literal,
+		join:join,
+		//
+		_depth_: 1,
+		// This is the list of parsers, to modify them, use jsDump.setParser
+		parsers:{
+			window: '[Window]',
+			document: '[Document]',
+			error:'[ERROR]', //when no parser is found, shouldn't happen
+			unknown: '[Unknown]',
+			'null':'null',
+			'undefined':'undefined',
+			'function':function( fn ) {
+				var ret = 'function',
+					name = 'name' in fn ? fn.name : (reName.exec(fn)||[])[1];//functions never have name in IE
+				if ( name )
+					ret += ' ' + name;
+				ret += '(';
+
+				ret = [ ret, QUnit.jsDump.parse( fn, 'functionArgs' ), '){'].join('');
+				return join( ret, QUnit.jsDump.parse(fn,'functionCode'), '}' );
+			},
+			array: array,
+			nodelist: array,
+			arguments: array,
+			object:function( map, stack ) {
+				var ret = [ ];
+				QUnit.jsDump.up();
+				for ( var key in map ) {
+				    var val = map[key];
+					ret.push( QUnit.jsDump.parse(key,'key') + ': ' + QUnit.jsDump.parse(val, undefined, stack));
+                }
+				QUnit.jsDump.down();
+				return join( '{', ret, '}' );
+			},
+			node:function( node ) {
+				var open = QUnit.jsDump.HTML ? '&lt;' : '<',
+					close = QUnit.jsDump.HTML ? '&gt;' : '>';
+
+				var tag = node.nodeName.toLowerCase(),
+					ret = open + tag;
+
+				for ( var a in QUnit.jsDump.DOMAttrs ) {
+					var val = node[QUnit.jsDump.DOMAttrs[a]];
+					if ( val )
+						ret += ' ' + a + '=' + QUnit.jsDump.parse( val, 'attribute' );
+				}
+				return ret + close + open + '/' + tag + close;
+			},
+			functionArgs:function( fn ) {//function calls it internally, it's the arguments part of the function
+				var l = fn.length;
+				if ( !l ) return '';
+
+				var args = Array(l);
+				while ( l-- )
+					args[l] = String.fromCharCode(97+l);//97 is 'a'
+				return ' ' + args.join(', ') + ' ';
+			},
+			key:quote, //object calls it internally, the key part of an item in a map
+			functionCode:'[code]', //function calls it internally, it's the content of the function
+			attribute:quote, //node calls it internally, it's an html attribute value
+			string:quote,
+			date:quote,
+			regexp:literal, //regex
+			number:literal,
+			'boolean':literal
+		},
+		DOMAttrs:{//attributes to dump from nodes, name=>realName
+			id:'id',
+			name:'name',
+			'class':'className'
+		},
+		HTML:false,//if true, entities are escaped ( <, >, \t, space and \n )
+		indentChar:'  ',//indentation unit
+		multiline:true //if true, items in a collection, are separated by a \n, else just a space.
+	};
+
+	return jsDump;
+})();
+
+// from Sizzle.js
+function getText( elems ) {
+	var ret = "", elem;
+
+	for ( var i = 0; elems[i]; i++ ) {
+		elem = elems[i];
+
+		// Get the text from text nodes and CDATA nodes
+		if ( elem.nodeType === 3 || elem.nodeType === 4 ) {
+			ret += elem.nodeValue;
+
+		// Traverse everything else, except comment nodes
+		} else if ( elem.nodeType !== 8 ) {
+			ret += getText( elem.childNodes );
+		}
+	}
+
+	return ret;
+};
+
+//from jquery.js
+function inArray( elem, array ) {
+	if ( array.indexOf ) {
+		return array.indexOf( elem );
+	}
+
+	for ( var i = 0, length = array.length; i < length; i++ ) {
+		if ( array[ i ] === elem ) {
+			return i;
+		}
+	}
+
+	return -1;
+}
 
 /*
  * Javascript Diff Algorithm
@@ -33,5 +1456,130 @@
  *
  * QUnit.diff("the quick brown fox jumped over", "the quick fox jumps over") == "the  quick <del>brown </del> fox <del>jumped </del><ins>jumps </ins> over"
  */
+QUnit.diff = (function() {
+	function diff(o, n) {
+		var ns = {};
+		var os = {};
 
-(function(e){function a(){u.autorun=!0,u.currentModule&&S("moduleDone",o,{name:u.currentModule,failed:u.moduleStats.bad,passed:u.moduleStats.all-u.moduleStats.bad,total:u.moduleStats.all});var e=w("qunit-banner"),t=w("qunit-tests"),n=+(new Date)-u.started,r=u.stats.all-u.stats.bad,i=["Tests completed in ",n," milliseconds.<br/>",'<span class="passed">',r,'</span> tests of <span class="total">',u.stats.all,'</span> passed, <span class="failed">',u.stats.bad,"</span> failed."].join("");e&&(e.className=u.stats.bad?"qunit-fail":"qunit-pass"),t&&(w("qunit-testresult").innerHTML=i),u.altertitle&&typeof document!="undefined"&&document.title&&(document.title=[u.stats.bad?"✖":"✔",document.title.replace(/^[\u2714\u2716] /i,"")].join(" ")),S("done",o,{failed:u.stats.bad,passed:r,total:u.stats.all,runtime:n})}function f(e){var t=u.filter,n=!1;if(!t)return!0;var r=t.charAt(0)==="!";return r&&(t=t.slice(1)),e.indexOf(t)!==-1?!r:(r&&(n=!0),n)}function l(){try{throw new Error}catch(e){if(e.stacktrace)return e.stacktrace.split("\n")[6];if(e.stack)return e.stack.split("\n")[4];e.sourceURL}}function c(e){return e?(e+="",e.replace(/[\&<>]/g,function(e){switch(e){case"&":return"&amp;";case"<":return"&lt;";case">":return"&gt;";default:return e}})):""}function h(e,t){u.queue.push(e),u.autorun&&!u.blocking&&p(t)}function p(n){var r=(new Date).getTime();u.depth=u.depth?u.depth+1:1;while(u.queue.length&&!u.blocking){if(!(!t.setTimeout||u.updateRate<=0||(new Date).getTime()-r<u.updateRate)){e.setTimeout(function(){p(n)},13);break}u.queue.shift()()}u.depth--,n&&!u.blocking&&!u.queue.length&&u.depth===0&&a()}function d(){u.pollution=[];if(u.noglobals)for(var t in e){if(!i.call(e,t))continue;u.pollution.push(t)}}function v(e){var t=u.pollution;d();var n=m(u.pollution,t);n.length>0&&ok(!1,"Introduced global variable(s): "+n.join(", "));var r=m(t,u.pollution);r.length>0&&ok(!1,"Deleted global variable(s): "+r.join(", "))}function m(e,t){var n=e.slice();for(var r=0;r<n.length;r++)for(var i=0;i<t.length;i++)if(n[r]===t[i]){n.splice(r,1),r--;break}return n}function g(t,n,r){typeof console!="undefined"&&console.error&&console.warn?(console.error(t),console.error(n),console.warn(r.toString())):e.opera&&opera.postError&&opera.postError(t,n,r.toString)}function y(e,t){for(var n in t)t[n]===undefined?delete e[n]:e[n]=t[n];return e}function b(e,t,n){e.addEventListener?e.addEventListener(t,n,!1):e.attachEvent?e.attachEvent("on"+t,n):n()}function w(e){return typeof document!="undefined"&&!!document&&!!document.getElementById&&document.getElementById(e)}function E(e){return function(t){u[e].push(t)}}function S(e,t,n){var r;if(o.hasOwnProperty(e))o[e].call(t,n);else{r=u[e];for(var i=0;i<r.length;i++)r[i].call(t,n)}}function x(e){var t="",n;for(var r=0;e[r];r++)n=e[r],n.nodeType===3||n.nodeType===4?t+=n.nodeValue:n.nodeType!==8&&(t+=x(n.childNodes));return t}function T(e,t){if(t.indexOf)return t.indexOf(e);for(var n=0,r=t.length;n<r;n++)if(t[n]===e)return n;return-1}var t={setTimeout:typeof e.setTimeout!="undefined",sessionStorage:function(){try{return!!sessionStorage.getItem}catch(e){return!1}}()},n=0,r=Object.prototype.toString,i=Object.prototype.hasOwnProperty,s=function(e,t,n,r,i,s){this.name=e,this.testName=t,this.expected=n,this.testEnvironmentArg=r,this.async=i,this.callback=s,this.assertions=[]};s.prototype={init:function(){var e=w("qunit-tests");if(e){var t=document.createElement("strong");t.innerHTML="Running "+this.name;var r=document.createElement("li");r.appendChild(t),r.className="running",r.id=this.id="test-output"+n++,e.appendChild(r)}},setup:function(){this.module!=u.previousModule&&(u.previousModule&&S("moduleDone",o,{name:u.previousModule,failed:u.moduleStats.bad,passed:u.moduleStats.all-u.moduleStats.bad,total:u.moduleStats.all}),u.previousModule=this.module,u.moduleStats={all:0,bad:0},S("moduleStart",o,{name:this.module})),u.current=this,this.testEnvironment=y({setup:function(){},teardown:function(){}},this.moduleTestEnvironment),this.testEnvironmentArg&&y(this.testEnvironment,this.testEnvironmentArg),S("testStart",o,{name:this.testName,module:this.module}),o.current_testEnvironment=this.testEnvironment;try{u.pollution||d(),this.testEnvironment.setup.call(this.testEnvironment)}catch(e){o.ok(!1,"Setup failed on "+this.testName+": "+e.message)}},run:function(){u.current=this,this.async&&o.stop();if(u.notrycatch){this.callback.call(this.testEnvironment);return}try{this.callback.call(this.testEnvironment)}catch(e){g("Test "+this.testName+" died, exception and test follows",e,this.callback),o.ok(!1,"Died on test #"+(this.assertions.length+1)+": "+e.message+" - "+o.jsDump.parse(e)),d(),u.blocking&&start()}},teardown:function(){u.current=this;try{this.testEnvironment.teardown.call(this.testEnvironment),v()}catch(e){o.ok(!1,"Teardown failed on "+this.testName+": "+e.message)}},finish:function(){u.current=this,this.expected!=null&&this.expected!=this.assertions.length&&o.ok(!1,"Expected "+this.expected+" assertions, but "+this.assertions.length+" were run");var n=0,r=0,i=w("qunit-tests");u.stats.all+=this.assertions.length,u.moduleStats.all+=this.assertions.length;if(i){var s=document.createElement("ol");for(var a=0;a<this.assertions.length;a++){var f=this.assertions[a],l=document.createElement("li");l.className=f.result?"pass":"fail",l.innerHTML=f.message||(f.result?"okay":"failed"),s.appendChild(l),f.result?n++:(r++,u.stats.bad++,u.moduleStats.bad++)}o.config.reorder&&t.sessionStorage&&(r?sessionStorage.setItem("qunit-"+this.module+"-"+this.testName,r):sessionStorage.removeItem("qunit-"+this.module+"-"+this.testName)),r==0&&(s.style.display="none");var c=document.createElement("strong");c.innerHTML=this.name+" <b class='counts'>(<b class='failed'>"+r+"</b>, <b class='passed'>"+n+"</b>, "+this.assertions.length+")</b>";var h=document.createElement("a");h.innerHTML="Rerun",h.href=o.url({filter:x([c]).replace(/\([^)]+\)$/,"").replace(/(^\s*|\s*$)/g,"")}),b(c,"click",function(){var e=c.nextSibling.nextSibling,t=e.style.display;e.style.display=t==="none"?"block":"none"}),b(c,"dblclick",function(t){var n=t&&t.target?t.target:e.event.srcElement;if(n.nodeName.toLowerCase()=="span"||n.nodeName.toLowerCase()=="b")n=n.parentNode;e.location&&n.nodeName.toLowerCase()==="strong"&&(e.location=o.url({filter:x([n]).replace(/\([^)]+\)$/,"").replace(/(^\s*|\s*$)/g,"")}))});var l=w(this.id);l.className=r?"fail":"pass",l.removeChild(l.firstChild),l.appendChild(c),l.appendChild(h),l.appendChild(s)}else for(var a=0;a<this.assertions.length;a++)this.assertions[a].result||(r++,u.stats.bad++,u.moduleStats.bad++);try{o.reset()}catch(p){g("reset() failed, following Test "+this.testName+", exception and reset fn follows",p,o.reset)}S("testDone",o,{name:this.testName,module:this.module,failed:r,passed:this.assertions.length-r,total:this.assertions.length})},queue:function(){function n(){h(function(){e.setup()}),h(function(){e.run()}),h(function(){e.teardown()}),h(function(){e.finish()})}var e=this;h(function(){e.init()});var r=o.config.reorder&&t.sessionStorage&&+sessionStorage.getItem("qunit-"+this.module+"-"+this.testName);r?n():h(n,!0)}};var o={module:function(e,t){u.currentModule=e,u.currentModuleTestEnviroment=t},asyncTest:function(e,t,n){arguments.length===2&&(n=t,t=null),o.test(e,t,n,!0)},test:function(e,t,n,r){var i='<span class="test-name">'+e+"</span>",o;arguments.length===2&&(n=t,t=null),t&&typeof t=="object"&&(o=t,t=null),u.currentModule&&(i='<span class="module-name">'+u.currentModule+"</span>: "+i);if(!f(u.currentModule+": "+e))return;var a=new s(i,e,t,o,r,n);a.module=u.currentModule,a.moduleTestEnvironment=u.currentModuleTestEnviroment,a.queue()},expect:function(e){u.current.expected=e},ok:function(e,t){e=!!e;var n={result:e,message:t};t=c(t),S("log",o,n),u.current.assertions.push({result:e,message:t})},equal:function(e,t,n){o.push(t==e,e,t,n)},notEqual:function(e,t,n){o.push(t!=e,e,t,n)},deepEqual:function(e,t,n){o.push(o.equiv(e,t),e,t,n)},notDeepEqual:function(e,t,n){o.push(!o.equiv(e,t),e,t,n)},strictEqual:function(e,t,n){o.push(t===e,e,t,n)},notStrictEqual:function(e,t,n){o.push(t!==e,e,t,n)},raises:function(e,t,n){var r,i=!1;typeof t=="string"&&(n=t,t=null);try{e()}catch(s){r=s}r&&(t?o.objectType(t)==="regexp"?i=t.test(r):r instanceof t?i=!0:t.call({},r)===!0&&(i=!0):i=!0),o.ok(i,n)},start:function(n){u.semaphore-=n||1;if(u.semaphore>0)return;u.semaphore<0&&(u.semaphore=0),t.setTimeout?e.setTimeout(function(){if(u.semaphore>0)return;u.timeout&&clearTimeout(u.timeout),u.blocking=!1,p(!0)},13):(u.blocking=!1,p(!0))},stop:function(n){u.semaphore+=n||1,u.blocking=!0,u.testTimeout&&t.setTimeout&&(clearTimeout(u.timeout),u.timeout=e.setTimeout(function(){o.ok(!1,"Test timed out"),u.semaphore=1,o.start()},u.testTimeout))}};(function(){function e(){}e.prototype=o,o=new e,o.constructor=e})(),o.equals=o.equal,o.same=o.deepEqual;var u={queue:[],blocking:!0,hidepassed:!1,reorder:!0,altertitle:!0,urlConfig:["noglobals","notrycatch"],begin:[],done:[],log:[],testStart:[],testDone:[],moduleStart:[],moduleDone:[]};(function(){var t=e.location||{search:"",protocol:"file:"},n=t.search.slice(1).split("&"),r=n.length,i={},s;if(n[0])for(var a=0;a<r;a++)s=n[a].split("="),s[0]=decodeURIComponent(s[0]),s[1]=s[1]?decodeURIComponent(s[1]):!0,i[s[0]]=s[1];o.urlParams=i,u.filter=i.filter,o.isLocal=t.protocol==="file:"})(),typeof exports=="undefined"||typeof require=="undefined"?(y(e,o),e.QUnit=o):(y(exports,o),exports.QUnit=o),y(o,{config:u,init:function(){y(u,{stats:{all:0,bad:0},moduleStats:{all:0,bad:0},started:+(new Date),updateRate:1e3,blocking:!1,autostart:!0,autorun:!1,filter:"",queue:[],semaphore:0});var e=w("qunit-tests"),t=w("qunit-banner"),n=w("qunit-testresult");e&&(e.innerHTML=""),t&&(t.className=""),n&&n.parentNode.removeChild(n),e&&(n=document.createElement("p"),n.id="qunit-testresult",n.className="result",e.parentNode.insertBefore(n,e),n.innerHTML="Running...<br/>&nbsp;")},reset:function(){if(e.jQuery)jQuery("#qunit-fixture").html(u.fixture);else{var t=w("qunit-fixture");t&&(t.innerHTML=u.fixture)}},triggerEvent:function(e,t,n){document.createEvent?(n=document.createEvent("MouseEvents"),n.initMouseEvent(t,!0,!0,e.ownerDocument.defaultView,0,0,0,0,0,!1,!1,!1,!1,0,null),e.dispatchEvent(n)):e.fireEvent&&e.fireEvent("on"+t)},is:function(e,t){return o.objectType(t)==e},objectType:function(e){if(typeof e=="undefined")return"undefined";if(e===null)return"null";var t=r.call(e).match(/^\[object\s(.*)\]$/)[1]||"";switch(t){case"Number":return isNaN(e)?"nan":"number";case"String":case"Boolean":case"Array":case"Date":case"RegExp":case"Function":return t.toLowerCase()}return typeof e=="object"?"object":undefined},push:function(e,t,n,r){var i={result:e,message:r,actual:t,expected:n};r=c(r)||(e?"okay":"failed"),r='<span class="test-message">'+r+"</span>",n=c(o.jsDump.parse(n)),t=c(o.jsDump.parse(t));var s=r+'<table><tr class="test-expected"><th>Expected: </th><td><pre>'+n+"</pre></td></tr>";t!=n&&(s+='<tr class="test-actual"><th>Result: </th><td><pre>'+t+"</pre></td></tr>",s+='<tr class="test-diff"><th>Diff: </th><td><pre>'+o.diff(n,t)+"</pre></td></tr>");if(!e){var a=l();a&&(i.source=a,s+='<tr class="test-source"><th>Source: </th><td><pre>'+c(a)+"</pre></td></tr>")}s+="</table>",S("log",o,i),u.current.assertions.push({result:!!e,message:s})},url:function(t){t=y(y({},o.urlParams),t);var n="?",r;for(r in t){if(!i.call(t,r))continue;n+=encodeURIComponent(r)+"="+encodeURIComponent(t[r])+"&"}return e.location.pathname+n.slice(0,-1)},extend:y,id:w,addEvent:b}),y(o.constructor.prototype,{begin:E("begin"),done:E("done"),log:E("log"),testStart:E("testStart"),testDone:E("testDone"),moduleStart:E("moduleStart"),moduleDone:E("moduleDone")});if(typeof document=="undefined"||document.readyState==="complete")u.autorun=!0;o.load=function(){S("begin",o,{});var n=y({},u);o.init(),y(u,n),u.blocking=!1;var r="",i=u.urlConfig.length;for(var s=0,a;s<i,a=u.urlConfig[s];s++)u[a]=o.urlParams[a],r+='<label><input name="'+a+'" type="checkbox"'+(u[a]?' checked="checked"':"")+">"+a+"</label>";var f=w("qunit-userAgent");f&&(f.innerHTML=navigator.userAgent);var l=w("qunit-header");l&&(l.innerHTML='<a href="'+o.url({filter:undefined})+'"> '+l.innerHTML+"</a> "+r,b(l,"change",function(t){var n={};n[t.target.name]=t.target.checked?!0:undefined,e.location=o.url(n)}));var c=w("qunit-testrunner-toolbar");if(c){var h=document.createElement("input");h.type="checkbox",h.id="qunit-filter-pass",b(h,"click",function(){var e=document.getElementById("qunit-tests");if(h.checked)e.className=e.className+" hidepass";else{var n=" "+e.className.replace(/[\n\t\r]/g," ")+" ";e.className=n.replace(/ hidepass /," ")}t.sessionStorage&&(h.checked?sessionStorage.setItem("qunit-filter-passed-tests","true"):sessionStorage.removeItem("qunit-filter-passed-tests"))});if(u.hidepassed||t.sessionStorage&&sessionStorage.getItem("qunit-filter-passed-tests")){h.checked=!0;var p=document.getElementById("qunit-tests");p.className=p.className+" hidepass"}c.appendChild(h);var d=document.createElement("label");d.setAttribute("for","qunit-filter-pass"),d.innerHTML="Hide passed tests",c.appendChild(d)}var v=w("qunit-fixture");v&&(u.fixture=v.innerHTML),u.autostart&&o.start()},b(e,"load",o.load),e.onerror=function(e,t,n){o.config.current?ok(!1,e+", "+t+":"+n):test("global failure",function(){ok(!1,e+", "+t+":"+n)})},o.equiv=function(){function r(e,t,n){var r=o.objectType(e);if(r)return o.objectType(t[r])==="function"?t[r].apply(t,n):t[r]}var e,t=[],n=[],i=function(){function r(e,t){return e instanceof t.constructor||t instanceof e.constructor?t==e:t===e}return{string:r,"boolean":r,number:r,"null":r,"undefined":r,nan:function(e){return isNaN(e)},date:function(e,t){return o.objectType(e)==="date"&&t.valueOf()===e.valueOf()},regexp:function(e,t){return o.objectType(e)==="regexp"&&t.source===e.source&&t.global===e.global&&t.ignoreCase===e.ignoreCase&&t.multiline===e.multiline},"function":function(){var e=t[t.length-1];return e!==Object&&typeof e!="undefined"},array:function(t,r){var i,s,u,a;if(o.objectType(t)!=="array")return!1;a=r.length;if(a!==t.length)return!1;n.push(r);for(i=0;i<a;i++){u=!1;for(s=0;s<n.length;s++)n[s]===r[i]&&(u=!0);if(!u&&!e(r[i],t[i]))return n.pop(),!1}return n.pop(),!0},object:function(r,i){var s,o,u,a=!0,f=[],l=[];if(i.constructor!==r.constructor)return!1;t.push(i.constructor),n.push(i);for(s in i){u=!1;for(o=0;o<n.length;o++)n[o]===i[s]&&(u=!0);f.push(s);if(!u&&!e(i[s],r[s])){a=!1;break}}t.pop(),n.pop();for(s in r)l.push(s);return a&&e(f.sort(),l.sort())}}}();return e=function(){var e=Array.prototype.slice.apply(arguments);return e.length<2?!0:function(e,t){return e===t?!0:e===null||t===null||typeof e=="undefined"||typeof t=="undefined"||o.objectType(e)!==o.objectType(t)?!1:r(e,i,[t,e])}(e[0],e[1])&&arguments.callee.apply(this,e.splice(1,e.length-1))},e}(),o.jsDump=function(){function e(e){return'"'+e.toString().replace(/"/g,'\\"')+'"'}function t(e){return e+""}function n(e,t,n){var r=u.separator(),i=u.indent(),s=u.indent(1);return t.join&&(t=t.join(","+r+s)),t?[e,s+t,i+n].join(r):e+n}function i(e,t){var r=e.length,i=Array(r);this.up();while(r--)i[r]=this.parse(e[r],undefined,t);return this.down(),n("[",i,"]")}var s=/^function (\w+)/,u={parse:function(e,t,n){n=n||[];var r=this.parsers[t||this.typeOf(e)];t=typeof r;var i=T(e,n);if(i!=-1)return"recursion("+(i-n.length)+")";if(t=="function"){n.push(e);var s=r.call(this,e,n);return n.pop(),s}return t=="string"?r:this.parsers.error},typeOf:function(e){var t;return e===null?t="null":typeof e=="undefined"?t="undefined":o.is("RegExp",e)?t="regexp":o.is("Date",e)?t="date":o.is("Function",e)?t="function":typeof e.setInterval!==undefined&&typeof e.document!="undefined"&&typeof e.nodeType=="undefined"?t="window":e.nodeType===9?t="document":e.nodeType?t="node":r.call(e)==="[object Array]"||typeof e.length=="number"&&typeof e.item!="undefined"&&(e.length?e.item(0)===e[0]:e.item(0)===null&&typeof e[0]=="undefined")?t="array":t=typeof e,t},separator:function(){return this.multiline?this.HTML?"<br />":"\n":this.HTML?"&nbsp;":" "},indent:function(e){if(!this.multiline)return"";var t=this.indentChar;return this.HTML&&(t=t.replace(/\t/g,"   ").replace(/ /g,"&nbsp;")),Array(this._depth_+(e||0)).join(t)},up:function(e){this._depth_+=e||1},down:function(e){this._depth_-=e||1},setParser:function(e,t){this.parsers[e]=t},quote:e,literal:t,join:n,_depth_:1,parsers:{window:"[Window]",document:"[Document]",error:"[ERROR]",unknown:"[Unknown]","null":"null","undefined":"undefined","function":function(e){var t="function",r="name"in e?e.name:(s.exec(e)||[])[1];return r&&(t+=" "+r),t+="(",t=[t,o.jsDump.parse(e,"functionArgs"),"){"].join(""),n(t,o.jsDump.parse(e,"functionCode"),"}")},array:i,nodelist:i,arguments:i,object:function(e,t){var r=[];o.jsDump.up();for(var i in e){var s=e[i];r.push(o.jsDump.parse(i,"key")+": "+o.jsDump.parse(s,undefined,t))}return o.jsDump.down(),n("{",r,"}")},node:function(e){var t=o.jsDump.HTML?"&lt;":"<",n=o.jsDump.HTML?"&gt;":">",r=e.nodeName.toLowerCase(),i=t+r;for(var s in o.jsDump.DOMAttrs){var u=e[o.jsDump.DOMAttrs[s]];u&&(i+=" "+s+"="+o.jsDump.parse(u,"attribute"))}return i+n+t+"/"+r+n},functionArgs:function(e){var t=e.length;if(!t)return"";var n=Array(t);while(t--)n[t]=String.fromCharCode(97+t);return" "+n.join(", ")+" "},key:e,functionCode:"[code]",attribute:e,string:e,date:e,regexp:t,number:t,"boolean":t},DOMAttrs:{id:"id",name:"name","class":"className"},HTML:!1,indentChar:"  ",multiline:!0};return u}(),o.diff=function(){function e(e,t){var n={},r={};for(var s=0;s<t.length;s++)n[t[s]]==null&&(n[t[s]]={rows:[],o:null}),n[t[s]].rows.push(s);for(var s=0;s<e.length;s++)r[e[s]]==null&&(r[e[s]]={rows:[],n:null}),r[e[s]].rows.push(s);for(var s in n){if(!i.call(n,s))continue;n[s].rows.length==1&&typeof r[s]!="undefined"&&r[s].rows.length==1&&(t[n[s].rows[0]]={text:t[n[s].rows[0]],row:r[s].rows[0]},e[r[s].rows[0]]={text:e[r[s].rows[0]],row:n[s].rows[0]})}for(var s=0;s<t.length-1;s++)t[s].text!=null&&t[s+1].text==null&&t[s].row+1<e.length&&e[t[s].row+1].text==null&&t[s+1]==e[t[s].row+1]&&(t[s+1]={text:t[s+1],row:t[s].row+1},e[t[s].row+1]={text:e[t[s].row+1],row:s+1});for(var s=t.length-1;s>0;s--)t[s].text!=null&&t[s-1].text==null&&t[s].row>0&&e[t[s].row-1].text==null&&t[s-1]==e[t[s].row-1]&&(t[s-1]={text:t[s-1],row:t[s].row-1},e[t[s].row-1]={text:e[t[s].row-1],row:s-1});return{o:e,n:t}}return function(t,n){t=t.replace(/\s+$/,""),n=n.replace(/\s+$/,"");var r=e(t==""?[]:t.split(/\s+/),n==""?[]:n.split(/\s+/)),i="",s=t.match(/\s+/g);s==null?s=[" "]:s.push(" ");var o=n.match(/\s+/g);o==null?o=[" "]:o.push(" ");if(r.n.length==0)for(var u=0;u<r.o.length;u++)i+="<del>"+r.o[u]+s[u]+"</del>";else{if(r.n[0].text==null)for(n=0;n<r.o.length&&r.o[n].text==null;n++)i+="<del>"+r.o[n]+s[n]+"</del>";for(var u=0;u<r.n.length;u++)if(r.n[u].text==null)i+="<ins>"+r.n[u]+o[u]+"</ins>";else{var a="";for(n=r.n[u].row+1;n<r.o.length&&r.o[n].text==null;n++)a+="<del>"+r.o[n]+s[n]+"</del>";i+=" "+r.n[u].text+o[u]+a}}return i}}()})(this)
+		for (var i = 0; i < n.length; i++) {
+			if (ns[n[i]] == null)
+				ns[n[i]] = {
+					rows: [],
+					o: null
+				};
+			ns[n[i]].rows.push(i);
+		}
+
+		for (var i = 0; i < o.length; i++) {
+			if (os[o[i]] == null)
+				os[o[i]] = {
+					rows: [],
+					n: null
+				};
+			os[o[i]].rows.push(i);
+		}
+
+		for (var i in ns) {
+			if ( !hasOwn.call( ns, i ) ) {
+				continue;
+			}
+			if (ns[i].rows.length == 1 && typeof(os[i]) != "undefined" && os[i].rows.length == 1) {
+				n[ns[i].rows[0]] = {
+					text: n[ns[i].rows[0]],
+					row: os[i].rows[0]
+				};
+				o[os[i].rows[0]] = {
+					text: o[os[i].rows[0]],
+					row: ns[i].rows[0]
+				};
+			}
+		}
+
+		for (var i = 0; i < n.length - 1; i++) {
+			if (n[i].text != null && n[i + 1].text == null && n[i].row + 1 < o.length && o[n[i].row + 1].text == null &&
+			n[i + 1] == o[n[i].row + 1]) {
+				n[i + 1] = {
+					text: n[i + 1],
+					row: n[i].row + 1
+				};
+				o[n[i].row + 1] = {
+					text: o[n[i].row + 1],
+					row: i + 1
+				};
+			}
+		}
+
+		for (var i = n.length - 1; i > 0; i--) {
+			if (n[i].text != null && n[i - 1].text == null && n[i].row > 0 && o[n[i].row - 1].text == null &&
+			n[i - 1] == o[n[i].row - 1]) {
+				n[i - 1] = {
+					text: n[i - 1],
+					row: n[i].row - 1
+				};
+				o[n[i].row - 1] = {
+					text: o[n[i].row - 1],
+					row: i - 1
+				};
+			}
+		}
+
+		return {
+			o: o,
+			n: n
+		};
+	}
+
+	return function(o, n) {
+		o = o.replace(/\s+$/, '');
+		n = n.replace(/\s+$/, '');
+		var out = diff(o == "" ? [] : o.split(/\s+/), n == "" ? [] : n.split(/\s+/));
+
+		var str = "";
+
+		var oSpace = o.match(/\s+/g);
+		if (oSpace == null) {
+			oSpace = [" "];
+		}
+		else {
+			oSpace.push(" ");
+		}
+		var nSpace = n.match(/\s+/g);
+		if (nSpace == null) {
+			nSpace = [" "];
+		}
+		else {
+			nSpace.push(" ");
+		}
+
+		if (out.n.length == 0) {
+			for (var i = 0; i < out.o.length; i++) {
+				str += '<del>' + out.o[i] + oSpace[i] + "</del>";
+			}
+		}
+		else {
+			if (out.n[0].text == null) {
+				for (n = 0; n < out.o.length && out.o[n].text == null; n++) {
+					str += '<del>' + out.o[n] + oSpace[n] + "</del>";
+				}
+			}
+
+			for (var i = 0; i < out.n.length; i++) {
+				if (out.n[i].text == null) {
+					str += '<ins>' + out.n[i] + nSpace[i] + "</ins>";
+				}
+				else {
+					var pre = "";
+
+					for (n = out.n[i].row + 1; n < out.o.length && out.o[n].text == null; n++) {
+						pre += '<del>' + out.o[n] + oSpace[n] + "</del>";
+					}
+					str += " " + out.n[i].text + nSpace[i] + pre;
+				}
+			}
+		}
+
+		return str;
+	};
+})();
+
+})(this);

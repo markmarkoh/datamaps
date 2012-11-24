@@ -1,1 +1,8 @@
-define({stdio:{print:function(e,t){console.log(e,t)}}})
+define({
+    stdio: {
+        //Funky list args to appease Safari
+        print: function (a, b) {
+            console.log(a, b);
+        }
+    }
+});

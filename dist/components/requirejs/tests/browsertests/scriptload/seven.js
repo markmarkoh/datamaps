@@ -1,1 +1,1 @@
-log("seven.js script")
+log("seven.js script");

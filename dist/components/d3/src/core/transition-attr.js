@@ -1,1 +1,32 @@
-d3_transitionPrototype.attr=function(e,t){if(arguments.length<2){for(t in e)this.attrTween(t,d3_tweenByName(e[t],t));return this}return this.attrTween(e,d3_tweenByName(t,e))},d3_transitionPrototype.attrTween=function(e,t){function r(e,r){var i=t.call(this,e,r,this.getAttribute(n));return i===d3_tweenRemove?(this.removeAttribute(n),null):i&&function(e){this.setAttribute(n,i(e))}}function i(e,r){var i=t.call(this,e,r,this.getAttributeNS(n.space,n.local));return i===d3_tweenRemove?(this.removeAttributeNS(n.space,n.local),null):i&&function(e){this.setAttributeNS(n.space,n.local,i(e))}}var n=d3.ns.qualify(e);return this.tween("attr."+e,n.local?i:r)}
+d3_transitionPrototype.attr = function(name, value) {
+  if (arguments.length < 2) {
+
+    // For attr(object), the object specifies the names and values of the
+    // attributes to transition. The values may be functions that are
+    // evaluated for each element.
+    for (value in name) this.attrTween(value, d3_tweenByName(name[value], value));
+    return this;
+  }
+
+  return this.attrTween(name, d3_tweenByName(value, name));
+};
+
+d3_transitionPrototype.attrTween = function(nameNS, tween) {
+  var name = d3.ns.qualify(nameNS);
+
+  function attrTween(d, i) {
+    var f = tween.call(this, d, i, this.getAttribute(name));
+    return f === d3_tweenRemove
+        ? (this.removeAttribute(name), null)
+        : f && function(t) { this.setAttribute(name, f(t)); };
+  }
+
+  function attrTweenNS(d, i) {
+    var f = tween.call(this, d, i, this.getAttributeNS(name.space, name.local));
+    return f === d3_tweenRemove
+        ? (this.removeAttributeNS(name.space, name.local), null)
+        : f && function(t) { this.setAttributeNS(name.space, name.local, f(t)); };
+  }
+
+  return this.tween("attr." + nameNS, name.local ? attrTweenNS : attrTween);
+};

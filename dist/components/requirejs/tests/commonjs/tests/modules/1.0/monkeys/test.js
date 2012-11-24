@@ -1,1 +1,18 @@
-define(["require","exports","module","system"],function(e,t,n){t.print=typeof print!="undefined"?print:function(){var t=e("system"),n=t.stdio;n.print.apply(n,arguments)},t.assert=function(e,n){e?t.print("PASS "+n,"pass"):t.print("FAIL "+n,"fail")}})
+define(["require", "exports", "module", "system"], function(require, exports, module) {
+
+exports.print = typeof print !== "undefined" ? print : function () {
+    var system = require("system");
+    var stdio = system.stdio;
+    stdio.print.apply(stdio, arguments);
+};
+
+exports.assert = function (guard, message) {
+    if (guard) {
+        exports.print('PASS ' + message, 'pass');
+    } else {
+        exports.print('FAIL ' + message, 'fail');
+    }
+};
+
+
+});

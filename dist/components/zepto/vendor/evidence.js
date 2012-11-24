@@ -5,4 +5,1055 @@
  *  evidence.js is freely distributable under the terms of an MIT-style license.
  *--------------------------------------------------------------------------*/
 
-(function(e){function r(){p.extend.apply(p,arguments)}function i(){return e.Evidence=t,r}function o(){return(e.location||"").toString().replace(s,"$1")}function u(e,t){function n(){}return n.prototype=t.prototype,e.prototype=new n,e.prototype.constructor=e,e}function a(t,n){"setTimeout"in e?window.setTimeout(function(){t.call(n)},10):t.call(n)}function f(e){this.message=e}function l(e,t,n){this.message=e,this.template=t||"",this.args=n}function c(e,t,n){this.message=e.replace(/%/g,"%%"),this.template=t||"",this.args=n}function p(e){this._methodName=e,this.name=e}function d(e,t){this.name=e,this._tests=[],t&&this.push.apply(this,t)}function v(){}function m(){}function g(){e.console&&e.console.log?this.logger=w:Object.prototype.toString.call(e.environment)==="[object Environment]"&&e.print?this.logger=S:this.logger=E,this.autoRun=!0,this.verbosity=w.INFO,this.runner=x}function y(){this.testCount=0,this.assertionCount=0,this.skipCount=0,this.skips=[],this.failureCount=0,this.failures=[],this.errors=[],this.errorCount=0,this.testCount=0}function w(e){typeof e!="undefined"&&(this.level=e)}function E(e){w.call(this,e)}function S(e){w.call(this,e)}function x(e){v.call(this),this.logger=e}function T(e){y.call(this),this.logger=e}var t=e.Evidence,n=e.onload;r.noConflict=i,r.VERSION="0.6";var s=/.*?\/(\w+\.html)(.*)/;f.displayName="AssertionSkippedError",function(e){e.name="AssertionSkippedError"}(f.prototype),r.AssertionSkippedError=f,l.displayName="AssertionFailedError",function(e){e.name="AssertionFailedError"}(l.prototype),r.AssertionFailedError=l,c.displayName="AssertionMessage",function(e){function t(){return N.printf(this.message+this.template,this.args)}e.toString=t}(c.prototype),r.AssertionMessage=c;var h=function(){function e(e,t,n){if(!e){var r=Array.prototype.slice.call(arguments,3);throw new l(t,n,r)}this.addAssertion()}function t(e){throw new f(e||"Skipped!")}function n(e){this._assertExpression(!1,e||"Flunked!")}function r(e,t){this._assertExpression(!!e,t||"Failed assertion.","Expected %o to evaluate to true.",e)}function i(e,t){this._assertExpression(!e,t||"Failed refutation.","Expected %o to evaluate to false.",e)}function s(e,t){this._assertExpression(e===!0,t||"Failed assertion.","Expected %o to be true.",e)}function o(e,t){this._assertExpression(e!==!0,t||"Failed refutation.","Expected %o to not be true.",e)}function u(e,t){this._assertExpression(e===null,t||"Failed assertion.","Expected %o to be null.",e)}function a(e,t){this._assertExpression(e!==null,t||"Failed refutation.","Expected %o to not be null.",e)}function c(e,t){this._assertExpression(typeof e=="undefined",t||"Failed assertion.","Expected %o to be undefined.",e)}function h(e,t){this._assertExpression(typeof e!="undefined",t||"Failed refutation.","Expected %o to not be undefined.",e)}function p(e,t){this._assertExpression(e===!1,t||"Failed assertion.","Expected %o to be false.",e)}function d(e,t){this._assertExpression(e!==!1,t||"Failed refutation.","Expected %o to not be false.",e)}function v(e,t,n){this._assertExpression(e==t,n||"Failed assertion.","Expected %o to be == to %o.",t,e)}function m(e,t,n){this._assertExpression(e!=t,n||"Failed refutation.","Expected %o to be != to %o.",t,e)}function g(e,t,n){this._assertExpression(e===t,n||"Failed assertion.","Expected %o to be === to %o.",t,e)}function y(e,t,n){this._assertExpression(e!==t,n||"Failed refutation.","Expected %o to be !== to %o.",t,e)}function b(e,t,n){this._assertExpression(e in t,n||"Failed assertion.",'Expected "%s" to be a property of %o.',e,t)}function w(e,t,n){this._assertExpression(!(e in t),n||"Failed refutation.",'Expected "%s" to not be a property of %o.',e,t)}return{_assertExpression:e,skip:t,assert:r,refute:i,assertNot:i,assertTrue:s,assertNull:u,assertUndefined:c,assertFalse:p,assertIdentical:g,refuteIdentical:y,assertEqual:v,refuteEqual:m,assertIn:b,refuteIn:w,fail:n,flunk:n}}();r.Assertions=h,function(){function e(t,n){function r(e){p.call(this,e)}n||(n=t,t=o()),u(r,this),r.displayName=t,r.extend=e;for(var i in n)r.prototype[i]=n[i];return p.subclasses.push(r),r}function t(){}t.prototype=h,p.prototype=new t,p.constructor=p,p.displayName="TestCase",p.extend=e,p.subclasses=[],p.defaultTimeout=1e4}(),function(t){function n(e){e&&(this._result=e);try{this._nextAssertions?(this._result.restartTest(this),this._nextAssertions(this)):(this._result.startTest(this),this.setUp(this),this[this._methodName](this))}catch(t){this._filterException(t)}finally{if(this._paused)this._result.pauseTest(this);else try{this.tearDown(this)}catch(t){this._filterException(t)}finally{this._nextAssertions=null,this._result.stopTest(this),a(function(){this.parent.next()},this)}}}function r(e){var t=e.name;switch(t){case"AssertionFailedError":this._result.addFailure(this,e);break;case"AssertionSkippedError":this._result.addSkip(this,e);break;default:this._result.addError(this,e)}}function i(t){this._paused=!0;var n=this;t&&(this._nextAssertions=t),n._timeoutId=e.setTimeout(function(){n.resume(function(){n.fail("Test timed out. Testing was not resumed after being paused.")})},p.defaultTimeout)}function s(t){this._paused&&(this._paused=!1,e.clearTimeout(this._timeoutId),t&&(this._nextAssertions=t),this.run())}function o(){return 1}function u(){return this.constructor.displayName+"#"+this.name}function f(){this._result.addAssertion()}t.run=n,t.addAssertion=f,t._filterException=r,t.pause=i,t.resume=s,t.size=o,t.toString=u,t.setUp=function(){},t.tearDown=function(){}}(p.prototype),r.TestCase=p,d.displayName="TestSuite",function(e){function t(e){return this._index=0,this._result=e,e.startSuite(this),this.next(),e}function n(){var e=this._tests[this._index];e?(this._index++,e.run(this._result)):(this._result.stopSuite(this),this.parent?this.parent.next():this._result.stop(new Date))}function r(){for(var e=0,t=arguments.length;e<t;e++){var n=arguments[e];n.parent=this,this._tests.push(n)}}function i(e){e.parent=this,this._tests.push(e)}function s(e){for(var t=0,n=e.length;t<n;t++)this.addTest(e[t])}function o(){var e=this._tests,t=e.length,n=0;for(var r=0;r<t;r++)n+=e[r].size();return n}function u(){return this.size()===0}function a(){return this.name}e.run=t,e.next=n,e.push=r,e.size=o,e.isEmpty=u,e.toString=a}(d.prototype),r.TestSuite=d,v.displayName="TestRunner",function(e){function t(e){e.parent=null;var t=this._makeResult();return t.start(new Date),e.run(t),t}function n(){return new y}e.run=t,e._makeResult=n}(v.prototype),r.TestRunner=v,m.displayName="TestLoader",function(e){function t(e){var t=new d(e.displayName),n=this.getTestCaseNames(e);for(var r=0;r<n.length;r++)t.push(new e(n[r]));return t}function n(e){var t=new d(o());for(var n=0;n<e.length;n++){var r=e[n],i=C.loadTestsFromTestCase(r);i.isEmpty()||t.push(i)}return t}function r(e){var t=[],n=e.prototype,r=this.testMethodPrefix;for(var i in n)i.indexOf(r)===0&&t.push(i);return t.sort()}function i(){return n(p.subclasses)}e.loadTestsFromTestCase=t,e.loadRegisteredTestCases=i,e.loadTestsFromTestCases=n,e.testMethodPrefix="test",e.getTestCaseNames=r}(m.prototype),r.TestLoader=m,function(){function e(e){var t=new this;e=e||t.retrieveOptions(),t.processOptions(e),t.autoRun&&t.run()}g.run=e,g.displayName="AutoRunner",g.LOGGERS={console:w,popup:E,command_line:S},g.RUNNERS={console:x}}(),function(t){function n(){var e=new this.logger(this.verbosity),t=new this.runner(e),n=C.loadRegisteredTestCases();return n._tests.length<=1&&(n=n._tests[0]),t.run(n)}function r(e){var t={};e=(e+"").match(/^(?:[^?#]*\?)([^#]+?)(?:#.*)?$/),e=e&&e[1];if(!e)return t;var n=e.split("&"),r=n.length;if(!r)return t;for(var i=0;i<r;i++){var s=n[i].split("="),o=decodeURIComponent(s[0]),u=s[1];u=u?decodeURIComponent(u):!0,t[o]=u}return t}function i(e){var t={};for(var n=0;n<e.length;n++){var r=e[n];if(r.indexOf("-")===0){var i=e[n+1];i&&i.indexOf("-")!==0?n++:i=!0,t[r.substr(1)]=i}}return t}function s(){return e.location?this.processQueryString(e.location):e.arguments?this.processArguments(e.arguments):{}}function o(t){for(var n in t){var r=t[n];switch(n){case"timeout":p.defaultTimeout=e.parseFloat(r)*1e3;break;case"run":this.autoRun=r==="false"?!1:!0;break;case"logger":this.logger=g.LOGGERS[r];break;case"verbosity":var i=e.parseInt(r);this.verbosity=e.isNaN(i)?w[r]:i;break;case"runner":this.runner=g.RUNNERS[r]}}}t.run=n,t.processQueryString=r,t.processArguments=i,t.retrieveOptions=s,t.processOptions=o}(g.prototype),r.AutoRunner=g,y.displayName="TestResult",function(e){function t(){this.assertionCount++}function n(e,t){this.skipCount++,this.skips.push(t)}function r(e,t){this.failureCount++,this.failures.push(t)}function i(e,t){this.errorCount++,this.errors.push(t)}function s(e){this.testCount++}function o(e){}function u(e){}function a(e){}function f(e){}function l(e){}function c(e){this.t0=e}function h(e){this.t1=e}function p(){return this.testCount+" tests, "+this.assertionCount+" assertions, "+this.failureCount+" failures, "+this.errorCount+" errors, "+this.skipCount+" skips"}e.addAssertion=t,e.addSkip=n,e.addFailure=r,e.addError=i,e.startTest=s,e.stopTest=o,e.pauseTest=u,e.restartTest=a,e.startSuite=f,e.stopSuite=l,e.start=c,e.stop=h,e.toString=p}(y.prototype),r.TestResult=y;var b={};w.displayName="Logger",w.LEVELS=["NOTSET","DEBUG","INFO","WARN","ERROR","CRITICAL"],w.CRITICAL=5,w.ERROR=4,w.WARN=3,w.INFO=2,w.DEBUG=1,w.NOTSET=0,function(t){function n(e,t){this.log(w.CRITICAL,e,t)}function r(e,t){this.log(w.ERROR,e,t)}function i(e,t){this.log(w.WARN,e,t)}function s(e,t){this.log(w.INFO,e,t)}function o(e,t){this.log(w.DEBUG,e,t)}function u(t,n,r){t=t||w.NOTSET;var i=e.console,s=w.LEVELS[t].toLowerCase();s==="critical"&&(s="error"),s=s in i?s:"log",t>=this.level&&(r?(r=r.slice(0),r.unshift(n),i[s].apply(i,r)):i[s](n))}t.log=u,t.critical=n,t.error=r,t.warn=i,t.info=s,t.debug=o,t.level=0}(w.prototype),b.Logger=w,u(E,w),E.displayName="PopupLogger",function(t){function i(e){return e.replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&").replace(/[\n\r]+/,"<br />")}function s(){var t=e.open("","popup","height=400,width=400"),n=t.document;return n.write('<!doctype html>               <html lang="en">                 <head>                   <meta charset="utf-8">                   <title>Console</title>                 </head>                 <body><div id="evidence_console"></div></body>               </html>'),n.close(),t.focus(),t}function o(e,t){this.popup=this.popup||this._makePopup();var s=w.LEVELS[e],o='<div style="';o+=n,o+=r[s]||"",o+='">',e>w.INFO&&(o+='<span style="font-weight: bold;">',o+=s,o+=":</span> "),o+=i(t),o+="</div>";var u=this.popup.document,a=u.createElement("div");a.innerHTML=o,o=a.firstChild,a=null,u.getElementById("evidence_console").appendChild(o)}function u(e,t,n){e=e||w.NOTSET,e>=this.level&&(n&&(t=N.printf(t,n)),this._appendLine(e,t))}var n="color: #333; background-color: #fff; font-family: monospace; border-bottom: 1px solid #ccc;",r={WARN:"color: #000; background-color: #fc6;",ERROR:"color: #f00; background-color: #fcc;",CRITICAL:"color: #fff; background-color: #000;"};t.log=u,t._makePopup=s,t._appendLine=o}(E.prototype),b.PopupLogger=E,u(S,w),S.displayName="CommandLineLogger",function(t){function n(t,n,r){t=t||w.NOTSET;if(t>=this.level){var i="";t>w.INFO&&(i=w.LEVELS[t]+": "),r&&(n=N.printf(n,r)),e.print(i+n)}}t.log=n}(S.prototype),b.CommandLineLogger=S,u(x,v),x.displayName="ConsoleTestRunner",function(e){function t(){return new T(this.logger)}e._makeResult=t}(x.prototype),b.TestRunner=x,u(T,y),T.displayName="ConsoleTestResult",function(e){function n(){this.assertionCount++}function r(e,n){t.addSkip.call(this,e,n),this.logger.warn("Skipping testcase "+e+": "+n.message)}function i(e,n){t.addFailure.call(this,e,n),this.logger.error(e+": "+n.message+" "+n.template,n.args)}function s(e,n){t.addError.call(this,e,n),this.logger.error(e+" threw an error. "+n)}function o(e){t.startTest.call(this,e),this.logger.debug("Started testcase "+e+".")}function u(e){this.logger.debug("Completed testcase "+e+".")}function a(e){this.logger.info("Paused testcase "+e+".")}function f(e){this.logger.info("Restarted testcase "+e+".")}function l(e){this.logger.info("Started suite "+e+".")}function c(e){this.logger.info("Completed suite "+e+".")}function h(e){t.start.call(this,e),this.logger.info("Started tests.")}function p(e){t.stop.call(this,e),this.logger.info("Completed tests in "+(e-this.t0)/1e3+"s."),this.logger.info(this.toString()+".")}var t=y.prototype;e.addAssertion=n,e.addSkip=r,e.addFailure=i,e.addError=s,e.startTest=o,e.stopTest=u,e.pauseTest=a,e.restartTest=f,e.startSuite=l,e.stopSuite=c,e.start=h,e.stop=p}(T.prototype),b.TestResult=T;var N=function(){function e(e,t,n){var r=[],i,s=/(^%|.%)([a-zA-Z])/,t=t.splice(0);n=n||String;if(e.length<=0)return"";while(i=s.exec(e)){var o=i[0],u=i.index,a,f;o.indexOf("%%")===0?(r.push(e.substr(0,u)),r.push(o.substr(1))):(r.push(e.substr(0,o.indexOf(!1)?u+1:u)),a=i[2],f=t.shift(),f=n(f,a),r.push(f)),e=e.substr(u+o.length)}return r.push(e),r.join("")}return{printf:e,Console:b}}();r.UI=N;var C=new m;r.defaultLoader=C,e.Evidence=r;if(e.location)e.onload=function(){typeof n=="function"&&n.call(e),g.run()};else if(e.arguments){var k=java.lang.Runtime.getRuntime(),L=new java.lang.Thread(function(){g.run()});k.addShutdownHook(L)}})(this)
+(function(global) {
+  var originalEvidence = global.Evidence,
+      originalOnload   = global.onload;
+
+  function Evidence() {
+    TestCase.extend.apply(TestCase, arguments);
+  }
+
+  function noConflict() {
+    global.Evidence = originalEvidence;
+    return Evidence;
+  }
+
+  Evidence.noConflict = noConflict;
+  Evidence.VERSION    = '0.6';
+
+var FILE_REGEXP = /.*?\/(\w+\.html)(.*)/;
+
+function getNameFromFile() {
+  return (global.location || '').toString().replace(FILE_REGEXP, '$1');
+}
+
+function chain(subclass, superclass) {
+  function Subclass() {}
+  Subclass.prototype = superclass.prototype;
+  subclass.prototype = new Subclass();
+  subclass.prototype.constructor = subclass;
+  return subclass;
+}
+
+function defer(block, context) {
+  if ('setTimeout' in global) {
+    window.setTimeout(function() {
+      block.call(context);
+    }, 10);
+  } else {
+    block.call(context);
+  }
+}
+function AssertionSkippedError(message) {
+  this.message = message;
+}
+
+AssertionSkippedError.displayName = 'AssertionSkippedError';
+
+(function(p) {
+  p.name = 'AssertionSkippedError';
+})(AssertionSkippedError.prototype);
+Evidence.AssertionSkippedError = AssertionSkippedError;
+function AssertionFailedError(message, template, args) {
+  this.message = message;
+  this.template = template || '';
+  this.args = args;
+}
+
+AssertionFailedError.displayName = 'AssertionFailedError';
+
+(function(p) {
+  p.name = 'AssertionFailedError';
+})(AssertionFailedError.prototype);
+Evidence.AssertionFailedError = AssertionFailedError;
+function AssertionMessage(message, template, args) {
+  this.message = message.replace(/%/g, '%%');
+  this.template = template || '';
+  this.args = args;
+}
+
+AssertionMessage.displayName = 'AssertionMessage';
+
+(function(p) {
+  function toString() {
+    return UI.printf(this.message + this.template, this.args);
+  }
+  p.toString = toString;
+})(AssertionMessage.prototype);
+Evidence.AssertionMessage = AssertionMessage;
+
+var Assertions = (function() {
+  function _assertExpression(expression, message, template) {
+    /*for (var i=0; i < 100000; i++) {
+      (function(){})()
+    }*/
+    if (expression) {
+      this.addAssertion();
+    } else {
+      var args = Array.prototype.slice.call(arguments, 3);
+      throw new AssertionFailedError(message, template, args);
+    }
+  }
+
+  function skip(message) {
+    throw new AssertionSkippedError(message || 'Skipped!');
+  }
+
+  function fail(message) {
+    this._assertExpression(false, message || 'Flunked!');
+  }
+
+  function assert(test, message) {
+    this._assertExpression(
+      !!test,
+      message || 'Failed assertion.',
+      'Expected %o to evaluate to true.', test
+    );
+  }
+
+  function refute(test, message) {
+    this._assertExpression(
+      !test,
+      message || 'Failed refutation.',
+      'Expected %o to evaluate to false.', test
+    );
+  }
+
+  function assertTrue(test, message) {
+    this._assertExpression(
+      (test === true),
+      message || 'Failed assertion.',
+      'Expected %o to be true.', test
+    );
+  }
+
+  function refuteTrue(test, message) {
+    this._assertExpression(
+      (test !== true),
+      message || 'Failed refutation.',
+      'Expected %o to not be true.', test
+    );
+  }
+
+  function assertNull(test, message) {
+    this._assertExpression(
+      (test === null),
+      message || 'Failed assertion.',
+      'Expected %o to be null.', test
+    );
+  }
+
+  function refuteNull(test, message) {
+    this._assertExpression(
+      (test !== null),
+      message || 'Failed refutation.',
+      'Expected %o to not be null.', test
+    );
+  }
+
+  function assertUndefined(test, message) {
+    this._assertExpression(
+      (typeof test === 'undefined'),
+      message || 'Failed assertion.',
+      'Expected %o to be undefined.', test
+    );
+  }
+
+  function refuteUndefined(test, message) {
+    this._assertExpression(
+      (typeof test !== 'undefined'),
+      message || 'Failed refutation.',
+      'Expected %o to not be undefined.', test
+    );
+  }
+
+  function assertFalse(test, message) {
+    this._assertExpression(
+      (test === false),
+      message || 'Failed assertion.',
+      'Expected %o to be false.', test
+    );
+  }
+
+  function refuteFalse(test, message) {
+    this._assertExpression(
+      (test !== false),
+      message || 'Failed refutation.',
+      'Expected %o to not be false.', test
+    );
+  }
+
+  function assertEqual(expected, actual, message) {
+    this._assertExpression(
+      (expected == actual),
+      message || 'Failed assertion.',
+      'Expected %o to be == to %o.', actual, expected
+    );
+  }
+
+  function refuteEqual(expected, actual, message) {
+    this._assertExpression(
+      (expected != actual),
+      message || 'Failed refutation.',
+      'Expected %o to be != to %o.', actual, expected
+    );
+  }
+
+  function assertIdentical(expected, actual, message) {
+    this._assertExpression(
+      (expected === actual),
+      message || 'Failed assertion.',
+      'Expected %o to be === to %o.', actual, expected
+    );
+  }
+
+  function refuteIdentical(expected, actual, message) {
+    this._assertExpression(
+      (expected !== actual),
+      message || 'Failed refutation.',
+      'Expected %o to be !== to %o.', actual, expected
+    );
+  }
+
+  function assertIn(property, object, message) {
+    this._assertExpression(
+      (property in object),
+      message || 'Failed assertion.',
+      'Expected "%s" to be a property of %o.', property, object
+    );
+  }
+
+  function refuteIn(property, object, message) {
+    this._assertExpression(
+      !(property in object),
+      message || 'Failed refutation.',
+      'Expected "%s" to not be a property of %o.', property, object
+    );
+  }
+
+  return {
+    _assertExpression: _assertExpression,
+    skip: skip,
+    assert: assert,
+    refute: refute,
+    assertNot: refute,
+    assertTrue: assertTrue,
+    assertNull: assertNull,
+    assertUndefined: assertUndefined,
+    assertFalse: assertFalse,
+    assertIdentical: assertIdentical,
+    refuteIdentical: refuteIdentical,
+    assertEqual: assertEqual,
+    refuteEqual: refuteEqual,
+    assertIn: assertIn,
+    refuteIn: refuteIn,
+    fail: fail,
+    flunk: fail
+  };
+})();
+  Evidence.Assertions = Assertions;
+function TestCase(methodName) {
+  this._methodName = methodName;
+  this.name = methodName;
+}
+
+(function() {
+  function extend(name, methods) {
+    function TestCaseSubclass(methodName) {
+      TestCase.call(this, methodName);
+    }
+
+    if (!methods) {
+      methods = name;
+      name = getNameFromFile();
+    }
+
+    chain(TestCaseSubclass, this);
+    TestCaseSubclass.displayName = name;
+    TestCaseSubclass.extend = extend;
+
+    for(var prop in methods) {
+      TestCaseSubclass.prototype[prop] = methods[prop];
+    }
+    TestCase.subclasses.push(TestCaseSubclass);
+    return TestCaseSubclass;
+  }
+
+  function AssertionsMixin() {}
+  AssertionsMixin.prototype = Assertions;
+  TestCase.prototype = new AssertionsMixin();
+  TestCase.constructor = TestCase;
+
+  TestCase.displayName = 'TestCase';
+  TestCase.extend      = extend;
+  TestCase.subclasses  = [];
+  TestCase.defaultTimeout = 10000;
+})();
+
+(function(p) {
+  function run(result) {
+    if (result) { this._result = result; }
+    try {
+      if (this._nextAssertions) {
+        this._result.restartTest(this);
+        this._nextAssertions(this);
+      } else {
+        /*this._globalProperties = objectKeys(global);*/
+        this._result.startTest(this);
+        this.setUp(this);
+        this[this._methodName](this);
+      }
+    } catch(e) {
+      this._filterException(e);
+    } finally {
+      if (this._paused) {
+        this._result.pauseTest(this);
+      } else {
+        try {
+          this.tearDown(this);
+        } catch(e) {
+          this._filterException(e);
+        } finally {
+          this._nextAssertions = null;
+          this._result.stopTest(this);
+          defer(function() {
+            this.parent.next();
+          }, this);
+        }
+      }
+    }
+  }
+
+  function _filterException(e) {
+    var name = e.name;
+    switch(name) {
+      case 'AssertionFailedError':
+        this._result.addFailure(this, e);
+        break;
+      case 'AssertionSkippedError':
+        this._result.addSkip(this, e);
+        break;
+      default:
+        this._result.addError(this, e);
+    }
+  }
+
+  function pause(assertions) {
+    this._paused = true;
+    var self = this;
+    if (assertions) { this._nextAssertions = assertions; }
+    self._timeoutId = global.setTimeout(function() {
+      self.resume(function() {
+        self.fail('Test timed out. Testing was not resumed after being paused.');
+      });
+    }, TestCase.defaultTimeout);
+  }
+
+  function resume(assertions) {
+    if (this._paused) { // avoid race conditions
+      this._paused = false;
+      global.clearTimeout(this._timeoutId);
+      if (assertions) { this._nextAssertions = assertions; }
+      this.run();
+    }
+  }
+
+  function size() {
+    return 1;
+  }
+
+  function toString() {
+    return this.constructor.displayName + '#' + this.name;
+  }
+
+  function addAssertion() {
+    this._result.addAssertion();
+  }
+
+  p.run              = run;
+  p.addAssertion     = addAssertion;
+  p._filterException = _filterException;
+  p.pause            = pause;
+  p.resume           = resume;
+  p.size             = size;
+  p.toString         = toString;
+  p.setUp            = function() {};
+  p.tearDown         = function() {};
+})(TestCase.prototype);
+  Evidence.TestCase = TestCase;
+function TestSuite(name, tests) {
+  this.name = name;
+  this._tests = [];
+  if (tests) {
+    this.push.apply(this, tests);
+  }
+}
+
+TestSuite.displayName = 'TestSuite';
+
+(function(p) {
+  function run(result) {
+    this._index = 0;
+    this._result = result;
+    result.startSuite(this);
+    this.next();
+    return result;
+  }
+
+  function next() {
+    var next = this._tests[this._index];
+    if (next) {
+      this._index++;
+      next.run(this._result);
+    } else {
+      this._result.stopSuite(this);
+      if (this.parent) {
+        this.parent.next();
+      } else {
+        this._result.stop(new Date());
+      }
+    }
+  }
+
+  function push() {
+    for (var i = 0, length = arguments.length; i < length; i++) {
+      var test = arguments[i];
+      test.parent = this;
+      this._tests.push(test);
+    }
+  }
+
+  function addTest(test) {
+    test.parent = this;
+    this._tests.push(test);
+  }
+
+  function addTests(tests) {
+    for (var i = 0, length = tests.length; i < length; i++) {
+      this.addTest(tests[i]);
+    }
+  }
+
+  function size() {
+    var tests  = this._tests,
+        length = tests.length,
+        sum    = 0;
+
+    for (var i = 0; i < length; i++) {
+      sum += tests[i].size();
+    }
+    return sum;
+  }
+
+  function isEmpty() {
+    return this.size() === 0;
+  }
+
+  function toString() {
+    return this.name;
+  }
+  p.run  = run;
+  p.next = next;
+  p.push = push;
+  p.size = size;
+  p.isEmpty = isEmpty;
+  p.toString = toString;
+})(TestSuite.prototype);
+  Evidence.TestSuite = TestSuite;
+function TestRunner() {
+}
+
+TestRunner.displayName = 'TestRunner';
+
+(function(p) {
+  function run(suite) {
+    suite.parent = null;
+    var result = this._makeResult();
+    result.start(new Date());
+    suite.run(result);
+    return result;
+  }
+
+  function _makeResult() {
+    return new TestResult();
+  }
+
+  p.run = run;
+  p._makeResult = _makeResult;
+})(TestRunner.prototype);
+  Evidence.TestRunner = TestRunner;
+function TestLoader() {
+}
+
+TestLoader.displayName = 'TestLoader';
+
+(function(p) {
+  function loadTestsFromTestCase(testcaseClass) {
+    var suite = new TestSuite(testcaseClass.displayName),
+        props = this.getTestCaseNames(testcaseClass);
+    for (var i=0; i < props.length; i++) {
+      suite.push(new testcaseClass(props[i]));
+    }
+    return suite;
+  }
+
+  function loadTestsFromTestCases(testcases) {
+    var suite = new TestSuite(getNameFromFile());
+    for (var i = 0; i < testcases.length; i++) {
+      var testcase = testcases[i];
+      var subSuite = defaultLoader.loadTestsFromTestCase(testcase);
+      if (!subSuite.isEmpty()) { suite.push(subSuite); }
+    }
+    return suite;
+  }
+
+  function getTestCaseNames(testcaseClass) {
+    var results = [],
+        proto = testcaseClass.prototype,
+        prefix = this.testMethodPrefix;
+
+    for (var property in proto) {
+      if (property.indexOf(prefix) === 0) {
+        results.push(property);
+      }
+    }
+    return results.sort();
+  }
+
+  function loadRegisteredTestCases() {
+    return loadTestsFromTestCases(TestCase.subclasses);
+  }
+
+  p.loadTestsFromTestCase = loadTestsFromTestCase;
+  p.loadRegisteredTestCases = loadRegisteredTestCases;
+  p.loadTestsFromTestCases = loadTestsFromTestCases;
+  p.testMethodPrefix = 'test';
+  p.getTestCaseNames = getTestCaseNames;
+
+})(TestLoader.prototype);
+  Evidence.TestLoader = TestLoader;
+function AutoRunner() {
+  if (global.console && global.console.log) {
+    this.logger = Logger;
+  } else if (Object.prototype.toString.call(global.environment) === '[object Environment]' && global.print) {
+    this.logger = CommandLineLogger;
+  } else {
+    this.logger = PopupLogger;
+  }
+  this.autoRun   = true;
+  this.verbosity = Logger.INFO;
+  this.runner    = ConsoleTestRunner;
+}
+
+(function() {
+  function run(options) {
+    var autoRunner = new this();
+    options = options || autoRunner.retrieveOptions();
+    autoRunner.processOptions(options);
+    if (autoRunner.autoRun) { autoRunner.run() };
+  }
+
+  AutoRunner.run = run;
+  AutoRunner.displayName = 'AutoRunner';
+  AutoRunner.LOGGERS = {
+    console:      Logger,
+    popup:        PopupLogger,
+    command_line: CommandLineLogger
+  };
+
+  AutoRunner.RUNNERS = {
+    console: ConsoleTestRunner
+  };
+})();
+
+(function(p) {
+  function run() {
+    var logger = new this.logger(this.verbosity),
+        runner = new this.runner(logger),
+        suite = defaultLoader.loadRegisteredTestCases();
+    if (suite._tests.length <= 1) {
+      suite = suite._tests[0];
+    }
+    return runner.run(suite);
+  }
+
+  function processQueryString(str) {
+    var results = {};
+    str = (str + '').match(/^(?:[^?#]*\?)([^#]+?)(?:#.*)?$/);
+    str = str && str[1];
+
+    if (!str) { return results; }
+
+    var pairs = str.split('&'),
+        length = pairs.length;
+    if (!length) { return results; }
+
+    for (var i = 0; i < length; i++) {
+      var pair  = pairs[i].split('='),
+          key   = decodeURIComponent(pair[0]),
+          value = pair[1];
+      value = value ? decodeURIComponent(value) : true;
+      results[key] = value;
+    }
+    return results;
+  }
+
+  function processArguments(args) { // RHINO
+    var results = {};
+
+    for (var i = 0; i < args.length; i++) {
+      var arg = args[i];
+      if (arg.indexOf('-') === 0) {
+        var value = args[i + 1];
+        if (value && value.indexOf('-') !== 0) {
+          i++;
+        } else {
+          value = true;
+        }
+        results[arg.substr(1)] = value;
+      }
+    }
+    return results;
+  }
+
+  function retrieveOptions() {
+    if (global.location) {
+      return this.processQueryString(global.location);
+    }
+    if (global.arguments) {
+      return this.processArguments(global.arguments);
+    }
+    return {};
+  }
+
+  function processOptions(options) {
+    for(var key in options) {
+      var value = options[key];
+      switch(key) {
+        case 'timeout':
+          TestCase.defaultTimeout = global.parseFloat(value) * 1000;
+          break;
+        case 'run':
+          this.autoRun = value === 'false' ? false : true;
+          break;
+        case 'logger':
+          this.logger = AutoRunner.LOGGERS[value];
+          break;
+        case 'verbosity':
+          var i = global.parseInt(value);
+          this.verbosity = global.isNaN(i) ? Logger[value] : i;
+          break;
+        case 'runner':
+          this.runner = AutoRunner.RUNNERS[value];
+          break;
+      }
+    }
+  }
+
+  p.run = run;
+  p.processQueryString = processQueryString;
+  p.processArguments = processArguments;
+  p.retrieveOptions = retrieveOptions;
+  p.processOptions = processOptions;
+})(AutoRunner.prototype);
+  Evidence.AutoRunner = AutoRunner;
+function TestResult() {
+  this.testCount      = 0;
+  this.assertionCount = 0;
+  this.skipCount      = 0;
+  this.skips          = [];
+  this.failureCount   = 0;
+  this.failures       = [];
+  this.errors         = [];
+  this.errorCount     = 0;
+  this.testCount      = 0;
+}
+
+TestResult.displayName = 'TestResult';
+
+(function(p) {
+  function addAssertion() {
+    this.assertionCount++;
+  }
+
+  function addSkip(testcase, reason) {
+    this.skipCount++;
+    this.skips.push(reason);
+  }
+
+  function addFailure(testcase, reason) {
+    this.failureCount++;
+    this.failures.push(reason);
+  }
+
+  function addError(testcase, error) {
+    this.errorCount++;
+    this.errors.push(error);
+  }
+
+  function startTest(testcase) {
+    this.testCount++;
+  }
+
+  function stopTest(testcase) {}
+
+  function pauseTest(testcase) {}
+
+  function restartTest(testcase) {}
+
+  function startSuite(suite) {}
+
+  function stopSuite(suite) {}
+
+  function start(t0) {
+    this.t0 = t0;
+  }
+
+  function stop(t1) {
+    this.t1 = t1;
+  }
+
+  function toString() {
+    return this.testCount      + ' tests, ' +
+           this.assertionCount + ' assertions, ' +
+           this.failureCount   + ' failures, ' +
+           this.errorCount     + ' errors, ' +
+           this.skipCount      + ' skips';
+  }
+
+  p.addAssertion  = addAssertion;
+  p.addSkip       = addSkip;
+  p.addFailure    = addFailure;
+  p.addError      = addError;
+  p.startTest     = startTest;
+  p.stopTest      = stopTest;
+  p.pauseTest     = pauseTest;
+  p.restartTest   = restartTest;
+  p.startSuite    = startSuite;
+  p.stopSuite     = stopSuite;
+  p.start         = start;
+  p.stop          = stop;
+  p.toString      = toString;
+})(TestResult.prototype);
+  Evidence.TestResult = TestResult;
+var Console = {};
+
+function Logger(level) {
+  if (typeof level !== 'undefined') {
+    this.level = level;
+  }
+}
+
+Logger.displayName = 'Logger';
+Logger.LEVELS = ['NOTSET', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'CRITICAL'];
+Logger.CRITICAL = 5;
+Logger.ERROR    = 4;
+Logger.WARN     = 3;
+Logger.INFO     = 2;
+Logger.DEBUG    = 1;
+Logger.NOTSET   = 0;
+
+(function(p) {
+  function critical(template, params) {
+    this.log(Logger.CRITICAL, template, params);
+  }
+
+  function error(template, params) {
+    this.log(Logger.ERROR, template, params);
+  }
+
+  function warn(template, params) {
+    this.log(Logger.WARN, template, params);
+  }
+
+  function info(template, params) {
+    this.log(Logger.INFO, template, params);
+  }
+
+  function debug(template, params) {
+    this.log(Logger.DEBUG, template, params);
+  }
+
+  function log(level, template, params) {
+    level = level || Logger.NOTSET;
+    var c = global.console;
+
+    var method = Logger.LEVELS[level].toLowerCase();
+    if (method === 'critical') { method = 'error'; }
+    method = (method in c) ? method : 'log';
+
+    if (level >= this.level) {
+      if (params) {
+        params = params.slice(0);
+        params.unshift(template);
+        c[method].apply(c, params);
+      } else {
+        c[method](template);
+      }
+    }
+  }
+
+  p.log      = log;
+  p.critical = critical;
+  p.error    = error;
+  p.warn     = warn;
+  p.info     = info;
+  p.debug    = debug;
+  p.level    = 0;
+})(Logger.prototype);
+Console.Logger = Logger;
+function PopupLogger(level) {
+  Logger.call(this, level);
+}
+
+chain(PopupLogger, Logger);
+PopupLogger.displayName = 'PopupLogger';
+
+(function(p) {
+  var BASIC_STYLES = 'color: #333; background-color: #fff; font-family: monospace; border-bottom: 1px solid #ccc;';
+  var STYLES = {
+    WARN:     'color: #000; background-color: #fc6;',
+    ERROR:    'color: #f00; background-color: #fcc;',
+    CRITICAL: 'color: #fff; background-color: #000;'
+  };
+
+  function _cleanup(html) {
+    return html.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&').replace(/[\n\r]+/, '<br />');
+  }
+
+  function _makePopup() {
+    var popup = global.open('','popup','height=400,width=400');
+    var doc = popup.document;
+    doc.write('<!doctype html>\
+               <html lang="en">\
+                 <head>\
+                   <meta charset="utf-8">\
+                   <title>Console</title>\
+                 </head>\
+                 <body><div id="evidence_console"></div></body>\
+               </html>');
+    doc.close();
+    popup.focus();
+    return popup;
+  }
+
+  function _appendLine(level, msg) {
+    this.popup = this.popup || this._makePopup();
+    var levelName = Logger.LEVELS[level];
+
+    var html = '<div style="';
+    html += BASIC_STYLES;
+    html += STYLES[levelName] || '';
+    html += '">';
+    if (level > Logger.INFO) {
+      html += '<span style="font-weight: bold;">';
+      html += levelName;
+      html += ':</span> ';
+    }
+    html += _cleanup(msg);
+    html += '</div>';
+    var doc = this.popup.document,
+        div = doc.createElement('div');
+    div.innerHTML = html;
+    html = div.firstChild;
+    div = null;
+    doc.getElementById('evidence_console').appendChild(html);
+  }
+
+  function log(level, msg, params) {
+    level = level || Logger.NOTSET;
+    if (level >= this.level) {
+      if (params) {
+        msg = UI.printf(msg, params);
+      }
+      this._appendLine(level, msg);
+    }
+  }
+
+  p.log = log;
+  p._makePopup = _makePopup;
+  p._appendLine = _appendLine;
+})(PopupLogger.prototype);
+Console.PopupLogger = PopupLogger;
+function CommandLineLogger(level) {
+  Logger.call(this, level);
+}
+
+chain(CommandLineLogger, Logger);
+CommandLineLogger.displayName = 'CommandLineLogger';
+
+(function(p) {
+
+  function log(level, msg, params) {
+    level = level || Logger.NOTSET;
+    if (level >= this.level) {
+      var prefix = '';
+      if (level > Logger.INFO) {
+        prefix = Logger.LEVELS[level]+ ': ';
+      }
+      if (params) {
+        msg = UI.printf(msg, params);
+      }
+      global.print(prefix + msg);
+    }
+  }
+
+  p.log = log;
+})(CommandLineLogger.prototype);
+Console.CommandLineLogger = CommandLineLogger;
+function ConsoleTestRunner(logger) {
+  TestRunner.call(this);
+  this.logger = logger;
+}
+
+chain(ConsoleTestRunner, TestRunner);
+ConsoleTestRunner.displayName = 'ConsoleTestRunner';
+
+(function(p) {
+  function _makeResult() {
+    return new ConsoleTestResult(this.logger);
+  }
+
+  p._makeResult = _makeResult;
+})(ConsoleTestRunner.prototype);
+Console.TestRunner = ConsoleTestRunner;
+function ConsoleTestResult(logger) {
+  TestResult.call(this);
+  this.logger = logger;
+}
+
+chain(ConsoleTestResult, TestResult);
+ConsoleTestResult.displayName = 'ConsoleTestResult';
+
+(function(p) {
+  var _super = TestResult.prototype;
+
+  function addAssertion() {
+    this.assertionCount++;
+  }
+
+  function addSkip(testcase, msg) {
+    _super.addSkip.call(this, testcase, msg);
+    this.logger.warn('Skipping testcase ' + testcase + ': ' + msg.message);
+  }
+
+  function addFailure(testcase, msg) {
+    _super.addFailure.call(this, testcase, msg);
+    this.logger.error(testcase + ': ' + msg.message + ' ' + msg.template, msg.args);
+  }
+
+  function addError(testcase, error) {
+    _super.addError.call(this, testcase, error);
+    this.logger.error(testcase + ' threw an error. ' + error);
+  }
+
+  function startTest(testcase) {
+    _super.startTest.call(this, testcase);
+    this.logger.debug('Started testcase ' + testcase + '.');
+  }
+
+  function stopTest(testcase) {
+    this.logger.debug('Completed testcase ' + testcase + '.');
+  }
+
+  function pauseTest(testcase) {
+    this.logger.info('Paused testcase ' + testcase + '.');
+  }
+
+  function restartTest(testcase) {
+    this.logger.info('Restarted testcase ' + testcase + '.');
+  }
+
+  function startSuite(suite) {
+    this.logger.info('Started suite ' + suite + '.');
+  }
+
+  function stopSuite(suite) {
+    this.logger.info('Completed suite ' + suite + '.');
+  }
+
+  function start(t0) {
+    _super.start.call(this, t0);
+    this.logger.info('Started tests.');
+  }
+
+  function stop(t1) {
+    _super.stop.call(this, t1);
+    this.logger.info('Completed tests in ' + ((t1 - this.t0)/1000) + 's.');
+    this.logger.info(this.toString() + '.');
+  }
+
+  p.addAssertion  = addAssertion;
+  p.addSkip       = addSkip;
+  p.addFailure    = addFailure;
+  p.addError      = addError;
+  p.startTest     = startTest;
+  p.stopTest      = stopTest;
+  p.pauseTest     = pauseTest;
+  p.restartTest   = restartTest;
+  p.startSuite    = startSuite;
+  p.stopSuite     = stopSuite;
+  p.start         = start;
+  p.stop          = stop;
+})(ConsoleTestResult.prototype);
+
+
+Console.TestResult = ConsoleTestResult;
+var UI = (function() {
+  function printf(template, args, inspector) {
+    var parts = [], m,
+        regexp = /(^%|.%)([a-zA-Z])/,
+        args = args.splice(0); // clone args
+
+    inspector = inspector || String;
+
+    if (template.length <= 0) {
+      return '';
+    }
+    while (m = regexp.exec(template)) {
+      var match = m[0], index = m.index, type, arg;
+
+      if (match.indexOf('%%') === 0) {
+        parts.push(template.substr(0, index));
+        parts.push(match.substr(1));
+      } else {
+        parts.push(template.substr(0, match.indexOf('%' === 0) ? index + 1 : index));
+        type = m[2];
+        arg = args.shift();
+        arg = inspector(arg, type);
+        parts.push(arg);
+      }
+      template = template.substr(index + match.length);
+    }
+    parts.push(template);
+    return parts.join('');
+  }
+
+   return {
+     printf: printf,
+     Console: Console
+   };
+})();
+  Evidence.UI = UI;
+
+  var defaultLoader = new TestLoader();
+  Evidence.defaultLoader = defaultLoader;
+
+  global.Evidence = Evidence;
+
+  if (global.location) {
+    global.onload = function() {
+      if (typeof originalOnload === 'function') {
+        originalOnload.call(global);
+      }
+      AutoRunner.run();
+    };
+  } else if (global.arguments) {
+    var runtime = java.lang.Runtime.getRuntime();
+    var thread = new java.lang.Thread(function() {
+      AutoRunner.run();
+    });
+    runtime.addShutdownHook(thread);
+  }
+
+})(this);

@@ -1,1 +1,7 @@
-var e={nested:{e:{name:"e"}}}
+var e = {
+    nested: {
+        e: {
+            name: 'e'
+        }
+    }
+};

@@ -1,1 +1,3 @@
-d3.merge=function(e){return Array.prototype.concat.apply([],e)}
+d3.merge = function(arrays) {
+  return Array.prototype.concat.apply([], arrays);
+};

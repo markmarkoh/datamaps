@@ -1,1 +1,6 @@
-define(["c","c/sub"],function(e,t){return{c:e,csub:t}})
+define(['c', 'c/sub'], function (c, csub) {
+    return {
+        c: c,
+        csub: csub
+    };
+});

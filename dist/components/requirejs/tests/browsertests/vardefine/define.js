@@ -1,5 +1,5 @@
 
-function define([],message) {
+function define(message) {
     log(message);
 }
 

@@ -1,1 +1,10 @@
-function d3_scaleExtent(e){var t=e[0],n=e[e.length-1];return t<n?[t,n]:[n,t]}function d3_scaleRange(e){return e.rangeExtent?e.rangeExtent():d3_scaleExtent(e.range())}d3.scale={}
+d3.scale = {};
+
+function d3_scaleExtent(domain) {
+  var start = domain[0], stop = domain[domain.length - 1];
+  return start < stop ? [start, stop] : [stop, start];
+}
+
+function d3_scaleRange(scale) {
+  return scale.rangeExtent ? scale.rangeExtent() : d3_scaleExtent(scale.range());
+}

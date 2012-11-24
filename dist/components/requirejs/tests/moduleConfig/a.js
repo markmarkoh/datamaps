@@ -1,1 +1,5 @@
-define(["module"],function(e){return{type:e.config().id}})
+define(['module'], function (module) {
+    return {
+        type: module.config().id
+    };
+});

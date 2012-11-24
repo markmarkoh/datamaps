@@ -1,1 +1,7 @@
-define("tres",[],function(){return{name:"tres"}})
+define("tres",
+  function() {
+    return {
+      name: "tres"
+    };
+  }
+);

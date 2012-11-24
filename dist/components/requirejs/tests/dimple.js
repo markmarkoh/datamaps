@@ -1,1 +1,8 @@
-define("dimple",{color:"dimple-blue"})
+//
+// this is a comment
+//
+define("dimple",
+    {
+      color: "dimple-blue"
+    }
+);

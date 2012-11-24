@@ -1,1 +1,8 @@
-define(["specificCollection","bigCollection"],function(e,t){return{name:"app",specificCollection:e,bigCollection:t}})
+define(['specificCollection', 'bigCollection'], function (specificCollection, bigCollection) {
+
+    return {
+        name: 'app',
+        specificCollection: specificCollection,
+        bigCollection: bigCollection
+    }
+});

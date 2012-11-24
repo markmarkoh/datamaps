@@ -1,1 +1,23 @@
-require({map:{"*":{person:"employee"},employee:{person:"person"}}},["application"],function(e){doh.register("pluginMapDynamic",[function(n){n.is("application",e.name),n.is("employed person",e.person.name)}]),doh.run()})
+require({
+    map: {
+        '*': {
+            'person': 'employee'
+        },
+        'employee': {
+            'person': 'person'
+        }
+    }
+}, ['application'], function (application) {
+
+    doh.register(
+        'pluginMapDynamic',
+        [
+            function pluginMapDynamic(t){
+                t.is('application', application.name);
+                t.is('employed person', application.person.name);
+            }
+        ]
+    );
+    doh.run();
+
+});

@@ -1,1 +1,61 @@
-function d3_lab(e,t,n){return new d3_Lab(e,t,n)}function d3_Lab(e,t,n){this.l=e,this.a=t,this.b=n}function d3_lab_rgb(e,t,n){var r=(e+16)/116,i=r+t/500,s=r-n/200;return i=d3_lab_xyz(i)*d3_lab_X,r=d3_lab_xyz(r)*d3_lab_Y,s=d3_lab_xyz(s)*d3_lab_Z,d3_rgb(d3_xyz_rgb(3.2404542*i-1.5371385*r-.4985314*s),d3_xyz_rgb(-0.969266*i+1.8760108*r+.041556*s),d3_xyz_rgb(.0556434*i-.2040259*r+1.0572252*s))}function d3_lab_hcl(e,t,n){return d3_hcl(Math.atan2(n,t)/Math.PI*180,Math.sqrt(t*t+n*n),e)}function d3_lab_xyz(e){return e>.206893034?e*e*e:(e-4/29)/7.787037}d3.lab=function(e,t,n){return arguments.length===1?e instanceof d3_Lab?d3_lab(e.l,e.a,e.b):e instanceof d3_Hcl?d3_hcl_lab(e.l,e.c,e.h):d3_rgb_lab((e=d3.rgb(e)).r,e.g,e.b):d3_lab(+e,+t,+n)};var d3_lab_K=18,d3_lab_X=.95047,d3_lab_Y=1,d3_lab_Z=1.08883,d3_labPrototype=d3_Lab.prototype=new d3_Color;d3_labPrototype.brighter=function(e){return d3_lab(Math.min(100,this.l+d3_lab_K*(arguments.length?e:1)),this.a,this.b)},d3_labPrototype.darker=function(e){return d3_lab(Math.max(0,this.l-d3_lab_K*(arguments.length?e:1)),this.a,this.b)},d3_labPrototype.rgb=function(){return d3_lab_rgb(this.l,this.a,this.b)}
+d3.lab = function(l, a, b) {
+  return arguments.length === 1
+      ? (l instanceof d3_Lab ? d3_lab(l.l, l.a, l.b)
+      : (l instanceof d3_Hcl ? d3_hcl_lab(l.l, l.c, l.h)
+      : d3_rgb_lab((l = d3.rgb(l)).r, l.g, l.b)))
+      : d3_lab(+l, +a, +b);
+};
+
+function d3_lab(l, a, b) {
+  return new d3_Lab(l, a, b);
+}
+
+function d3_Lab(l, a, b) {
+  this.l = l;
+  this.a = a;
+  this.b = b;
+}
+
+// Corresponds roughly to RGB brighter/darker
+var d3_lab_K = 18;
+
+// D65 standard referent
+var d3_lab_X = 0.950470,
+    d3_lab_Y = 1,
+    d3_lab_Z = 1.088830;
+
+var d3_labPrototype = d3_Lab.prototype = new d3_Color;
+
+d3_labPrototype.brighter = function(k) {
+  return d3_lab(Math.min(100, this.l + d3_lab_K * (arguments.length ? k : 1)), this.a, this.b);
+};
+
+d3_labPrototype.darker = function(k) {
+  return d3_lab(Math.max(0, this.l - d3_lab_K * (arguments.length ? k : 1)), this.a, this.b);
+};
+
+d3_labPrototype.rgb = function() {
+  return d3_lab_rgb(this.l, this.a, this.b);
+};
+
+function d3_lab_rgb(l, a, b) {
+  var y = (l + 16) / 116,
+      x = y + a / 500,
+      z = y - b / 200;
+  x = d3_lab_xyz(x) * d3_lab_X;
+  y = d3_lab_xyz(y) * d3_lab_Y;
+  z = d3_lab_xyz(z) * d3_lab_Z;
+  return d3_rgb(
+    d3_xyz_rgb( 3.2404542 * x - 1.5371385 * y - 0.4985314 * z),
+    d3_xyz_rgb(-0.9692660 * x + 1.8760108 * y + 0.0415560 * z),
+    d3_xyz_rgb( 0.0556434 * x - 0.2040259 * y + 1.0572252 * z)
+  );
+}
+
+function d3_lab_hcl(l, a, b) {
+  return d3_hcl(Math.atan2(b, a) / Math.PI * 180, Math.sqrt(a * a + b * b), l);
+}
+
+function d3_lab_xyz(x) {
+  return x > 0.206893034 ? x * x * x : (x - 4 / 29) / 7.787037;
+}

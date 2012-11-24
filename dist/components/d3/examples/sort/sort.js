@@ -1,1 +1,119 @@
-function start(){function t(){var n=e.pop();line.data(n,Number).transition().duration(duration).attr("transform",transform),e.length?setTimeout(t,duration):(shuffle(data),setTimeout(start,duration+4e3))}var e=mergesort(data).reverse();t()}function transform(e,t){return"translate("+x(t)+","+height+")rotate("+a(e)+")"}function shuffle(e){var t=e.length,n,r;while(--t>0)n=~~(Math.random()*(t+1)),r=e[n],e[n]=e[t],e[t]=r;return e}function mergesort(e){function o(t,n,r){n=Math.min(e.length,n),r=Math.min(e.length,r);for(;t<n;t++)if(e[t]>e[n]){var i=e[t];return e[t]=e[n],u(n,r,i),!0}return!1}function u(t,n,r){while(t+1<n&&e[t+1]<r){var i=e[t];e[t]=e[t+1],e[t+1]=i,t++}e[t]=r}var t=[],n,r,i=e.length,s=1;while(s<e.length){n=r=0;while(n<e.length)r+=o(n,n+=s,n+=s);r?t.push(e.slice()):s<<=1}return t}var width=960,height=50,n=240,x=d3.scale.linear().domain([0,n]).range([height,width-height]),a=d3.scale.linear().domain([0,n-1]).range([150,210]),data=shuffle(d3.range(n)),duration=250,vis=d3.select("#chart").append("svg").attr("width",width).attr("height",height),line=vis.selectAll("line").data(data).enter().append("line").attr("x1",0).attr("y1",0).attr("x2",0).attr("y2",height).attr("transform",transform);start()
+// Based on http://vis.stanford.edu/protovis/ex/sort.html
+// Based on work by Robert Sedgewick
+
+var width = 960,
+    height = 50,
+    n = 240;
+
+var x = d3.scale.linear()
+    .domain([0, n])
+    .range([height, width - height]);
+
+var a = d3.scale.linear()
+    .domain([0, n - 1])
+    .range([90 + 60, 270 - 60]);
+
+var data = shuffle(d3.range(n)),
+    duration = 250;
+
+var vis = d3.select("#chart").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+var line = vis.selectAll("line")
+    .data(data)
+  .enter().append("line")
+    .attr("x1", 0)
+    .attr("y1", 0)
+    .attr("x2", 0)
+    .attr("y2", height)
+    .attr("transform", transform);
+
+start();
+
+// Start the animation!
+function start() {
+  var passes = mergesort(data).reverse();
+
+  update();
+
+  function update() {
+    var pass = passes.pop();
+
+    line.data(pass, Number)
+      .transition()
+        .duration(duration)
+        .attr("transform", transform);
+
+    if (passes.length) {
+      setTimeout(update, duration);
+    } else {
+      shuffle(data);
+      setTimeout(start, duration + 4000);
+    }
+  }
+}
+
+function transform(d, i) {
+  return "translate(" + x(i) + "," + height + ")rotate(" + a(d) + ")";
+}
+
+// Fisher-Yates shuffle
+function shuffle(array) {
+  var i = array.length, j, t;
+  while (--i > 0) {
+    j = ~~(Math.random() * (i + 1));
+    t = array[j];
+    array[j] = array[i];
+    array[i] = t;
+  }
+  return array;
+}
+
+//
+// Sorts the specified array using bottom-up mergesort, returning an array of
+// arrays representing the state of the specified array after each insertion for
+// each parallel pass. The first pass is performed at size = 2.
+//
+function mergesort(array) {
+  var passes = [],
+      i,
+      j,
+      n = array.length,
+      m = 1;
+
+  // double the size each pass
+  while (m < array.length) {
+    i = j = 0; while (i < array.length) j += merge(i, i += m, i += m);
+    if (j) passes.push(array.slice());
+    else m <<= 1;
+  }
+
+  // Merges two adjacent sorted arrays in-place.
+  function merge(start, middle, end) {
+    middle = Math.min(array.length, middle);
+    end = Math.min(array.length, end);
+    for (; start < middle; start++) {
+      if (array[start] > array[middle]) {
+        var v = array[start];
+        array[start] = array[middle];
+        insert(middle, end, v);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Inserts the value v into the subarray specified by start and end.
+  function insert(start, end, v) {
+    while (start + 1 < end && array[start + 1] < v) {
+      var tmp = array[start];
+      array[start] = array[start + 1];
+      array[start + 1] = tmp;
+      start++;
+    }
+    array[start] = v;
+  }
+
+  return passes;
+}

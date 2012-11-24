@@ -1,1 +1,49 @@
-define("d",{name:"d"}),define("adapter/d",["d"],function(e){return e.adapted=!0,e}),define("e",["d"],function(e){return{name:"e",d:e}}),require({baseUrl:"./",map:{"*":{d:"adapter/d"},"adapter/d":{d:"d"}}},["e","adapter/d"],function(e,t){doh.register("mapConfigStarAdapter",[function(r){r.is("e",e.name),r.is("d",e.d.name),r.is(!0,e.d.adapted),r.is(!0,t.adapted),r.is("d",t.name)}]),doh.run()}),define("mapConfigStarAdapter-tests",[],function(){})
+
+define('d',{
+    name: 'd'
+});
+
+define('adapter/d',['d'], function(d) {
+    d.adapted = true;
+    return d;
+});
+
+define('e',['d'], function (d) {
+    return {
+        name: 'e',
+        d: d
+    };
+});
+
+/*global doh */
+require({
+        baseUrl: './',
+        map: {
+            '*': {
+                'd': 'adapter/d'
+            },
+            'adapter/d': {
+                d: 'd'
+            }
+        }
+    },
+    ['e', 'adapter/d'],
+    function(e, adapterD) {
+        
+        doh.register(
+            'mapConfigStarAdapter',
+            [
+                function mapConfigStarAdapter(t){
+                    t.is('e', e.name);
+                    t.is('d', e.d.name);
+                    t.is(true, e.d.adapted);
+                    t.is(true, adapterD.adapted);
+                    t.is('d', adapterD.name);
+                }
+            ]
+        );
+        doh.run();
+    }
+);
+
+define("mapConfigStarAdapter-tests", function(){});

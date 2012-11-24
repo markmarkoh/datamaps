@@ -1,1 +1,3 @@
-define({name:"dojox/window/pane"})
+define({
+    name: 'dojox/window/pane'
+});

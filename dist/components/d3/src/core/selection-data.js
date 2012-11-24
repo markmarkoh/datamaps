@@ -1,1 +1,121 @@
-function d3_selection_dataNode(e){return{__data__:e}}d3_selectionPrototype.data=function(e,t){function o(e,n){var r,i=e.length,s=n.length,o=Math.min(i,s),l=Math.max(i,s),c=[],h=[],p=[],d,v;if(t){var m=new d3_Map,g=[],y,b=n.length;for(r=-1;++r<i;)y=t.call(d=e[r],d.__data__,r),m.has(y)?p[b++]=d:m.set(y,d),g.push(y);for(r=-1;++r<s;)y=t.call(n,v=n[r],r),m.has(y)?(c[r]=d=m.get(y),d.__data__=v,h[r]=p[r]=null):(h[r]=d3_selection_dataNode(v),c[r]=p[r]=null),m.remove(y);for(r=-1;++r<i;)m.has(g[r])&&(p[r]=e[r])}else{for(r=-1;++r<o;)d=e[r],v=n[r],d?(d.__data__=v,c[r]=d,h[r]=p[r]=null):(h[r]=d3_selection_dataNode(v),c[r]=p[r]=null);for(;r<s;++r)h[r]=d3_selection_dataNode(n[r]),c[r]=p[r]=null;for(;r<l;++r)p[r]=e[r],h[r]=c[r]=null}h.update=c,h.parentNode=c.parentNode=p.parentNode=e.parentNode,u.push(h),a.push(c),f.push(p)}var n=-1,r=this.length,i,s;if(!arguments.length){e=new Array(r=(i=this[0]).length);while(++n<r)if(s=i[n])e[n]=s.__data__;return e}var u=d3_selection_enter([]),a=d3_selection([]),f=d3_selection([]);if(typeof e=="function")while(++n<r)o(i=this[n],e.call(i,i.parentNode.__data__,n));else while(++n<r)o(i=this[n],e);return a.enter=function(){return u},a.exit=function(){return f},a}
+d3_selectionPrototype.data = function(value, key) {
+  var i = -1,
+      n = this.length,
+      group,
+      node;
+
+  // If no value is specified, return the first value.
+  if (!arguments.length) {
+    value = new Array(n = (group = this[0]).length);
+    while (++i < n) {
+      if (node = group[i]) {
+        value[i] = node.__data__;
+      }
+    }
+    return value;
+  }
+
+  function bind(group, groupData) {
+    var i,
+        n = group.length,
+        m = groupData.length,
+        n0 = Math.min(n, m),
+        n1 = Math.max(n, m),
+        updateNodes = [],
+        enterNodes = [],
+        exitNodes = [],
+        node,
+        nodeData;
+
+    if (key) {
+      var nodeByKeyValue = new d3_Map,
+          keyValues = [],
+          keyValue,
+          j = groupData.length;
+
+      for (i = -1; ++i < n;) {
+        keyValue = key.call(node = group[i], node.__data__, i);
+        if (nodeByKeyValue.has(keyValue)) {
+          exitNodes[j++] = node; // duplicate key
+        } else {
+          nodeByKeyValue.set(keyValue, node);
+        }
+        keyValues.push(keyValue);
+      }
+
+      for (i = -1; ++i < m;) {
+        keyValue = key.call(groupData, nodeData = groupData[i], i)
+        if (nodeByKeyValue.has(keyValue)) {
+          updateNodes[i] = node = nodeByKeyValue.get(keyValue);
+          node.__data__ = nodeData;
+          enterNodes[i] = exitNodes[i] = null;
+        } else {
+          enterNodes[i] = d3_selection_dataNode(nodeData);
+          updateNodes[i] = exitNodes[i] = null;
+        }
+        nodeByKeyValue.remove(keyValue);
+      }
+
+      for (i = -1; ++i < n;) {
+        if (nodeByKeyValue.has(keyValues[i])) {
+          exitNodes[i] = group[i];
+        }
+      }
+    } else {
+      for (i = -1; ++i < n0;) {
+        node = group[i];
+        nodeData = groupData[i];
+        if (node) {
+          node.__data__ = nodeData;
+          updateNodes[i] = node;
+          enterNodes[i] = exitNodes[i] = null;
+        } else {
+          enterNodes[i] = d3_selection_dataNode(nodeData);
+          updateNodes[i] = exitNodes[i] = null;
+        }
+      }
+      for (; i < m; ++i) {
+        enterNodes[i] = d3_selection_dataNode(groupData[i]);
+        updateNodes[i] = exitNodes[i] = null;
+      }
+      for (; i < n1; ++i) {
+        exitNodes[i] = group[i];
+        enterNodes[i] = updateNodes[i] = null;
+      }
+    }
+
+    enterNodes.update
+        = updateNodes;
+
+    enterNodes.parentNode
+        = updateNodes.parentNode
+        = exitNodes.parentNode
+        = group.parentNode;
+
+    enter.push(enterNodes);
+    update.push(updateNodes);
+    exit.push(exitNodes);
+  }
+
+  var enter = d3_selection_enter([]),
+      update = d3_selection([]),
+      exit = d3_selection([]);
+
+  if (typeof value === "function") {
+    while (++i < n) {
+      bind(group = this[i], value.call(group, group.parentNode.__data__, i));
+    }
+  } else {
+    while (++i < n) {
+      bind(group = this[i], value);
+    }
+  }
+
+  update.enter = function() { return enter; };
+  update.exit = function() { return exit; };
+  return update;
+};
+
+function d3_selection_dataNode(data) {
+  return {__data__: data};
+}

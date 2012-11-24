@@ -1,1 +1,15 @@
-define("funcTwo",["require","funcOne"],function(e){var t=function(t){this.name=t,this.one=new(e("funcOne"))("ONE")};return t.prototype.oneName=function(){return this.one.getName()},t})
+define("funcTwo",
+    ["require", "funcOne"],
+    function (require) {
+        var two = function (name) {
+            this.name = name;
+            this.one = new (require("funcOne"))("ONE");
+        };
+    
+        two.prototype.oneName = function () {
+            return this.one.getName();
+        };
+
+        return two;
+    }
+);

@@ -1,1 +1,1 @@
-require(["sub/a"])
+require(['sub/a']);

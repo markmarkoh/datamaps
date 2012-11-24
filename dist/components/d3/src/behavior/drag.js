@@ -1,1 +1,82 @@
-d3.behavior.drag=function(){function n(){this.on("mousedown.drag",r).on("touchstart.drag",r)}function r(){function l(){var e=n.parentNode;return s?d3.touches(e).filter(function(e){return e.identifier===s})[0]:d3.mouse(e)}function c(){if(!n.parentNode)return h();var e=l(),t=e[0]-u[0],i=e[1]-u[1];a|=t|i,u=e,d3_eventCancel(),r({type:"drag",x:e[0]+o[0],y:e[1]+o[1],dx:t,dy:i})}function h(){r({type:"dragend"}),a&&(d3_eventCancel(),d3.event.target===i&&f.on("click.drag",p,!0)),f.on(s?"touchmove.drag-"+s:"mousemove.drag",null).on(s?"touchend.drag-"+s:"mouseup.drag",null)}function p(){d3_eventCancel(),f.on("click.drag",null)}var n=this,r=e.of(n,arguments),i=d3.event.target,s=d3.event.touches&&d3.event.changedTouches[0].identifier,o,u=l(),a=0,f=d3.select(window).on(s?"touchmove.drag-"+s:"mousemove.drag",c).on(s?"touchend.drag-"+s:"mouseup.drag",h,!0);t?(o=t.apply(n,arguments),o=[o.x-u[0],o.y-u[1]]):o=[0,0],s||d3_eventCancel(),r({type:"dragstart"})}var e=d3_eventDispatch(n,"drag","dragstart","dragend"),t=null;return n.origin=function(e){return arguments.length?(t=e,n):t},d3.rebind(n,e,"on")}
+d3.behavior.drag = function() {
+  var event = d3_eventDispatch(drag, "drag", "dragstart", "dragend"),
+      origin = null;
+
+  function drag() {
+    this.on("mousedown.drag", mousedown)
+        .on("touchstart.drag", mousedown);
+  }
+
+  function mousedown() {
+    var target = this,
+        event_ = event.of(target, arguments),
+        eventTarget = d3.event.target,
+        touchId = d3.event.touches && d3.event.changedTouches[0].identifier,
+        offset,
+        origin_ = point(),
+        moved = 0;
+
+    var w = d3.select(window)
+        .on(touchId ? "touchmove.drag-" + touchId : "mousemove.drag", dragmove)
+        .on(touchId ? "touchend.drag-" + touchId : "mouseup.drag", dragend, true);
+
+    if (origin) {
+      offset = origin.apply(target, arguments);
+      offset = [offset.x - origin_[0], offset.y - origin_[1]];
+    } else {
+      offset = [0, 0];
+    }
+
+    // Only cancel mousedown; touchstart is needed for draggable links.
+    if (!touchId) d3_eventCancel();
+    event_({type: "dragstart"});
+
+    function point() {
+      var p = target.parentNode;
+      return touchId
+          ? d3.touches(p).filter(function(p) { return p.identifier === touchId; })[0]
+          : d3.mouse(p);
+    }
+
+    function dragmove() {
+      if (!target.parentNode) return dragend(); // target removed from DOM
+
+      var p = point(),
+          dx = p[0] - origin_[0],
+          dy = p[1] - origin_[1];
+
+      moved |= dx | dy;
+      origin_ = p;
+      d3_eventCancel();
+
+      event_({type: "drag", x: p[0] + offset[0], y: p[1] + offset[1], dx: dx, dy: dy});
+    }
+
+    function dragend() {
+      event_({type: "dragend"});
+
+      // if moved, prevent the mouseup (and possibly click) from propagating
+      if (moved) {
+        d3_eventCancel();
+        if (d3.event.target === eventTarget) w.on("click.drag", click, true);
+      }
+
+      w .on(touchId ? "touchmove.drag-" + touchId : "mousemove.drag", null)
+        .on(touchId ? "touchend.drag-" + touchId : "mouseup.drag", null);
+    }
+
+    // prevent the subsequent click from propagating (e.g., for anchors)
+    function click() {
+      d3_eventCancel();
+      w.on("click.drag", null);
+    }
+  }
+
+  drag.origin = function(x) {
+    if (!arguments.length) return origin;
+    origin = x;
+    return drag;
+  };
+
+  return d3.rebind(drag, event, "on");
+};

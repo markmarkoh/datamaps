@@ -2,4 +2,34 @@
 //     (c) 2010-2012 Thomas Fuchs
 //     Zepto.js may be freely distributed under the MIT license.
 
-(function(e){if(e.os.ios){var t={},n;function r(e){return"tagName"in e?e:e.parentNode}e(document).bind("gesturestart",function(e){var i=Date.now(),s=i-(t.last||i);t.target=r(e.target),n&&clearTimeout(n),t.e1=e.scale,t.last=i}).bind("gesturechange",function(e){t.e2=e.scale}).bind("gestureend",function(n){t.e2>0?(Math.abs(t.e1-t.e2)!=0&&e(t.target).trigger("pinch")&&e(t.target).trigger("pinch"+(t.e1-t.e2>0?"In":"Out")),t.e1=t.e2=t.last=0):"last"in t&&(t={})}),["pinch","pinchIn","pinchOut"].forEach(function(t){e.fn[t]=function(e){return this.bind(t,e)}})}})(Zepto)
+;(function($){
+  if ($.os.ios) {
+    var gesture = {}, gestureTimeout
+
+    function parentIfText(node){
+      return 'tagName' in node ? node : node.parentNode
+    }
+
+    $(document).bind('gesturestart', function(e){
+      var now = Date.now(), delta = now - (gesture.last || now)
+      gesture.target = parentIfText(e.target)
+      gestureTimeout && clearTimeout(gestureTimeout)
+      gesture.e1 = e.scale
+      gesture.last = now
+    }).bind('gesturechange', function(e){
+      gesture.e2 = e.scale
+    }).bind('gestureend', function(e){
+      if (gesture.e2 > 0) {
+        Math.abs(gesture.e1 - gesture.e2) != 0 && $(gesture.target).trigger('pinch') &&
+          $(gesture.target).trigger('pinch' + (gesture.e1 - gesture.e2 > 0 ? 'In' : 'Out'))
+        gesture.e1 = gesture.e2 = gesture.last = 0
+      } else if ('last' in gesture) {
+        gesture = {}
+      }
+    })
+
+    ;['pinch', 'pinchIn', 'pinchOut'].forEach(function(m){
+      $.fn[m] = function(callback){ return this.bind(m, callback) }
+    })
+  }
+})(Zepto)

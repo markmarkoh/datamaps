@@ -1,1 +1,5 @@
-(function(e){e.A={name:"a"}})(this)
+(function (root) {
+    root.A = {
+        name: 'a'
+    };
+}(this));

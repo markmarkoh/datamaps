@@ -1,1 +1,84 @@
-require("../env");var assert=require("assert"),datum={};module.exports={topic:function(){return d3.select("body").html("").selectAll("div").data([0,1]).enter().append("div").selectAll("span").data(function(e){return e<<=1,[e,e+1]}).enter().append("span").classed("foo",function(e,t){return e&1}).transition().delay(100).duration(150).ease("bounce")},"preserves matching elements":function(e){var t=e.filter(function(e,t){return t===0});assert.isTrue(t[0][0]===e[0][0]),assert.isTrue(t[1][0]===e[1][0])},"removes non-matching elements":function(e){var t=d3.merge(e.filter(function(e,t){return e&1}));assert.equal(t.indexOf(e[0][0]),-1),assert.equal(t.indexOf(e[1][0]),-1)},"preserves data":function(e){var t=e.filter(function(e,t){return e&1});assert.equal(t[0][0].node.__data__,1),assert.equal(t[1][0].node.__data__,3)},"preserves grouping":function(e){var t=e.filter(function(e,t){return e&1});assert.equal(t.length,2),assert.equal(t[0].length,1),assert.equal(t[1].length,1)},"preserves parent node":function(e){var t=e.filter(function(e,t){return e&1});assert.isTrue(t[0].parentNode===e[0].parentNode),assert.isTrue(t[1].parentNode===e[1].parentNode)},"does not preserve index":function(e){var t=[];e.filter(function(e,t){return e&1}).each(function(e,n){t.push(n)}),assert.deepEqual(t,[0,0])},"ignores null nodes":function(){var e=d3.selectAll("span");e[0][1]=null;var t=e.filter(function(e,t){return e&1});assert.isTrue(t[0][0]===e[0][3]),assert.equal(t.length,1)},"can be specified as a selector":function(e){var t=e.filter(".foo");assert.equal(t.length,2),assert.equal(t[0].length,1),assert.equal(t[1].length,1)},"returns a new selection":function(e){assert.isFalse(e.filter(function(){return 1})===e)},"inherits the delay":function(e){var t=e.filter(function(){return 1});assert.equal(t[0][0].delay,100)},"inherits the duration":function(e){var t=e.filter(function(){return 1});assert.equal(t[0][0].duration,150)},"inherits easing":function(e){},"inherits the transition id":function(e){var t=e.filter(function(){return 1});assert.equal(t.id,e.id)}}
+require("../env");
+
+var assert = require("assert");
+
+var datum = {};
+
+module.exports = {
+  topic: function() {
+    return d3.select("body").html("").selectAll("div")
+        .data([0, 1])
+      .enter().append("div")
+      .selectAll("span")
+        .data(function(d) { d <<= 1; return [d, d + 1]; })
+      .enter().append("span")
+        .classed("foo", function(d, i) { return d & 1; })
+      .transition()
+        .delay(100)
+        .duration(150)
+        .ease("bounce");
+  },
+
+  "preserves matching elements": function(span) {
+    var some = span.filter(function(d, i) { return i === 0; });
+    assert.isTrue(some[0][0] === span[0][0]);
+    assert.isTrue(some[1][0] === span[1][0]);
+  },
+  "removes non-matching elements": function(span) {
+    var some = d3.merge(span.filter(function(d, i) { return d & 1; }));
+    assert.equal(some.indexOf(span[0][0]), -1);
+    assert.equal(some.indexOf(span[1][0]), -1);
+  },
+  "preserves data": function(span) {
+    var some = span.filter(function(d, i) { return d & 1; });
+    assert.equal(some[0][0].node.__data__, 1);
+    assert.equal(some[1][0].node.__data__, 3);
+  },
+  "preserves grouping": function(span) {
+    var some = span.filter(function(d, i) { return d & 1; });
+    assert.equal(some.length, 2);
+    assert.equal(some[0].length, 1);
+    assert.equal(some[1].length, 1);
+  },
+  "preserves parent node": function(span) {
+    var some = span.filter(function(d, i) { return d & 1; });
+    assert.isTrue(some[0].parentNode === span[0].parentNode);
+    assert.isTrue(some[1].parentNode === span[1].parentNode);
+  },
+  "does not preserve index": function(span) {
+    var indexes = [];
+    span.filter(function(d, i) { return d & 1; }).each(function(d, i) { indexes.push(i); });
+    assert.deepEqual(indexes, [0, 0]);
+  },
+  "ignores null nodes": function() {
+    var span = d3.selectAll("span");
+    span[0][1] = null;
+    var some = span.filter(function(d, i) { return d & 1; });
+    assert.isTrue(some[0][0] === span[0][3]);
+    assert.equal(some.length, 1);
+  },
+  "can be specified as a selector": function(span) {
+    var some = span.filter(".foo");
+    assert.equal(some.length, 2);
+    assert.equal(some[0].length, 1);
+    assert.equal(some[1].length, 1);
+  },
+  "returns a new selection": function(span) {
+    assert.isFalse(span.filter(function() { return 1; }) === span);
+  },
+  "inherits the delay": function(t1) {
+    var t2 = t1.filter(function() { return 1; });
+    assert.equal(t2[0][0].delay, 100);
+  },
+  "inherits the duration": function(t1) {
+    var t2 = t1.filter(function() { return 1; });
+    assert.equal(t2[0][0].duration, 150);
+  },
+  "inherits easing": function(t1) {
+    // TODO how to test this?
+  },
+  "inherits the transition id": function(t1) {
+    var t2 = t1.filter(function() { return 1; });
+    assert.equal(t2.id, t1.id);
+  }
+};

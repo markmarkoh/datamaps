@@ -1,1 +1,4 @@
-define(["d"],function(e){return e.adapted=!0,e})
+define(['d'], function(d) {
+    d.adapted = true;
+    return d;
+});

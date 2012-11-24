@@ -1,1 +1,96 @@
-function inDelta(e,t,n){return(Array.isArray(t)?inDeltaArray:inDeltaNumber)(e,t,n)}function inDeltaArray(e,t,n){var r=t.length,i=-1;if(e.length!==r)return!1;while(++i<r)if(!inDelta(e[i],t[i],n))return!1;return!0}function inDeltaNumber(e,t,n){return e>=t-n&&e<=t+n}function pathEqual(e,t){e=parsePath(e),t=parsePath(t);var n=e.length,r=-1,i,s;if(n!==t.length)return!1;while(++r<n){i=e[r],s=t[r];if(typeof i=="string"){if(i!==s)return!1}else{if(typeof s!="number")return!1;if(Math.abs(i-s)>1e-6)return!1}}return!0}function parsePath(e){var t=[];reNumber.lastIndex=0;for(var n=0,r=0,i,s;s=reNumber.exec(e);++n){if(s.index){var o=e.substring(r,i=s.index);/^[, ]$/.test(o)||t.push(o)}t.push(parseFloat(s[0])),r=reNumber.lastIndex}return r<e.length&&t.push(e.substring(r)),t}function formatPath(e){return e.replace(reNumber,formatNumber)}function formatNumber(e){return Math.abs((e=+e)-Math.floor(e))<1e-6?Math.floor(e):e.toFixed(6)}var assert=require("assert");assert.inDelta=function(e,t,n,r){inDelta(e,t,n)||assert.fail(e,t,r||"expected {actual} to be in within *"+n+"* of {expected}",null,assert.inDelta)},assert.domNull=function(e,t){e!==null&&assert.fail(e+"",null,t||"expected null, got {actual}","===",assert.domNull)},assert.domEqual=function(e,t,n){e!==t&&assert.fail(e+"",t+"",n||"expected {expected}, got {actual}","===",assert.domEqual)},assert.rgbEqual=function(e,t,n,r,i){(e.r!==t||e.g!==n||e.b!==r)&&assert.fail("rgb("+e.r+","+e.g+","+e.b+")","rgb("+t+", "+n+", "+r+")",i||"expected {expected}, got {actual}","===",assert.rgbEqual)},assert.hslEqual=function(e,t,n,r,i){(Math.abs(e.h-t)>1e-6||Math.abs(e.s-n)>1e-6||Math.abs(e.l-r)>1e-6)&&assert.fail("hsl("+e.h+","+e.s*100+"%,"+e.l*100+"%)","hsl("+t+","+n*100+"%,"+r*100+"%)",i||"expected {expected}, got {actual}",null,assert.hslEqual)},assert.pathEqual=function(e,t,n){pathEqual(e,t)||assert.fail(formatPath(e),formatPath(t),n||"expected {expected}, got {actual}",null,assert.pathEqual)};var reNumber=/[-+]?(?:\d+\.\d+|\d+\.|\.\d+|\d+)(?:[eE][-]?\d+)?/g
+var assert = require("assert");
+
+assert.inDelta = function(actual, expected, delta, message) {
+  if (!inDelta(actual, expected, delta)) {
+    assert.fail(actual, expected, message || "expected {actual} to be in within *" + delta + "* of {expected}", null, assert.inDelta);
+  }
+};
+
+assert.domNull = function(actual, message) {
+  if (actual !== null) {
+    assert.fail(actual+"", null, message || "expected null, got {actual}", "===", assert.domNull);
+  }
+};
+
+assert.domEqual = function(actual, expected, message) {
+  if (actual !== expected) {
+    assert.fail(actual+"", expected+"", message || "expected {expected}, got {actual}", "===", assert.domEqual);
+  }
+};
+
+assert.rgbEqual = function(actual, r, g, b, message) {
+  if (actual.r !== r || actual.g !== g || actual.b !== b) {
+    assert.fail("rgb(" + actual.r + "," + actual.g + "," + actual.b + ")", "rgb(" + r + ", " + g + ", " + b + ")", message || "expected {expected}, got {actual}", "===", assert.rgbEqual);
+  }
+};
+
+assert.hslEqual = function(actual, h, s, l, message) {
+  if (Math.abs(actual.h - h) > 1e-6 || Math.abs(actual.s - s) > 1e-6 || Math.abs(actual.l - l) > 1e-6) {
+    assert.fail("hsl(" + actual.h + "," + (actual.s * 100) + "%," + (actual.l * 100) + "%)", "hsl(" + h + "," + (s * 100) + "%," + (l * 100) + "%)", message || "expected {expected}, got {actual}", null, assert.hslEqual);
+  }
+};
+
+assert.pathEqual = function(actual, expected, message) {
+  if (!pathEqual(actual, expected)) {
+    assert.fail(formatPath(actual), formatPath(expected), message || "expected {expected}, got {actual}", null, assert.pathEqual);
+  }
+};
+
+function inDelta(actual, expected, delta) {
+  return (Array.isArray(expected) ? inDeltaArray : inDeltaNumber)(actual, expected, delta);
+}
+
+function inDeltaArray(actual, expected, delta) {
+  var n = expected.length, i = -1;
+  if (actual.length !== n) return false;
+  while (++i < n) if (!inDelta(actual[i], expected[i], delta)) return false;
+  return true;
+}
+
+function inDeltaNumber(actual, expected, delta) {
+  return actual >= expected - delta && actual <= expected + delta;
+}
+
+function pathEqual(a, b) {
+  a = parsePath(a);
+  b = parsePath(b);
+  var n = a.length, i = -1, x, y;
+  if (n !== b.length) return false;
+  while (++i < n) {
+    x = a[i];
+    y = b[i];
+    if (typeof x === "string") {
+      if (x !== y) return false;
+    } else if (typeof y !== "number") {
+      return false;
+    } else if (Math.abs(x - y) > 1e-6) {
+      return false;
+    }
+  }
+  return true;
+}
+
+var reNumber = /[-+]?(?:\d+\.\d+|\d+\.|\.\d+|\d+)(?:[eE][-]?\d+)?/g;
+
+function parsePath(path) {
+  var parts = [];
+  reNumber.lastIndex = 0;
+  for (var i = 0, s0 = 0, s1, m; m = reNumber.exec(path); ++i) {
+    if (m.index) {
+      var part = path.substring(s0, s1 = m.index);
+      if (!/^[, ]$/.test(part)) parts.push(part);
+    }
+    parts.push(parseFloat(m[0]));
+    s0 = reNumber.lastIndex;
+  }
+  if (s0 < path.length) parts.push(path.substring(s0));
+  return parts;
+}
+
+function formatPath(path) {
+  return path.replace(reNumber, formatNumber);
+}
+
+function formatNumber(s) {
+  return Math.abs((s = +s) - Math.floor(s)) < 1e-6 ? Math.floor(s) : s.toFixed(6);
+}

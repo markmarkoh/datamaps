@@ -1,1 +1,17 @@
-require({baseUrl:"./"},["a"],function(e){doh.register("isBrowser",[function(n){n.is(!0,e.isBrowser),n.is(!0,requirejs.isBrowser)}]),doh.run()})
+require({
+        baseUrl: "./"
+    },
+    ["a"],
+    function(a) {
+        doh.register(
+            "isBrowser",
+            [
+                function isBrowser(t){
+                    t.is(true, a.isBrowser);
+                    t.is(true, requirejs.isBrowser);
+                }
+            ]
+        );
+        doh.run();
+    }
+);

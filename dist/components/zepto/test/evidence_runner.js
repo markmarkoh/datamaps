@@ -1,1 +1,96 @@
-(function(){function i(e,t){var n=function(){this.initialize.apply(this,arguments)},r=function(){};r.prototype=e.prototype,n.prototype=new r,n.prototype.constructor=n,n.prototype.initialize=function(){e.apply(this,arguments)};if(t){var i=t.call(n,e.prototype);for(var s in i)n.prototype[s]=i[s]}return n}function u(e){return document.getElementById(e)}function a(e,t){var n=u("results");n&&(e.failureCount||e.errorCount?(n.className="failed",n.innerHTML=r("Finished in %d s. &ndash; <em>%d failures, %d errors</em> (%d assertions)",[t,e.failureCount,e.errorCount,e.assertionCount])):(n.className="passed",n.innerHTML=r("Finished in %d s. &ndash; <em>%d tests passed</em> (%d assertions)",[t,e.testCount,e.assertionCount])),n.className+=" finished")}function h(){var e=/^Opera\b/.test(navigator.userAgent);for(var t in window)f.indexOf(t)<0&&l.indexOf(t)<0&&(!e||typeof window[t]!="object"||window[t].id!=t)&&window.console&&console.warn&&console.warn("unexpected global: "+t)}var e=Evidence.AutoRunner.RUNNERS.console,t=Evidence.UI.Console.TestResult,n=Evidence.AutoRunner,r=Evidence.UI.printf,s=i(e,function(e){return n.RUNNERS.zepto=this,{_makeResult:function(){return new o(this.logger)}}}),o=i(t,function(e){return{start:function(e){Evidence.TestResult.prototype.start.call(this,e),this.logger.debug("Started tests.")},stop:function(t){e.stop.call(this,t),a(this,(t-this.t0)/1e3),h()},pauseTest:function(e){this.logger.debug("Paused testcase "+e+".")},restartTest:function(e){this.logger.debug("Restarted testcase "+e+".")},startSuite:function(e){this.logger.debug("Started suite "+e+".")}}});(function(){var e=n.prototype.retrieveOptions;n.prototype.retrieveOptions=function(){var t=e.call(this);return t.runner||(t.runner="zepto"),t}})();var f=[],l=["Zepto","$","Evidence"];for(var c in window)f.push(c)})()
+(function(){
+  var ConsoleTestRunner = Evidence.AutoRunner.RUNNERS.console,
+      ConsoleTestResult = Evidence.UI.Console.TestResult,
+      AutoRunner = Evidence.AutoRunner,
+      printf = Evidence.UI.printf
+
+  function inherit(superclass, extra) {
+    var klass = function(){
+      this.initialize.apply(this, arguments)
+    }
+    var tmp = function(){}
+    tmp.prototype = superclass.prototype
+    klass.prototype = new tmp()
+    klass.prototype.constructor = klass
+    klass.prototype.initialize = function(){
+      superclass.apply(this, arguments)
+    }
+
+    if (extra) {
+      var methods = extra.call(klass, superclass.prototype)
+      for (var method in methods) klass.prototype[method] = methods[method]
+    }
+    return klass
+  }
+
+  var TestRunner = inherit(ConsoleTestRunner, function(_super) {
+    AutoRunner.RUNNERS.zepto = this
+    return {
+      _makeResult: function() { return new TestResult(this.logger) }
+    }
+  })
+
+  var TestResult = inherit(ConsoleTestResult, function(_super) {
+    return {
+      start: function(t0) {
+        Evidence.TestResult.prototype.start.call(this, t0)
+        this.logger.debug('Started tests.')
+      },
+      stop: function(t1) {
+        _super.stop.call(this, t1)
+        displayResults(this, (t1-this.t0)/1000)
+        checkLeakedGlobals()
+      },
+      pauseTest: function(testcase) {
+        this.logger.debug('Paused testcase ' + testcase + '.')
+      },
+      restartTest: function(testcase) {
+        this.logger.debug('Restarted testcase ' + testcase + '.')
+      },
+      startSuite: function(suite) {
+        this.logger.debug('Started suite ' + suite + '.')
+      }
+    }
+  })
+
+  // HACK: force our test runner as default
+  ;(function(){
+    var _super = AutoRunner.prototype.retrieveOptions
+    AutoRunner.prototype.retrieveOptions = function() {
+      var options = _super.call(this)
+      if (!options.runner) options.runner = 'zepto'
+      return options
+    }
+  })()
+
+  function $(id) { return document.getElementById(id) }
+
+  function displayResults(results, seconds) {
+    var container = $('results')
+    if (container) {
+      if (results.failureCount || results.errorCount) {
+        container.className = 'failed'
+        container.innerHTML = printf("Finished in %d s. &ndash; <em>%d failures, %d errors</em> (%d assertions)",
+                                     [seconds, results.failureCount, results.errorCount, results.assertionCount])
+      } else {
+        container.className = 'passed'
+        container.innerHTML = printf("Finished in %d s. &ndash; <em>%d tests passed</em> (%d assertions)",
+                                     [seconds, results.testCount, results.assertionCount])
+      }
+      container.className += ' finished'
+    }
+  }
+
+  var globals = [], expected = ['Zepto', '$', 'Evidence']
+  for (var key in window) globals.push(key)
+
+  function checkLeakedGlobals() {
+    var opera = /^Opera\b/.test(navigator.userAgent)
+    for (var key in window)
+      if ( globals.indexOf(key) < 0 && expected.indexOf(key) < 0 &&
+          (!opera || typeof window[key] != 'object' || window[key].id != key) &&
+          window.console && console.warn
+          )
+        console.warn("unexpected global: " + key)
+  }
+})()

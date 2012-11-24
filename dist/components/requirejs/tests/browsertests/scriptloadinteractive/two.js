@@ -1,1 +1,5 @@
-def(function(){return{name:"two"}})
+def(function () {
+    return {
+        name: 'two'
+    };
+});

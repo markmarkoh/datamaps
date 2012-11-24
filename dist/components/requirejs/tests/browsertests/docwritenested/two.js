@@ -1,1 +1,3 @@
-two={name:"two"}
+two = {
+    name: "two"
+};

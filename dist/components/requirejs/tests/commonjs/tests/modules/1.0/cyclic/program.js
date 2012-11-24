@@ -1,1 +1,13 @@
-define(["require","exports","module","test","a","b"],function(e,t,n){var r=e("test"),i=e("a"),s=e("b");r.assert(i.a,"a exists"),r.assert(s.b,"b exists"),r.assert(i.a().b===s.b,"a gets b"),r.assert(s.b().a===i.a,"b gets a"),r.print("DONE","info")})
+define(["require", "exports", "module", "test","a","b"], function(require, exports, module) {
+var test = require('test');
+var a = require('a');
+var b = require('b');
+
+test.assert(a.a, 'a exists');
+test.assert(b.b, 'b exists')
+test.assert(a.a().b === b.b, 'a gets b');
+test.assert(b.b().a === a.a, 'b gets a');
+
+test.print('DONE', 'info');
+
+});

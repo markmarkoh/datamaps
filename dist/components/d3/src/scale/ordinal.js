@@ -1,1 +1,88 @@
-function d3_scale_ordinal(e,t){function s(t){return r[((n.get(t)||n.set(t,e.push(t)))-1)%r.length]}function o(t,n){return d3.range(e.length).map(function(e){return t+n*e})}var n,r,i;return s.domain=function(r){if(!arguments.length)return e;e=[],n=new d3_Map;var i=-1,o=r.length,u;while(++i<o)n.has(u=r[i])||n.set(u,e.push(u));return s[t.t].apply(s,t.a)},s.range=function(e){return arguments.length?(r=e,i=0,t={t:"range",a:arguments},s):r},s.rangePoints=function(n,u){arguments.length<2&&(u=0);var a=n[0],f=n[1],l=(f-a)/(Math.max(1,e.length-1)+u);return r=o(e.length<2?(a+f)/2:a+l*u/2,l),i=0,t={t:"rangePoints",a:arguments},s},s.rangeBands=function(n,u,a){arguments.length<2&&(u=0),arguments.length<3&&(a=u);var f=n[1]<n[0],l=n[f-0],c=n[1-f],h=(c-l)/(e.length-u+2*a);return r=o(l+h*a,h),f&&r.reverse(),i=h*(1-u),t={t:"rangeBands",a:arguments},s},s.rangeRoundBands=function(n,u,a){arguments.length<2&&(u=0),arguments.length<3&&(a=u);var f=n[1]<n[0],l=n[f-0],c=n[1-f],h=Math.floor((c-l)/(e.length-u+2*a)),p=c-l-(e.length-u)*h;return r=o(l+Math.round(p/2),h),f&&r.reverse(),i=Math.round(h*(1-u)),t={t:"rangeRoundBands",a:arguments},s},s.rangeBand=function(){return i},s.rangeExtent=function(){return d3_scaleExtent(t.a[0])},s.copy=function(){return d3_scale_ordinal(e,t)},s.domain(e)}d3.scale.ordinal=function(){return d3_scale_ordinal([],{t:"range",a:[[]]})}
+d3.scale.ordinal = function() {
+  return d3_scale_ordinal([], {t: "range", a: [[]]});
+};
+
+function d3_scale_ordinal(domain, ranger) {
+  var index,
+      range,
+      rangeBand;
+
+  function scale(x) {
+    return range[((index.get(x) || index.set(x, domain.push(x))) - 1) % range.length];
+  }
+
+  function steps(start, step) {
+    return d3.range(domain.length).map(function(i) { return start + step * i; });
+  }
+
+  scale.domain = function(x) {
+    if (!arguments.length) return domain;
+    domain = [];
+    index = new d3_Map;
+    var i = -1, n = x.length, xi;
+    while (++i < n) if (!index.has(xi = x[i])) index.set(xi, domain.push(xi));
+    return scale[ranger.t].apply(scale, ranger.a);
+  };
+
+  scale.range = function(x) {
+    if (!arguments.length) return range;
+    range = x;
+    rangeBand = 0;
+    ranger = {t: "range", a: arguments};
+    return scale;
+  };
+
+  scale.rangePoints = function(x, padding) {
+    if (arguments.length < 2) padding = 0;
+    var start = x[0],
+        stop = x[1],
+        step = (stop - start) / (Math.max(1, domain.length - 1) + padding);
+    range = steps(domain.length < 2 ? (start + stop) / 2 : start + step * padding / 2, step);
+    rangeBand = 0;
+    ranger = {t: "rangePoints", a: arguments};
+    return scale;
+  };
+
+  scale.rangeBands = function(x, padding, outerPadding) {
+    if (arguments.length < 2) padding = 0;
+    if (arguments.length < 3) outerPadding = padding;
+    var reverse = x[1] < x[0],
+        start = x[reverse - 0],
+        stop = x[1 - reverse],
+        step = (stop - start) / (domain.length - padding + 2 * outerPadding);
+    range = steps(start + step * outerPadding, step);
+    if (reverse) range.reverse();
+    rangeBand = step * (1 - padding);
+    ranger = {t: "rangeBands", a: arguments};
+    return scale;
+  };
+
+  scale.rangeRoundBands = function(x, padding, outerPadding) {
+    if (arguments.length < 2) padding = 0;
+    if (arguments.length < 3) outerPadding = padding;
+    var reverse = x[1] < x[0],
+        start = x[reverse - 0],
+        stop = x[1 - reverse],
+        step = Math.floor((stop - start) / (domain.length - padding + 2 * outerPadding)),
+        error = stop - start - (domain.length - padding) * step;
+    range = steps(start + Math.round(error / 2), step);
+    if (reverse) range.reverse();
+    rangeBand = Math.round(step * (1 - padding));
+    ranger = {t: "rangeRoundBands", a: arguments};
+    return scale;
+  };
+
+  scale.rangeBand = function() {
+    return rangeBand;
+  };
+
+  scale.rangeExtent = function() {
+    return d3_scaleExtent(ranger.a[0]);
+  };
+
+  scale.copy = function() {
+    return d3_scale_ordinal(domain, ranger);
+  };
+
+  return scale.domain(domain);
+}

@@ -1,1 +1,8 @@
-d3.quantile=function(e,t){var n=(e.length-1)*t+1,r=Math.floor(n),i=e[r-1],s=n-r;return s?i+s*(e[r]-i):i}
+// R-7 per <http://en.wikipedia.org/wiki/Quantile>
+d3.quantile = function(values, p) {
+  var H = (values.length - 1) * p + 1,
+      h = Math.floor(H),
+      v = values[h - 1],
+      e = H - h;
+  return e ? v + e * (values[h] - v) : v;
+};

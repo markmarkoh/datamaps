@@ -1,1 +1,57 @@
-function d3_layout_bundlePath(e){var t=e.source,n=e.target,r=d3_layout_bundleLeastCommonAncestor(t,n),i=[t];while(t!==r)t=t.parent,i.push(t);var s=i.length;while(n!==r)i.splice(s,0,n),n=n.parent;return i}function d3_layout_bundleAncestors(e){var t=[],n=e.parent;while(n!=null)t.push(e),e=n,n=n.parent;return t.push(e),t}function d3_layout_bundleLeastCommonAncestor(e,t){if(e===t)return e;var n=d3_layout_bundleAncestors(e),r=d3_layout_bundleAncestors(t),i=n.pop(),s=r.pop(),o=null;while(i===s)o=i,i=n.pop(),s=r.pop();return o}d3.layout.bundle=function(){return function(e){var t=[],n=-1,r=e.length;while(++n<r)t.push(d3_layout_bundlePath(e[n]));return t}}
+// Implements hierarchical edge bundling using Holten's algorithm. For each
+// input link, a path is computed that travels through the tree, up the parent
+// hierarchy to the least common ancestor, and then back down to the destination
+// node. Each path is simply an array of nodes.
+d3.layout.bundle = function() {
+  return function(links) {
+    var paths = [],
+        i = -1,
+        n = links.length;
+    while (++i < n) paths.push(d3_layout_bundlePath(links[i]));
+    return paths;
+  };
+};
+
+function d3_layout_bundlePath(link) {
+  var start = link.source,
+      end = link.target,
+      lca = d3_layout_bundleLeastCommonAncestor(start, end),
+      points = [start];
+  while (start !== lca) {
+    start = start.parent;
+    points.push(start);
+  }
+  var k = points.length;
+  while (end !== lca) {
+    points.splice(k, 0, end);
+    end = end.parent;
+  }
+  return points;
+}
+
+function d3_layout_bundleAncestors(node) {
+  var ancestors = [],
+      parent = node.parent;
+  while (parent != null) {
+    ancestors.push(node);
+    node = parent;
+    parent = parent.parent;
+  }
+  ancestors.push(node);
+  return ancestors;
+}
+
+function d3_layout_bundleLeastCommonAncestor(a, b) {
+  if (a === b) return a;
+  var aNodes = d3_layout_bundleAncestors(a),
+      bNodes = d3_layout_bundleAncestors(b),
+      aNode = aNodes.pop(),
+      bNode = bNodes.pop(),
+      sharedNode = null;
+  while (aNode === bNode) {
+    sharedNode = aNode;
+    aNode = aNodes.pop();
+    bNode = bNodes.pop();
+  }
+  return sharedNode;
+}

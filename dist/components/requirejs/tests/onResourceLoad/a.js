@@ -1,1 +1,13 @@
-define(["require","b"],function(e){var t=e("b");return a={name:"a",b:t,ids:[],add:function(e){this.ids.push(e)}}})
+define(function (require) {
+    //Important, notice the space between require and arg calls
+    var b = require ('b');
+
+    return (a = {
+        name: 'a',
+        b: b,
+        ids: [],
+        add: function (id) {
+            this.ids.push(id);
+        }
+    });
+});

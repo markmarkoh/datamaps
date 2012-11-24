@@ -1,1 +1,3 @@
-define("person",[],{name:"person"})
+define('person', [], {
+        name: 'person'
+});

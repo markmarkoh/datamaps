@@ -1,1 +1,3 @@
-define(["require","exports","module"],function(e,t){t.name="greek"})
+define(function (require, exports) {
+    exports.name = 'greek';
+});

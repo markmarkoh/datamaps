@@ -1,1 +1,22 @@
-require({baseUrl:"./"},["a"],function(e){e.doSomething(),doh.register("nestedRequire",[function(n){n.is(1,e.counter),n.is("base",e.base.name)}]),doh.run()})
+require({
+        baseUrl: './'
+    },
+    ['a'],
+    function(a) {
+        //This call then triggers another require call
+        //for a loaded resource. Make sure it does not
+        //trigger a double notification.
+        a.doSomething();
+
+        doh.register(
+            'nestedRequire',
+            [
+                function nestedRequire(t){
+                    t.is(1, a.counter);
+                    t.is('base', a.base.name);
+                }
+            ]
+        );
+        doh.run();
+    }
+);

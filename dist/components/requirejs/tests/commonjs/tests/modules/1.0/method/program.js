@@ -1,1 +1,11 @@
-define(["require","exports","module","test","a"],function(e,t,n){var r=e("test"),i=e("a"),s=i.foo;r.assert(i.foo()==i,"calling a module member"),r.assert(s()==function(){return this}(),"members not implicitly bound"),i.set(10),r.assert(i.get()==10,"get and set"),r.print("DONE","info")})
+define(["require", "exports", "module", "test","a"], function(require, exports, module) {
+var test = require('test');
+var a = require('a');
+var foo = a.foo;
+test.assert(a.foo() == a, 'calling a module member');
+test.assert(foo() == (function (){return this})(), 'members not implicitly bound');
+a.set(10);
+test.assert(a.get() == 10, 'get and set')
+test.print('DONE', 'info');
+
+});

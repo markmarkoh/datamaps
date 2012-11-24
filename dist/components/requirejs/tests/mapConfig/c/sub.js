@@ -1,1 +1,3 @@
-define({name:"c/sub"})
+define({
+    name: 'c/sub'
+});

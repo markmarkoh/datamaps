@@ -1,1 +1,3 @@
-define({name:"plug!c2"})
+define({
+    name: 'plug!c2'
+});

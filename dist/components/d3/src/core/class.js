@@ -1,1 +1,12 @@
-function d3_class(e,t){try{for(var n in t)Object.defineProperty(e.prototype,n,{value:t[n],enumerable:!1})}catch(r){e.prototype=t}}
+function d3_class(ctor, properties) {
+  try {
+    for (var key in properties) {
+      Object.defineProperty(ctor.prototype, key, {
+        value: properties[key],
+        enumerable: false
+      });
+    }
+  } catch (e) {
+    ctor.prototype = properties;
+  }
+}

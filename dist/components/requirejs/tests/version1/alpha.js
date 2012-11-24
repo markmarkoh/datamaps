@@ -1,1 +1,7 @@
-define("alpha",[],function(){return{version:1}})
+define("alpha",
+  function() {
+    return {
+      version: 1
+    };
+  }
+);

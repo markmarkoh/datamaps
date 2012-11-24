@@ -1,1 +1,5 @@
-d3.requote=function(e){return e.replace(d3_requote_re,"\\$&")};var d3_requote_re=/[\\\^\$\*\+\?\|\[\]\(\)\.\{\}]/g
+d3.requote = function(s) {
+  return s.replace(d3_requote_re, "\\$&");
+};
+
+var d3_requote_re = /[\\\^\$\*\+\?\|\[\]\(\)\.\{\}]/g;

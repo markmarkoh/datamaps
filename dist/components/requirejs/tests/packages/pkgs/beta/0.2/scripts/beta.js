@@ -1,1 +1,3 @@
-define([],function(){return"beta"})
+define(function () {
+    return 'beta';
+});

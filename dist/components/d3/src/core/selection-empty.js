@@ -1,1 +1,3 @@
-d3_selectionPrototype.empty=function(){return!this.node()}
+d3_selectionPrototype.empty = function() {
+  return !this.node();
+};

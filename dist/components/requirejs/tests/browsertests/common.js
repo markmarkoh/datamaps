@@ -1,1 +1,47 @@
-(function(){function n(){t=!0;if(e.length){var n=document.getElementsByTagName("body")[0];if(n)for(var r=0;r<e.length;r++){var i=document.createElement("div");i.innerHTML=e[r],n.appendChild(i)}e=[]}}function i(){document.readyState==="complete"?n():r<5&&(r+=1,setTimeout(i,1e3))}var e=[],t=!1;window.log=function(r){typeof console!="undefined"&&console.log?console.log(r):(e.push(r),t&&n())};var r=0;i()})()
+//Common functions for the test files. *MUST* be included after require.js.
+
+(function() {
+    var messages = [];
+    var bodyReady = false;
+  
+    window.log = function(message) {
+        if (typeof console != "undefined" && console.log) {
+            console.log(message);
+        } else {
+            messages.push(message);
+            if (bodyReady) {
+                dumpLogs();
+            }
+        }
+    }
+  
+    function dumpLogs() {
+        bodyReady = true;
+        if (messages.length) {
+            var body = document.getElementsByTagName("body")[0];
+            if (body) {
+                for (var i = 0; i < messages.length; i++) {
+                    var div = document.createElement("div");
+                    div.innerHTML = messages[i];
+                    body.appendChild(div);
+                }
+            }
+            messages =[];
+        }
+    }
+
+    //Wait for document ready before dumping results.
+    //Will not work with Firefox 3.5 or earlier, but just
+    //be sure to use Firebug or something that defines console.log
+    var tries = 0;
+    function checkDom() {
+        if (document.readyState === "complete") {
+            dumpLogs();
+        } else if (tries < 5) {
+            tries += 1;
+            setTimeout(checkDom, 1000);
+        }
+    }
+
+    checkDom();
+})();

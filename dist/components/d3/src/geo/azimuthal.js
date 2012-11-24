@@ -1,1 +1,80 @@
-d3.geo.azimuthal=function(){function a(t){var s=t[0]*d3_geo_radians-i,a=t[1]*d3_geo_radians,f=Math.cos(s),l=Math.sin(s),c=Math.cos(a),h=Math.sin(a),p=e!=="orthographic"?u*h+o*c*f:null,d,v=e==="stereographic"?1/(1+p):e==="gnomonic"?1/p:e==="equidistant"?(d=Math.acos(p),d?d/Math.sin(d):0):e==="equalarea"?Math.sqrt(2/(1+p)):1,m=v*c*l,g=v*(u*c*f-o*h);return[n*m+r[0],n*g+r[1]]}var e="orthographic",t,n=200,r=[480,250],i,s,o,u;return a.invert=function(t){var s=(t[0]-r[0])/n,a=(t[1]-r[1])/n,f=Math.sqrt(s*s+a*a),l=e==="stereographic"?2*Math.atan(f):e==="gnomonic"?Math.atan(f):e==="equidistant"?f:e==="equalarea"?2*Math.asin(.5*f):Math.asin(f),c=Math.sin(l),h=Math.cos(l);return[(i+Math.atan2(s*c,f*o*h+a*u*c))/d3_geo_radians,Math.asin(h*u-(f?a*c*o/f:0))/d3_geo_radians]},a.mode=function(t){return arguments.length?(e=t+"",a):e},a.origin=function(e){return arguments.length?(t=e,i=t[0]*d3_geo_radians,s=t[1]*d3_geo_radians,o=Math.cos(s),u=Math.sin(s),a):t},a.scale=function(e){return arguments.length?(n=+e,a):n},a.translate=function(e){return arguments.length?(r=[+e[0],+e[1]],a):r},a.origin([0,0])}
+// TODO clip input coordinates on opposite hemisphere
+d3.geo.azimuthal = function() {
+  var mode = "orthographic", // or stereographic, gnomonic, equidistant or equalarea
+      origin,
+      scale = 200,
+      translate = [480, 250],
+      x0,
+      y0,
+      cy0,
+      sy0;
+
+  function azimuthal(coordinates) {
+    var x1 = coordinates[0] * d3_geo_radians - x0,
+        y1 = coordinates[1] * d3_geo_radians,
+        cx1 = Math.cos(x1),
+        sx1 = Math.sin(x1),
+        cy1 = Math.cos(y1),
+        sy1 = Math.sin(y1),
+        cc = mode !== "orthographic" ? sy0 * sy1 + cy0 * cy1 * cx1 : null,
+        c,
+        k = mode === "stereographic" ? 1 / (1 + cc)
+          : mode === "gnomonic" ? 1 / cc
+          : mode === "equidistant" ? (c = Math.acos(cc), c ? c / Math.sin(c) : 0)
+          : mode === "equalarea" ? Math.sqrt(2 / (1 + cc))
+          : 1,
+        x = k * cy1 * sx1,
+        y = k * (sy0 * cy1 * cx1 - cy0 * sy1);
+    return [
+      scale * x + translate[0],
+      scale * y + translate[1]
+    ];
+  }
+
+  azimuthal.invert = function(coordinates) {
+    var x = (coordinates[0] - translate[0]) / scale,
+        y = (coordinates[1] - translate[1]) / scale,
+        p = Math.sqrt(x * x + y * y),
+        c = mode === "stereographic" ? 2 * Math.atan(p)
+          : mode === "gnomonic" ? Math.atan(p)
+          : mode === "equidistant" ? p
+          : mode === "equalarea" ? 2 * Math.asin(.5 * p)
+          : Math.asin(p),
+        sc = Math.sin(c),
+        cc = Math.cos(c);
+    return [
+      (x0 + Math.atan2(x * sc, p * cy0 * cc + y * sy0 * sc)) / d3_geo_radians,
+      Math.asin(cc * sy0 - (p ? (y * sc * cy0) / p : 0)) / d3_geo_radians
+    ];
+  };
+
+  azimuthal.mode = function(x) {
+    if (!arguments.length) return mode;
+    mode = x + "";
+    return azimuthal;
+  };
+
+  azimuthal.origin = function(x) {
+    if (!arguments.length) return origin;
+    origin = x;
+    x0 = origin[0] * d3_geo_radians;
+    y0 = origin[1] * d3_geo_radians;
+    cy0 = Math.cos(y0);
+    sy0 = Math.sin(y0);
+    return azimuthal;
+  };
+
+  azimuthal.scale = function(x) {
+    if (!arguments.length) return scale;
+    scale = +x;
+    return azimuthal;
+  };
+
+  azimuthal.translate = function(x) {
+    if (!arguments.length) return translate;
+    translate = [+x[0], +x[1]];
+    return azimuthal;
+  };
+
+  return azimuthal.origin([0, 0]);
+};

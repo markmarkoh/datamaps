@@ -1,1 +1,4 @@
-define(["require","exports","module","exports","require","module"],function(e,t,n){e("exports").name="foo",e("require")("exports").related=e("module").config().related})
+define(function(require, exports, module) {
+    require('exports').name = 'foo';
+    require('require')('exports').related = require('module').config().related;
+});

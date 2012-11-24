@@ -1,1 +1,10 @@
-define("three",{name:"three"}),define("four",["three"],function(e){return{name:"four",threeName:"three"}})
+define("three", {
+    name: "three"
+});
+
+define("four", ["three"], function (three) {
+    return {
+        name: "four",
+        threeName: "three"
+    };
+});

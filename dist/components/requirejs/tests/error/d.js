@@ -1,1 +1,7 @@
-define(["b"],function(e){return{name:"d",b:e}})
+define(['b'], function (b) {
+    return {
+       name: 'd',
+       b: b
+    };
+});
+

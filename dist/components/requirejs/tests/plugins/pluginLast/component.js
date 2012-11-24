@@ -1,1 +1,7 @@
-define(["text!component.html"],function(e){return{name:"component",html:e}})
+define(['text!component.html'], function (html) {
+    return {
+        name: 'component',
+        html: html
+    };
+});
+

@@ -1,6 +1,6 @@
 (function () {
 
-    function define([],msg) {
+    function define(msg) {
         log('STILL GOOD, inner define: ' + msg);
     }
 

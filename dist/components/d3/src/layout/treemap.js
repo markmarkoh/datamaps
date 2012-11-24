@@ -1,1 +1,217 @@
-function d3_layout_treemapPadNull(e){return{x:e.x,y:e.y,dx:e.dx,dy:e.dy}}function d3_layout_treemapPad(e,t){var n=e.x+t[3],r=e.y+t[0],i=e.dx-t[1]-t[3],s=e.dy-t[0]-t[2];return i<0&&(n+=i/2,i=0),s<0&&(r+=s/2,s=0),{x:n,y:r,dx:i,dy:s}}d3.layout.treemap=function(){function a(e,t){var n=-1,r=e.length,i,s;while(++n<r)s=(i=e[n]).value*(t<0?0:t),i.area=isNaN(s)||s<=0?0:s}function f(e){var t=e.children;if(t&&t.length){var n=i(e),r=[],s=t.slice(),o,u=Infinity,l,p=Math.min(n.dx,n.dy),d;a(s,n.dx*n.dy/e.value),r.area=0;while((d=s.length)>0)r.push(o=s[d-1]),r.area+=o.area,(l=c(r,p))<=u?(s.pop(),u=l):(r.area-=r.pop().area,h(r,p,n,!1),p=Math.min(n.dx,n.dy),r.length=r.area=0,u=Infinity);r.length&&(h(r,p,n,!0),r.length=r.area=0),t.forEach(f)}}function l(e){var t=e.children;if(t&&t.length){var n=i(e),r=t.slice(),s,o=[];a(r,n.dx*n.dy/e.value),o.area=0;while(s=r.pop())o.push(s),o.area+=s.area,s.z!=null&&(h(o,s.z?n.dx:n.dy,n,!r.length),o.length=o.area=0);t.forEach(l)}}function c(e,t){var n=e.area,r,i=0,s=Infinity,o=-1,a=e.length;while(++o<a){if(!(r=e[o].area))continue;r<s&&(s=r),r>i&&(i=r)}return n*=n,t*=t,n?Math.max(t*i*u/n,n/(t*s*u)):Infinity}function h(e,n,r,i){var s=-1,o=e.length,u=r.x,a=r.y,f=n?t(e.area/n):0,l;if(n==r.dx){if(i||f>r.dy)f=r.dy;while(++s<o)l=e[s],l.x=u,l.y=a,l.dy=f,u+=l.dx=Math.min(r.x+r.dx-u,f?t(l.area/f):0);l.z=!0,l.dx+=r.x+r.dx-u,r.y+=f,r.dy-=f}else{if(i||f>r.dx)f=r.dx;while(++s<o)l=e[s],l.x=u,l.y=a,l.dx=f,a+=l.dy=Math.min(r.y+r.dy-a,f?t(l.area/f):0);l.z=!1,l.dy+=r.y+r.dy-a,r.x+=f,r.dx-=f}}function p(t){var r=o||e(t),i=r[0];return i.x=0,i.y=0,i.dx=n[0],i.dy=n[1],o&&e.revalue(i),a([i],i.dx*i.dy/i.value),(o?l:f)(i),s&&(o=r),r}var e=d3.layout.hierarchy(),t=Math.round,n=[1,1],r=null,i=d3_layout_treemapPadNull,s=!1,o,u=.5*(1+Math.sqrt(5));return p.size=function(e){return arguments.length?(n=e,p):n},p.padding=function(e){function t(t){var n=e.call(p,t,t.depth);return n==null?d3_layout_treemapPadNull(t):d3_layout_treemapPad(t,typeof n=="number"?[n,n,n,n]:n)}function n(t){return d3_layout_treemapPad(t,e)}if(!arguments.length)return r;var s;return i=(r=e)==null?d3_layout_treemapPadNull:(s=typeof e)==="function"?t:s==="number"?(e=[e,e,e,e],n):n,p},p.round=function(e){return arguments.length?(t=e?Math.round:Number,p):t!=Number},p.sticky=function(e){return arguments.length?(s=e,o=null,p):s},p.ratio=function(e){return arguments.length?(u=e,p):u},d3_layout_hierarchyRebind(p,e)}
+// Squarified Treemaps by Mark Bruls, Kees Huizing, and Jarke J. van Wijk
+// Modified to support a target aspect ratio by Jeff Heer
+d3.layout.treemap = function() {
+  var hierarchy = d3.layout.hierarchy(),
+      round = Math.round,
+      size = [1, 1], // width, height
+      padding = null,
+      pad = d3_layout_treemapPadNull,
+      sticky = false,
+      stickies,
+      ratio = 0.5 * (1 + Math.sqrt(5)); // golden ratio
+
+  // Compute the area for each child based on value & scale.
+  function scale(children, k) {
+    var i = -1,
+        n = children.length,
+        child,
+        area;
+    while (++i < n) {
+      area = (child = children[i]).value * (k < 0 ? 0 : k);
+      child.area = isNaN(area) || area <= 0 ? 0 : area;
+    }
+  }
+
+  // Recursively arranges the specified node's children into squarified rows.
+  function squarify(node) {
+    var children = node.children;
+    if (children && children.length) {
+      var rect = pad(node),
+          row = [],
+          remaining = children.slice(), // copy-on-write
+          child,
+          best = Infinity, // the best row score so far
+          score, // the current row score
+          u = Math.min(rect.dx, rect.dy), // initial orientation
+          n;
+      scale(remaining, rect.dx * rect.dy / node.value);
+      row.area = 0;
+      while ((n = remaining.length) > 0) {
+        row.push(child = remaining[n - 1]);
+        row.area += child.area;
+        if ((score = worst(row, u)) <= best) { // continue with this orientation
+          remaining.pop();
+          best = score;
+        } else { // abort, and try a different orientation
+          row.area -= row.pop().area;
+          position(row, u, rect, false);
+          u = Math.min(rect.dx, rect.dy);
+          row.length = row.area = 0;
+          best = Infinity;
+        }
+      }
+      if (row.length) {
+        position(row, u, rect, true);
+        row.length = row.area = 0;
+      }
+      children.forEach(squarify);
+    }
+  }
+
+  // Recursively resizes the specified node's children into existing rows.
+  // Preserves the existing layout!
+  function stickify(node) {
+    var children = node.children;
+    if (children && children.length) {
+      var rect = pad(node),
+          remaining = children.slice(), // copy-on-write
+          child,
+          row = [];
+      scale(remaining, rect.dx * rect.dy / node.value);
+      row.area = 0;
+      while (child = remaining.pop()) {
+        row.push(child);
+        row.area += child.area;
+        if (child.z != null) {
+          position(row, child.z ? rect.dx : rect.dy, rect, !remaining.length);
+          row.length = row.area = 0;
+        }
+      }
+      children.forEach(stickify);
+    }
+  }
+
+  // Computes the score for the specified row, as the worst aspect ratio.
+  function worst(row, u) {
+    var s = row.area,
+        r,
+        rmax = 0,
+        rmin = Infinity,
+        i = -1,
+        n = row.length;
+    while (++i < n) {
+      if (!(r = row[i].area)) continue;
+      if (r < rmin) rmin = r;
+      if (r > rmax) rmax = r;
+    }
+    s *= s;
+    u *= u;
+    return s
+        ? Math.max((u * rmax * ratio) / s, s / (u * rmin * ratio))
+        : Infinity;
+  }
+
+  // Positions the specified row of nodes. Modifies `rect`.
+  function position(row, u, rect, flush) {
+    var i = -1,
+        n = row.length,
+        x = rect.x,
+        y = rect.y,
+        v = u ? round(row.area / u) : 0,
+        o;
+    if (u == rect.dx) { // horizontal subdivision
+      if (flush || v > rect.dy) v = rect.dy; // over+underflow
+      while (++i < n) {
+        o = row[i];
+        o.x = x;
+        o.y = y;
+        o.dy = v;
+        x += o.dx = Math.min(rect.x + rect.dx - x, v ? round(o.area / v) : 0);
+      }
+      o.z = true;
+      o.dx += rect.x + rect.dx - x; // rounding error
+      rect.y += v;
+      rect.dy -= v;
+    } else { // vertical subdivision
+      if (flush || v > rect.dx) v = rect.dx; // over+underflow
+      while (++i < n) {
+        o = row[i];
+        o.x = x;
+        o.y = y;
+        o.dx = v;
+        y += o.dy = Math.min(rect.y + rect.dy - y, v ? round(o.area / v) : 0);
+      }
+      o.z = false;
+      o.dy += rect.y + rect.dy - y; // rounding error
+      rect.x += v;
+      rect.dx -= v;
+    }
+  }
+
+  function treemap(d) {
+    var nodes = stickies || hierarchy(d),
+        root = nodes[0];
+    root.x = 0;
+    root.y = 0;
+    root.dx = size[0];
+    root.dy = size[1];
+    if (stickies) hierarchy.revalue(root);
+    scale([root], root.dx * root.dy / root.value);
+    (stickies ? stickify : squarify)(root);
+    if (sticky) stickies = nodes;
+    return nodes;
+  }
+
+  treemap.size = function(x) {
+    if (!arguments.length) return size;
+    size = x;
+    return treemap;
+  };
+
+  treemap.padding = function(x) {
+    if (!arguments.length) return padding;
+
+    function padFunction(node) {
+      var p = x.call(treemap, node, node.depth);
+      return p == null
+          ? d3_layout_treemapPadNull(node)
+          : d3_layout_treemapPad(node, typeof p === "number" ? [p, p, p, p] : p);
+    }
+
+    function padConstant(node) {
+      return d3_layout_treemapPad(node, x);
+    }
+
+    var type;
+    pad = (padding = x) == null ? d3_layout_treemapPadNull
+        : (type = typeof x) === "function" ? padFunction
+        : type === "number" ? (x = [x, x, x, x], padConstant)
+        : padConstant;
+    return treemap;
+  };
+
+  treemap.round = function(x) {
+    if (!arguments.length) return round != Number;
+    round = x ? Math.round : Number;
+    return treemap;
+  };
+
+  treemap.sticky = function(x) {
+    if (!arguments.length) return sticky;
+    sticky = x;
+    stickies = null;
+    return treemap;
+  };
+
+  treemap.ratio = function(x) {
+    if (!arguments.length) return ratio;
+    ratio = x;
+    return treemap;
+  };
+
+  return d3_layout_hierarchyRebind(treemap, hierarchy);
+};
+
+function d3_layout_treemapPadNull(node) {
+  return {x: node.x, y: node.y, dx: node.dx, dy: node.dy};
+}
+
+function d3_layout_treemapPad(node, padding) {
+  var x = node.x + padding[3],
+      y = node.y + padding[0],
+      dx = node.dx - padding[1] - padding[3],
+      dy = node.dy - padding[0] - padding[2];
+  if (dx < 0) { x += dx / 2; dx = 0; }
+  if (dy < 0) { y += dy / 2; dy = 0; }
+  return {x: x, y: y, dx: dx, dy: dy};
+}

@@ -1,1 +1,47 @@
-function classes(e){function n(e,r){r.children?r.children.forEach(function(e){n(r.name,e)}):t.push({packageName:e,className:r.name,value:r.size})}var t=[];return n(null,e),{children:t}}var r=960,format=d3.format(",d"),fill=d3.scale.category20c(),bubble=d3.layout.pack().sort(null).size([r,r]).padding(1.5),vis=d3.select("#chart").append("svg").attr("width",r).attr("height",r).attr("class","bubble");d3.json("../data/flare.json",function(e){var t=vis.selectAll("g.node").data(bubble.nodes(classes(e)).filter(function(e){return!e.children})).enter().append("g").attr("class","node").attr("transform",function(e){return"translate("+e.x+","+e.y+")"});t.append("title").text(function(e){return e.className+": "+format(e.value)}),t.append("circle").attr("r",function(e){return e.r}).style("fill",function(e){return fill(e.packageName)}),t.append("text").attr("text-anchor","middle").attr("dy",".3em").text(function(e){return e.className.substring(0,e.r/3)})})
+var r = 960,
+    format = d3.format(",d"),
+    fill = d3.scale.category20c();
+
+var bubble = d3.layout.pack()
+    .sort(null)
+    .size([r, r])
+    .padding(1.5);
+
+var vis = d3.select("#chart").append("svg")
+    .attr("width", r)
+    .attr("height", r)
+    .attr("class", "bubble");
+
+d3.json("../data/flare.json", function(json) {
+  var node = vis.selectAll("g.node")
+      .data(bubble.nodes(classes(json))
+      .filter(function(d) { return !d.children; }))
+    .enter().append("g")
+      .attr("class", "node")
+      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+  node.append("title")
+      .text(function(d) { return d.className + ": " + format(d.value); });
+
+  node.append("circle")
+      .attr("r", function(d) { return d.r; })
+      .style("fill", function(d) { return fill(d.packageName); });
+
+  node.append("text")
+      .attr("text-anchor", "middle")
+      .attr("dy", ".3em")
+      .text(function(d) { return d.className.substring(0, d.r / 3); });
+});
+
+// Returns a flattened hierarchy containing all leaf nodes under the root.
+function classes(root) {
+  var classes = [];
+
+  function recurse(name, node) {
+    if (node.children) node.children.forEach(function(child) { recurse(node.name, child); });
+    else classes.push({packageName: name, className: node.name, value: node.size});
+  }
+
+  recurse(null, root);
+  return {children: classes};
+}

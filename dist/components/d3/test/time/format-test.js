@@ -1,1 +1,470 @@
-require("../env");var vows=require("vows"),assert=require("assert"),time=require("./time"),local=time.local,utc=time.utc,suite=vows.describe("d3.time.format");suite.addBatch({format:{topic:function(){return d3.time.format},"formats abbreviated weekday":function(e){var t=e("%a");assert.equal(t(local(1990,0,1)),"Mon"),assert.equal(t(local(1990,0,2)),"Tue"),assert.equal(t(local(1990,0,3)),"Wed"),assert.equal(t(local(1990,0,4)),"Thu"),assert.equal(t(local(1990,0,5)),"Fri"),assert.equal(t(local(1990,0,6)),"Sat"),assert.equal(t(local(1990,0,7)),"Sun")},"formats weekday":function(e){var t=e("%A");assert.equal(t(local(1990,0,1)),"Monday"),assert.equal(t(local(1990,0,2)),"Tuesday"),assert.equal(t(local(1990,0,3)),"Wednesday"),assert.equal(t(local(1990,0,4)),"Thursday"),assert.equal(t(local(1990,0,5)),"Friday"),assert.equal(t(local(1990,0,6)),"Saturday"),assert.equal(t(local(1990,0,7)),"Sunday")},"formats abbreviated month":function(e){var t=e("%b");assert.equal(t(local(1990,0,1)),"Jan"),assert.equal(t(local(1990,1,1)),"Feb"),assert.equal(t(local(1990,2,1)),"Mar"),assert.equal(t(local(1990,3,1)),"Apr"),assert.equal(t(local(1990,4,1)),"May"),assert.equal(t(local(1990,5,1)),"Jun"),assert.equal(t(local(1990,6,1)),"Jul"),assert.equal(t(local(1990,7,1)),"Aug"),assert.equal(t(local(1990,8,1)),"Sep"),assert.equal(t(local(1990,9,1)),"Oct"),assert.equal(t(local(1990,10,1)),"Nov"),assert.equal(t(local(1990,11,1)),"Dec")},"formats locale date and time":function(e){var t=e("%c");assert.equal(t(local(1990,0,1)),"Mon Jan  1 00:00:00 1990")},"formats zero-padded date":function(e){var t=e("%d");assert.equal(t(local(1990,0,1)),"01")},"formats space-padded date":function(e){var t=e("%e");assert.equal(t(local(1990,0,1))," 1")},"formats zero-padded hour (24)":function(e){var t=e("%H");assert.equal(t(local(1990,0,1,0)),"00"),assert.equal(t(local(1990,0,1,13)),"13")},"formats zero-padded hour (12)":function(e){var t=e("%I");assert.equal(t(local(1990,0,1,0)),"12"),assert.equal(t(local(1990,0,1,13)),"01")},"formats zero-padded day of year":function(e){var t=e("%j");assert.equal(t(local(1990,0,1)),"001"),assert.equal(t(local(1990,5,1)),"152"),assert.equal(t(local(2010,2,13)),"072"),assert.equal(t(local(2010,2,14)),"073"),assert.equal(t(local(2010,2,15)),"074"),assert.equal(t(local(2010,10,6)),"310"),assert.equal(t(local(2010,10,7)),"311"),assert.equal(t(local(2010,10,8)),"312")},"formats zero-padded month":function(e){var t=e("%m");assert.equal(t(local(1990,0,1)),"01"),assert.equal(t(local(1990,9,1)),"10")},"formats zero-padded minute":function(e){var t=e("%M");assert.equal(t(local(1990,0,1,0,0)),"00"),assert.equal(t(local(1990,0,1,0,32)),"32")},"formats AM or PM":function(e){var t=e("%p");assert.equal(t(local(1990,0,1,0)),"AM"),assert.equal(t(local(1990,0,1,13)),"PM")},"formats zero-padded second":function(e){var t=e("%S");assert.equal(t(local(1990,0,1,0,0,0)),"00"),assert.equal(t(local(1990,0,1,0,0,32)),"32")},"formats zero-padded millisecond":function(e){var t=e("%L");assert.equal(t(local(1990,0,1,0,0,0,0)),"000"),assert.equal(t(local(1990,0,1,0,0,0,432)),"432")},"formats zero-padded week number":function(e){var t=e("%U");assert.equal(t(local(1990,0,1)),"00"),assert.equal(t(local(1990,5,1)),"21"),assert.equal(t(local(2010,2,13,23)),"10"),assert.equal(t(local(2010,2,14,0)),"11"),assert.equal(t(local(2010,2,15,0)),"11"),assert.equal(t(local(2010,10,6,23)),"44"),assert.equal(t(local(2010,10,7,0)),"45"),assert.equal(t(local(2010,10,8,0)),"45")},"formats locale date":function(e){var t=e("%x");assert.equal(t(local(1990,0,1)),"01/01/90"),assert.equal(t(local(2010,5,1)),"06/01/10")},"formats locale time":function(e){var t=e("%X");assert.equal(t(local(1990,0,1)),"00:00:00"),assert.equal(t(local(1990,0,1,13,34,59)),"13:34:59")},"formats zero-padded two-digit year":function(e){var t=e("%y");assert.equal(t(local(1990,0,1)),"90"),assert.equal(t(local(2002,0,1)),"02")},"formats zero-padded four-digit year":function(e){var t=e("%Y");assert.equal(t(local(123,0,1)),"0123"),assert.equal(t(local(1990,0,1)),"1990"),assert.equal(t(local(2002,0,1)),"2002"),assert.equal(t(local(10002,0,1)),"0002")},"formats time zone":function(e){var t=e("%Z");assert.equal(t(local(1990,0,1)),"-0800")},"formats literal percent sign":function(e){var t=e("%%");assert.equal(t(local(1990,0,1)),"%")},UTC:{topic:function(e){return e.utc},"formats abbreviated weekday":function(e){var t=e("%a");assert.equal(t(utc(1990,0,1)),"Mon"),assert.equal(t(utc(1990,0,2)),"Tue"),assert.equal(t(utc(1990,0,3)),"Wed"),assert.equal(t(utc(1990,0,4)),"Thu"),assert.equal(t(utc(1990,0,5)),"Fri"),assert.equal(t(utc(1990,0,6)),"Sat"),assert.equal(t(utc(1990,0,7)),"Sun")},"formats weekday":function(e){var t=e("%A");assert.equal(t(utc(1990,0,1)),"Monday"),assert.equal(t(utc(1990,0,2)),"Tuesday"),assert.equal(t(utc(1990,0,3)),"Wednesday"),assert.equal(t(utc(1990,0,4)),"Thursday"),assert.equal(t(utc(1990,0,5)),"Friday"),assert.equal(t(utc(1990,0,6)),"Saturday"),assert.equal(t(utc(1990,0,7)),"Sunday")},"formats abbreviated month":function(e){var t=e("%b");assert.equal(t(utc(1990,0,1)),"Jan"),assert.equal(t(utc(1990,1,1)),"Feb"),assert.equal(t(utc(1990,2,1)),"Mar"),assert.equal(t(utc(1990,3,1)),"Apr"),assert.equal(t(utc(1990,4,1)),"May"),assert.equal(t(utc(1990,5,1)),"Jun"),assert.equal(t(utc(1990,6,1)),"Jul"),assert.equal(t(utc(1990,7,1)),"Aug"),assert.equal(t(utc(1990,8,1)),"Sep"),assert.equal(t(utc(1990,9,1)),"Oct"),assert.equal(t(utc(1990,10,1)),"Nov"),assert.equal(t(utc(1990,11,1)),"Dec")},"formats locale date and time":function(e){var t=e("%c");assert.equal(t(utc(1990,0,1)),"Mon Jan  1 00:00:00 1990")},"formats zero-padded date":function(e){var t=e("%d");assert.equal(t(utc(1990,0,1)),"01")},"formats space-padded date":function(e){var t=e("%e");assert.equal(t(utc(1990,0,1))," 1")},"formats zero-padded hour (24)":function(e){var t=e("%H");assert.equal(t(utc(1990,0,1,0)),"00"),assert.equal(t(utc(1990,0,1,13)),"13")},"formats zero-padded hour (12)":function(e){var t=e("%I");assert.equal(t(utc(1990,0,1,0)),"12"),assert.equal(t(utc(1990,0,1,13)),"01")},"formats zero-padded day of year":function(e){var t=e("%j");assert.equal(t(utc(1990,0,1)),"001"),assert.equal(t(utc(1990,5,1)),"152"),assert.equal(t(utc(2010,2,13,23)),"072"),assert.equal(t(utc(2010,2,14,0)),"073"),assert.equal(t(utc(2010,2,15,0)),"074"),assert.equal(t(utc(2010,10,6,23)),"310"),assert.equal(t(utc(2010,10,7,0)),"311"),assert.equal(t(utc(2010,10,8,0)),"312")},"formats zero-padded month":function(e){var t=e("%m");assert.equal(t(utc(1990,0,1)),"01"),assert.equal(t(utc(1990,9,1)),"10")},"formats zero-padded minute":function(e){var t=e("%M");assert.equal(t(utc(1990,0,1,0,0)),"00"),assert.equal(t(utc(1990,0,1,0,32)),"32")},"formats AM or PM":function(e){var t=e("%p");assert.equal(t(utc(1990,0,1,0)),"AM"),assert.equal(t(utc(1990,0,1,13)),"PM")},"formats zero-padded second":function(e){var t=e("%S");assert.equal(t(utc(1990,0,1,0,0,0)),"00"),assert.equal(t(utc(1990,0,1,0,0,32)),"32")},"formats zero-padded millisecond":function(e){var t=e("%L");assert.equal(t(utc(1990,0,1,0,0,0,0)),"000"),assert.equal(t(utc(1990,0,1,0,0,0,432)),"432")},"formats zero-padded week number":function(e){var t=e("%U");assert.equal(t(utc(1990,0,1)),"00"),assert.equal(t(utc(1990,5,1)),"21"),assert.equal(t(utc(2010,2,13,23)),"10"),assert.equal(t(utc(2010,2,14,0)),"11"),assert.equal(t(utc(2010,2,15,0)),"11"),assert.equal(t(utc(2010,10,6,23)),"44"),assert.equal(t(utc(2010,10,7,0)),"45"),assert.equal(t(utc(2010,10,8,0)),"45")},"formats locale date":function(e){var t=e("%x");assert.equal(t(utc(1990,0,1)),"01/01/90"),assert.equal(t(utc(2010,5,1)),"06/01/10")},"formats locale time":function(e){var t=e("%X");assert.equal(t(utc(1990,0,1)),"00:00:00"),assert.equal(t(utc(1990,0,1,13,34,59)),"13:34:59")},"formats zero-padded two-digit year":function(e){var t=e("%y");assert.equal(t(utc(1990,0,1)),"90"),assert.equal(t(utc(2002,0,1)),"02")},"formats zero-padded four-digit year":function(e){var t=e("%Y");assert.equal(t(utc(123,0,1)),"0123"),assert.equal(t(utc(1990,0,1)),"1990"),assert.equal(t(utc(2002,0,1)),"2002"),assert.equal(t(utc(10002,0,1)),"0002")},"formats time zone":function(e){var t=e("%Z");assert.equal(t(utc(1990,0,1)),"+0000")},"formats literal percent sign":function(e){var t=e("%%");assert.equal(t(utc(1990,0,1)),"%")}},ISO:{topic:function(e){return e.iso},"toString is %Y-%m-%dT%H:%M:%S.%LZ":function(e){assert.equal(e+"","%Y-%m-%dT%H:%M:%S.%LZ")},"formats as ISO 8601":function(e){assert.equal(e(utc(1990,0,1,0,0,0)),"1990-01-01T00:00:00.000Z"),assert.equal(e(utc(2011,11,31,23,59,59)),"2011-12-31T23:59:59.000Z")}}},parse:{topic:function(){return d3.time.format},"parses abbreviated weekday and numeric date":function(e){var t=e("%a %m/%d/%Y").parse;assert.deepEqual(t("Sun 01/01/1990"),local(1990,0,1)),assert.deepEqual(t("Wed 02/03/1991"),local(1991,1,3)),assert.isNull(t("XXX 03/10/2010"))},"parses weekday and numeric date":function(e){var t=e("%A %m/%d/%Y").parse;assert.deepEqual(t("Sunday 01/01/1990"),local(1990,0,1)),assert.deepEqual(t("Wednesday 02/03/1991"),local(1991,1,3)),assert.isNull(t("Caturday 03/10/2010"))},"parses numeric date":function(e){var t=e("%m/%d/%y").parse;assert.deepEqual(t("01/01/90"),local(1990,0,1)),assert.deepEqual(t("02/03/91"),local(1991,1,3)),assert.isNull(t("03/10/2010"))},"parses locale date":function(e){var t=e("%x").parse;assert.deepEqual(t("01/01/90"),local(1990,0,1)),assert.deepEqual(t("02/03/91"),local(1991,1,3)),assert.isNull(t("03/10/2010"))},"parses abbreviated month, date and year":function(e){var t=e("%b %d, %Y").parse;assert.deepEqual(t("jan 01, 1990"),local(1990,0,1)),assert.deepEqual(t("feb  2, 2010"),local(2010,1,2)),assert.isNull(t("jan. 1, 1990"))},"parses month, date and year":function(e){var t=e("%B %d, %Y").parse;assert.deepEqual(t("january 01, 1990"),local(1990,0,1)),assert.deepEqual(t("February  2, 2010"),local(2010,1,2)),assert.isNull(t("jan 1, 1990"))},"parses locale date and time":function(e){var t=e("%c").parse;assert.deepEqual(t("Mon Jan  1 00:00:00 1990"),local(1990,0,1)),assert.deepEqual(t("Sun Jan  1 00:00:00 1990"),local(1990,0,1)),assert.deepEqual(t("Mon Jan 01 00:00:00 1990"),local(1990,0,1)),assert.deepEqual(t("Mon Jan 1 00:00:00 1990"),local(1990,0,1)),assert.deepEqual(t("Mon Jan 1 0:0:0 1990"),local(1990,0,1))},"parses twenty-four hour, minute and second":function(e){var t=e("%H:%M:%S").parse;assert.deepEqual(t("00:00:00"),local(1900,0,1,0,0,0)),assert.deepEqual(t("11:59:59"),local(1900,0,1,11,59,59)),assert.deepEqual(t("12:00:00"),local(1900,0,1,12,0,0)),assert.deepEqual(t("12:00:01"),local(1900,0,1,12,0,1)),assert.deepEqual(t("23:59:59"),local(1900,0,1,23,59,59))},"parses locale time":function(e){var t=e("%X").parse;assert.deepEqual(t("00:00:00"),local(1900,0,1,0,0,0)),assert.deepEqual(t("11:59:59"),local(1900,0,1,11,59,59)),assert.deepEqual(t("12:00:00"),local(1900,0,1,12,0,0)),assert.deepEqual(t("12:00:01"),local(1900,0,1,12,0,1)),assert.deepEqual(t("23:59:59"),local(1900,0,1,23,59,59))},"parses twelve hour, minute and second":function(e){var t=e("%I:%M:%S %p").parse;assert.deepEqual(t("12:00:00 am"),local(1900,0,1,0,0,0)),assert.deepEqual(t("11:59:59 AM"),local(1900,0,1,11,59,59)),assert.deepEqual(t("12:00:00 pm"),local(1900,0,1,12,0,0)),assert.deepEqual(t("12:00:01 pm"),local(1900,0,1,12,0,1)),assert.deepEqual(t("11:59:59 PM"),local(1900,0,1,23,59,59))},"doesn't crash when given weird strings":function(e){try{Object.prototype.foo=10;var t=e("%b %d, %Y").parse;assert.isNull(t("foo 1, 1990"))}finally{delete Object.prototype.foo}},UTC:{topic:function(e){return e.utc},"parses abbreviated weekday and numeric date":function(e){var t=e("%a %m/%d/%Y").parse;assert.deepEqual(t("Sun 01/01/1990"),utc(1990,0,1)),assert.deepEqual(t("Wed 02/03/1991"),utc(1991,1,3)),assert.isNull(t("XXX 03/10/2010"))},"parses weekday and numeric date":function(e){var t=e("%A %m/%d/%Y").parse;assert.deepEqual(t("Sunday 01/01/1990"),utc(1990,0,1)),assert.deepEqual(t("Wednesday 02/03/1991"),utc(1991,1,3)),assert.isNull(t("Caturday 03/10/2010"))},"parses numeric date":function(e){var t=e("%m/%d/%y").parse;assert.deepEqual(t("01/01/90"),utc(1990,0,1)),assert.deepEqual(t("02/03/91"),utc(1991,1,3)),assert.isNull(t("03/10/2010"))},"parses locale date":function(e){var t=e("%x").parse;assert.deepEqual(t("01/01/90"),utc(1990,0,1)),assert.deepEqual(t("02/03/91"),utc(1991,1,3)),assert.isNull(t("03/10/2010"))},"parses abbreviated month, date and year":function(e){var t=e("%b %d, %Y").parse;assert.deepEqual(t("jan 01, 1990"),utc(1990,0,1)),assert.deepEqual(t("feb  2, 2010"),utc(2010,1,2)),assert.isNull(t("jan. 1, 1990"))},"parses month, date and year":function(e){var t=e("%B %d, %Y").parse;assert.deepEqual(t("january 01, 1990"),utc(1990,0,1)),assert.deepEqual(t("February  2, 2010"),utc(2010,1,2)),assert.isNull(t("jan 1, 1990"))},"parses locale date and time":function(e){var t=e("%c").parse;assert.deepEqual(t("Mon Jan  1 00:00:00 1990"),utc(1990,0,1)),assert.deepEqual(t("Sun Jan  1 00:00:00 1990"),utc(1990,0,1)),assert.deepEqual(t("Mon Jan 01 00:00:00 1990"),utc(1990,0,1)),assert.deepEqual(t("Mon Jan 1 00:00:00 1990"),utc(1990,0,1)),assert.deepEqual(t("Mon Jan 1 0:0:0 1990"),utc(1990,0,1))},"parses twenty-four hour, minute and second":function(e){var t=e("%H:%M:%S").parse;assert.deepEqual(t("00:00:00"),utc(1900,0,1,0,0,0)),assert.deepEqual(t("11:59:59"),utc(1900,0,1,11,59,59)),assert.deepEqual(t("12:00:00"),utc(1900,0,1,12,0,0)),assert.deepEqual(t("12:00:01"),utc(1900,0,1,12,0,1)),assert.deepEqual(t("23:59:59"),utc(1900,0,1,23,59,59))},"parses locale time":function(e){var t=e("%X").parse;assert.deepEqual(t("00:00:00"),utc(1900,0,1,0,0,0)),assert.deepEqual(t("11:59:59"),utc(1900,0,1,11,59,59)),assert.deepEqual(t("12:00:00"),utc(1900,0,1,12,0,0)),assert.deepEqual(t("12:00:01"),utc(1900,0,1,12,0,1)),assert.deepEqual(t("23:59:59"),utc(1900,0,1,23,59,59))},"parses twelve hour, minute and second":function(e){var t=e("%I:%M:%S %p").parse;assert.deepEqual(t("12:00:00 am"),utc(1900,0,1,0,0,0)),assert.deepEqual(t("11:59:59 AM"),utc(1900,0,1,11,59,59)),assert.deepEqual(t("12:00:00 pm"),utc(1900,0,1,12,0,0)),assert.deepEqual(t("12:00:01 pm"),utc(1900,0,1,12,0,1)),assert.deepEqual(t("11:59:59 PM"),utc(1900,0,1,23,59,59))}},ISO:{topic:function(e){return e.iso},"parses as ISO 8601":function(e){var t=e.parse;assert.deepEqual(t("1990-01-01T00:00:00.000Z"),utc(1990,0,1,0,0,0)),assert.deepEqual(t("2011-12-31T23:59:59.000Z"),utc(2011,11,31,23,59,59)),assert.isNull(t("1990-01-01T00:00:00.000X"))}}}}),suite.export(module)
+require("../env");
+
+var vows = require("vows"),
+    assert = require("assert"),
+    time = require("./time"),
+    local = time.local,
+    utc = time.utc;
+
+var suite = vows.describe("d3.time.format");
+
+suite.addBatch({
+  "format": {
+    topic: function() {
+      return d3.time.format;
+    },
+    "formats abbreviated weekday": function(format) {
+      var f = format("%a");
+      assert.equal(f(local(1990, 0, 1)), "Mon");
+      assert.equal(f(local(1990, 0, 2)), "Tue");
+      assert.equal(f(local(1990, 0, 3)), "Wed");
+      assert.equal(f(local(1990, 0, 4)), "Thu");
+      assert.equal(f(local(1990, 0, 5)), "Fri");
+      assert.equal(f(local(1990, 0, 6)), "Sat");
+      assert.equal(f(local(1990, 0, 7)), "Sun");
+    },
+    "formats weekday": function(format) {
+      var f = format("%A");
+      assert.equal(f(local(1990, 0, 1)), "Monday");
+      assert.equal(f(local(1990, 0, 2)), "Tuesday");
+      assert.equal(f(local(1990, 0, 3)), "Wednesday");
+      assert.equal(f(local(1990, 0, 4)), "Thursday");
+      assert.equal(f(local(1990, 0, 5)), "Friday");
+      assert.equal(f(local(1990, 0, 6)), "Saturday");
+      assert.equal(f(local(1990, 0, 7)), "Sunday");
+    },
+    "formats abbreviated month": function(format) {
+      var f = format("%b");
+      assert.equal(f(local(1990, 0, 1)), "Jan");
+      assert.equal(f(local(1990, 1, 1)), "Feb");
+      assert.equal(f(local(1990, 2, 1)), "Mar");
+      assert.equal(f(local(1990, 3, 1)), "Apr");
+      assert.equal(f(local(1990, 4, 1)), "May");
+      assert.equal(f(local(1990, 5, 1)), "Jun");
+      assert.equal(f(local(1990, 6, 1)), "Jul");
+      assert.equal(f(local(1990, 7, 1)), "Aug");
+      assert.equal(f(local(1990, 8, 1)), "Sep");
+      assert.equal(f(local(1990, 9, 1)), "Oct");
+      assert.equal(f(local(1990, 10, 1)), "Nov");
+      assert.equal(f(local(1990, 11, 1)), "Dec");
+    },
+    "formats locale date and time": function(format) {
+      var f = format("%c");
+      assert.equal(f(local(1990, 0, 1)), "Mon Jan  1 00:00:00 1990");
+    },
+    "formats zero-padded date": function(format) {
+      var f = format("%d");
+      assert.equal(f(local(1990, 0, 1)), "01");
+    },
+    "formats space-padded date": function(format) {
+      var f = format("%e");
+      assert.equal(f(local(1990, 0, 1)), " 1");
+    },
+    "formats zero-padded hour (24)": function(format) {
+      var f = format("%H");
+      assert.equal(f(local(1990, 0, 1, 0)), "00");
+      assert.equal(f(local(1990, 0, 1, 13)), "13");
+    },
+    "formats zero-padded hour (12)": function(format) {
+      var f = format("%I");
+      assert.equal(f(local(1990, 0, 1, 0)), "12");
+      assert.equal(f(local(1990, 0, 1, 13)), "01");
+    },
+    "formats zero-padded day of year": function(format) {
+      var f = format("%j");
+      assert.equal(f(local(1990, 0, 1)), "001");
+      assert.equal(f(local(1990, 5, 1)), "152");
+      assert.equal(f(local(2010, 2, 13)), "072");
+      assert.equal(f(local(2010, 2, 14)), "073"); // DST begins
+      assert.equal(f(local(2010, 2, 15)), "074");
+      assert.equal(f(local(2010, 10, 6)), "310");
+      assert.equal(f(local(2010, 10, 7)), "311"); // DST ends
+      assert.equal(f(local(2010, 10, 8)), "312");
+    },
+    "formats zero-padded month": function(format) {
+      var f = format("%m");
+      assert.equal(f(local(1990, 0, 1)), "01");
+      assert.equal(f(local(1990, 9, 1)), "10");
+    },
+    "formats zero-padded minute": function(format) {
+      var f = format("%M");
+      assert.equal(f(local(1990, 0, 1, 0, 0)), "00");
+      assert.equal(f(local(1990, 0, 1, 0, 32)), "32");
+    },
+    "formats AM or PM": function(format) {
+      var f = format("%p");
+      assert.equal(f(local(1990, 0, 1, 0)), "AM");
+      assert.equal(f(local(1990, 0, 1, 13)), "PM");
+    },
+    "formats zero-padded second": function(format) {
+      var f = format("%S");
+      assert.equal(f(local(1990, 0, 1, 0, 0, 0)), "00");
+      assert.equal(f(local(1990, 0, 1, 0, 0, 32)), "32");
+    },
+    "formats zero-padded millisecond": function(format) {
+      var f = format("%L");
+      assert.equal(f(local(1990, 0, 1, 0, 0, 0, 0)), "000");
+      assert.equal(f(local(1990, 0, 1, 0, 0, 0, 432)), "432");
+    },
+    "formats zero-padded week number": function(format) {
+      var f = format("%U");
+      assert.equal(f(local(1990, 0, 1)), "00");
+      assert.equal(f(local(1990, 5, 1)), "21");
+      assert.equal(f(local(2010, 2, 13, 23)), "10");
+      assert.equal(f(local(2010, 2, 14, 00)), "11"); // DST begins
+      assert.equal(f(local(2010, 2, 15, 00)), "11");
+      assert.equal(f(local(2010, 10, 6, 23)), "44");
+      assert.equal(f(local(2010, 10, 7, 00)), "45"); // DST ends
+      assert.equal(f(local(2010, 10, 8, 00)), "45");
+    },
+    "formats locale date": function(format) {
+      var f = format("%x");
+      assert.equal(f(local(1990, 0, 1)), "01/01/90");
+      assert.equal(f(local(2010, 5, 1)), "06/01/10");
+    },
+    "formats locale time": function(format) {
+      var f = format("%X");
+      assert.equal(f(local(1990, 0, 1)), "00:00:00");
+      assert.equal(f(local(1990, 0, 1, 13, 34, 59)), "13:34:59");
+    },
+    "formats zero-padded two-digit year": function(format) {
+      var f = format("%y");
+      assert.equal(f(local(1990, 0, 1)), "90");
+      assert.equal(f(local(2002, 0, 1)), "02");
+    },
+    "formats zero-padded four-digit year": function(format) {
+      var f = format("%Y");
+      assert.equal(f(local(123, 0, 1)), "0123");
+      assert.equal(f(local(1990, 0, 1)), "1990");
+      assert.equal(f(local(2002, 0, 1)), "2002");
+      assert.equal(f(local(10002, 0, 1)), "0002");
+    },
+    "formats time zone": function(format) {
+      var f = format("%Z");
+      assert.equal(f(local(1990, 0, 1)), "-0800");
+    },
+    "formats literal percent sign": function(format) {
+      var f = format("%%");
+      assert.equal(f(local(1990, 0, 1)), "%");
+    },
+    "UTC": {
+      topic: function(format) {
+        return format.utc;
+      },
+      "formats abbreviated weekday": function(format) {
+        var f = format("%a");
+        assert.equal(f(utc(1990, 0, 1)), "Mon");
+        assert.equal(f(utc(1990, 0, 2)), "Tue");
+        assert.equal(f(utc(1990, 0, 3)), "Wed");
+        assert.equal(f(utc(1990, 0, 4)), "Thu");
+        assert.equal(f(utc(1990, 0, 5)), "Fri");
+        assert.equal(f(utc(1990, 0, 6)), "Sat");
+        assert.equal(f(utc(1990, 0, 7)), "Sun");
+      },
+      "formats weekday": function(format) {
+        var f = format("%A");
+        assert.equal(f(utc(1990, 0, 1)), "Monday");
+        assert.equal(f(utc(1990, 0, 2)), "Tuesday");
+        assert.equal(f(utc(1990, 0, 3)), "Wednesday");
+        assert.equal(f(utc(1990, 0, 4)), "Thursday");
+        assert.equal(f(utc(1990, 0, 5)), "Friday");
+        assert.equal(f(utc(1990, 0, 6)), "Saturday");
+        assert.equal(f(utc(1990, 0, 7)), "Sunday");
+      },
+      "formats abbreviated month": function(format) {
+        var f = format("%b");
+        assert.equal(f(utc(1990, 0, 1)), "Jan");
+        assert.equal(f(utc(1990, 1, 1)), "Feb");
+        assert.equal(f(utc(1990, 2, 1)), "Mar");
+        assert.equal(f(utc(1990, 3, 1)), "Apr");
+        assert.equal(f(utc(1990, 4, 1)), "May");
+        assert.equal(f(utc(1990, 5, 1)), "Jun");
+        assert.equal(f(utc(1990, 6, 1)), "Jul");
+        assert.equal(f(utc(1990, 7, 1)), "Aug");
+        assert.equal(f(utc(1990, 8, 1)), "Sep");
+        assert.equal(f(utc(1990, 9, 1)), "Oct");
+        assert.equal(f(utc(1990, 10, 1)), "Nov");
+        assert.equal(f(utc(1990, 11, 1)), "Dec");
+      },
+      "formats locale date and time": function(format) {
+        var f = format("%c");
+        assert.equal(f(utc(1990, 0, 1)), "Mon Jan  1 00:00:00 1990");
+      },
+      "formats zero-padded date": function(format) {
+        var f = format("%d");
+        assert.equal(f(utc(1990, 0, 1)), "01");
+      },
+      "formats space-padded date": function(format) {
+        var f = format("%e");
+        assert.equal(f(utc(1990, 0, 1)), " 1");
+      },
+      "formats zero-padded hour (24)": function(format) {
+        var f = format("%H");
+        assert.equal(f(utc(1990, 0, 1, 0)), "00");
+        assert.equal(f(utc(1990, 0, 1, 13)), "13");
+      },
+      "formats zero-padded hour (12)": function(format) {
+        var f = format("%I");
+        assert.equal(f(utc(1990, 0, 1, 0)), "12");
+        assert.equal(f(utc(1990, 0, 1, 13)), "01");
+      },
+      "formats zero-padded day of year": function(format) {
+        var f = format("%j");
+        assert.equal(f(utc(1990, 0, 1)), "001");
+        assert.equal(f(utc(1990, 5, 1)), "152");
+        assert.equal(f(utc(2010, 2, 13, 23)), "072");
+        assert.equal(f(utc(2010, 2, 14, 00)), "073"); // DST begins
+        assert.equal(f(utc(2010, 2, 15, 00)), "074");
+        assert.equal(f(utc(2010, 10, 6, 23)), "310");
+        assert.equal(f(utc(2010, 10, 7, 00)), "311"); // DST ends
+        assert.equal(f(utc(2010, 10, 8, 00)), "312");
+      },
+      "formats zero-padded month": function(format) {
+        var f = format("%m");
+        assert.equal(f(utc(1990, 0, 1)), "01");
+        assert.equal(f(utc(1990, 9, 1)), "10");
+      },
+      "formats zero-padded minute": function(format) {
+        var f = format("%M");
+        assert.equal(f(utc(1990, 0, 1, 0, 0)), "00");
+        assert.equal(f(utc(1990, 0, 1, 0, 32)), "32");
+      },
+      "formats AM or PM": function(format) {
+        var f = format("%p");
+        assert.equal(f(utc(1990, 0, 1, 0)), "AM");
+        assert.equal(f(utc(1990, 0, 1, 13)), "PM");
+      },
+      "formats zero-padded second": function(format) {
+        var f = format("%S");
+        assert.equal(f(utc(1990, 0, 1, 0, 0, 0)), "00");
+        assert.equal(f(utc(1990, 0, 1, 0, 0, 32)), "32");
+      },
+      "formats zero-padded millisecond": function(format) {
+        var f = format("%L");
+        assert.equal(f(utc(1990, 0, 1, 0, 0, 0, 0)), "000");
+        assert.equal(f(utc(1990, 0, 1, 0, 0, 0, 432)), "432");
+      },
+      "formats zero-padded week number": function(format) {
+        var f = format("%U");
+        assert.equal(f(utc(1990, 0, 1)), "00");
+        assert.equal(f(utc(1990, 5, 1)), "21");
+        assert.equal(f(utc(2010, 2, 13, 23)), "10");
+        assert.equal(f(utc(2010, 2, 14, 00)), "11"); // DST begins
+        assert.equal(f(utc(2010, 2, 15, 00)), "11");
+        assert.equal(f(utc(2010, 10, 6, 23)), "44");
+        assert.equal(f(utc(2010, 10, 7, 00)), "45"); // DST ends
+        assert.equal(f(utc(2010, 10, 8, 00)), "45");
+      },
+      "formats locale date": function(format) {
+        var f = format("%x");
+        assert.equal(f(utc(1990, 0, 1)), "01/01/90");
+        assert.equal(f(utc(2010, 5, 1)), "06/01/10");
+      },
+      "formats locale time": function(format) {
+        var f = format("%X");
+        assert.equal(f(utc(1990, 0, 1)), "00:00:00");
+        assert.equal(f(utc(1990, 0, 1, 13, 34, 59)), "13:34:59");
+      },
+      "formats zero-padded two-digit year": function(format) {
+        var f = format("%y");
+        assert.equal(f(utc(1990, 0, 1)), "90");
+        assert.equal(f(utc(2002, 0, 1)), "02");
+      },
+      "formats zero-padded four-digit year": function(format) {
+        var f = format("%Y");
+        assert.equal(f(utc(123, 0, 1)), "0123");
+        assert.equal(f(utc(1990, 0, 1)), "1990");
+        assert.equal(f(utc(2002, 0, 1)), "2002");
+        assert.equal(f(utc(10002, 0, 1)), "0002");
+      },
+      "formats time zone": function(format) {
+        var f = format("%Z");
+        assert.equal(f(utc(1990, 0, 1)), "+0000");
+      },
+      "formats literal percent sign": function(format) {
+        var f = format("%%");
+        assert.equal(f(utc(1990, 0, 1)), "%");
+      },
+    },
+    "ISO": {
+      topic: function(format) {
+        return format.iso;
+      },
+      "toString is %Y-%m-%dT%H:%M:%S.%LZ": function(format) {
+        assert.equal(format + "", "%Y-%m-%dT%H:%M:%S.%LZ");
+      },
+      "formats as ISO 8601": function(format) {
+        assert.equal(format(utc(1990, 0, 1, 0, 0, 0)), "1990-01-01T00:00:00.000Z");
+        assert.equal(format(utc(2011, 11, 31, 23, 59, 59)), "2011-12-31T23:59:59.000Z");
+      }
+    }
+  },
+  "parse": {
+    topic: function() {
+      return d3.time.format;
+    },
+    "parses abbreviated weekday and numeric date": function(format) {
+      var p = format("%a %m/%d/%Y").parse;
+      assert.deepEqual(p("Sun 01/01/1990"), local(1990, 0, 1));
+      assert.deepEqual(p("Wed 02/03/1991"), local(1991, 1, 3));
+      assert.isNull(p("XXX 03/10/2010"));
+    },
+    "parses weekday and numeric date": function(format) {
+      var p = format("%A %m/%d/%Y").parse;
+      assert.deepEqual(p("Sunday 01/01/1990"), local(1990, 0, 1));
+      assert.deepEqual(p("Wednesday 02/03/1991"), local(1991, 1, 3));
+      assert.isNull(p("Caturday 03/10/2010"));
+    },
+    "parses numeric date": function(format) {
+      var p = format("%m/%d/%y").parse;
+      assert.deepEqual(p("01/01/90"), local(1990, 0, 1));
+      assert.deepEqual(p("02/03/91"), local(1991, 1, 3));
+      assert.isNull(p("03/10/2010"));
+    },
+    "parses locale date": function(format) {
+      var p = format("%x").parse;
+      assert.deepEqual(p("01/01/90"), local(1990, 0, 1));
+      assert.deepEqual(p("02/03/91"), local(1991, 1, 3));
+      assert.isNull(p("03/10/2010"));
+    },
+    "parses abbreviated month, date and year": function(format) {
+      var p = format("%b %d, %Y").parse;
+      assert.deepEqual(p("jan 01, 1990"), local(1990, 0, 1));
+      assert.deepEqual(p("feb  2, 2010"), local(2010, 1, 2));
+      assert.isNull(p("jan. 1, 1990"));
+    },
+    "parses month, date and year": function(format) {
+      var p = format("%B %d, %Y").parse;
+      assert.deepEqual(p("january 01, 1990"), local(1990, 0, 1));
+      assert.deepEqual(p("February  2, 2010"), local(2010, 1, 2));
+      assert.isNull(p("jan 1, 1990"));
+    },
+    "parses locale date and time": function(format) {
+      var p = format("%c").parse;
+      assert.deepEqual(p("Mon Jan  1 00:00:00 1990"), local(1990, 0, 1));
+      assert.deepEqual(p("Sun Jan  1 00:00:00 1990"), local(1990, 0, 1));
+      assert.deepEqual(p("Mon Jan 01 00:00:00 1990"), local(1990, 0, 1));
+      assert.deepEqual(p("Mon Jan 1 00:00:00 1990"), local(1990, 0, 1));
+      assert.deepEqual(p("Mon Jan 1 0:0:0 1990"), local(1990, 0, 1));
+    },
+    "parses twenty-four hour, minute and second": function(format) {
+      var p = format("%H:%M:%S").parse;
+      assert.deepEqual(p("00:00:00"), local(1900, 0, 1, 0, 0, 0));
+      assert.deepEqual(p("11:59:59"), local(1900, 0, 1, 11, 59, 59));
+      assert.deepEqual(p("12:00:00"), local(1900, 0, 1, 12, 0, 0));
+      assert.deepEqual(p("12:00:01"), local(1900, 0, 1, 12, 0, 1));
+      assert.deepEqual(p("23:59:59"), local(1900, 0, 1, 23, 59, 59));
+    },
+    "parses locale time": function(format) {
+      var p = format("%X").parse;
+      assert.deepEqual(p("00:00:00"), local(1900, 0, 1, 0, 0, 0));
+      assert.deepEqual(p("11:59:59"), local(1900, 0, 1, 11, 59, 59));
+      assert.deepEqual(p("12:00:00"), local(1900, 0, 1, 12, 0, 0));
+      assert.deepEqual(p("12:00:01"), local(1900, 0, 1, 12, 0, 1));
+      assert.deepEqual(p("23:59:59"), local(1900, 0, 1, 23, 59, 59));
+    },
+    "parses twelve hour, minute and second": function(format) {
+      var p = format("%I:%M:%S %p").parse;
+      assert.deepEqual(p("12:00:00 am"), local(1900, 0, 1, 0, 0, 0));
+      assert.deepEqual(p("11:59:59 AM"), local(1900, 0, 1, 11, 59, 59));
+      assert.deepEqual(p("12:00:00 pm"), local(1900, 0, 1, 12, 0, 0));
+      assert.deepEqual(p("12:00:01 pm"), local(1900, 0, 1, 12, 0, 1));
+      assert.deepEqual(p("11:59:59 PM"), local(1900, 0, 1, 23, 59, 59));
+    },
+    "doesn't crash when given weird strings": function(format) {
+      try {
+        Object.prototype.foo = 10;
+        var p = format("%b %d, %Y").parse;
+        assert.isNull(p("foo 1, 1990"));
+      } finally {
+        delete Object.prototype.foo;
+      }
+    },
+    "UTC": {
+      topic: function(format) {
+        return format.utc;
+      },
+      "parses abbreviated weekday and numeric date": function(format) {
+        var p = format("%a %m/%d/%Y").parse;
+        assert.deepEqual(p("Sun 01/01/1990"), utc(1990, 0, 1));
+        assert.deepEqual(p("Wed 02/03/1991"), utc(1991, 1, 3));
+        assert.isNull(p("XXX 03/10/2010"));
+      },
+      "parses weekday and numeric date": function(format) {
+        var p = format("%A %m/%d/%Y").parse;
+        assert.deepEqual(p("Sunday 01/01/1990"), utc(1990, 0, 1));
+        assert.deepEqual(p("Wednesday 02/03/1991"), utc(1991, 1, 3));
+        assert.isNull(p("Caturday 03/10/2010"));
+      },
+      "parses numeric date": function(format) {
+        var p = format("%m/%d/%y").parse;
+        assert.deepEqual(p("01/01/90"), utc(1990, 0, 1));
+        assert.deepEqual(p("02/03/91"), utc(1991, 1, 3));
+        assert.isNull(p("03/10/2010"));
+      },
+      "parses locale date": function(format) {
+        var p = format("%x").parse;
+        assert.deepEqual(p("01/01/90"), utc(1990, 0, 1));
+        assert.deepEqual(p("02/03/91"), utc(1991, 1, 3));
+        assert.isNull(p("03/10/2010"));
+      },
+      "parses abbreviated month, date and year": function(format) {
+        var p = format("%b %d, %Y").parse;
+        assert.deepEqual(p("jan 01, 1990"), utc(1990, 0, 1));
+        assert.deepEqual(p("feb  2, 2010"), utc(2010, 1, 2));
+        assert.isNull(p("jan. 1, 1990"));
+      },
+      "parses month, date and year": function(format) {
+        var p = format("%B %d, %Y").parse;
+        assert.deepEqual(p("january 01, 1990"), utc(1990, 0, 1));
+        assert.deepEqual(p("February  2, 2010"), utc(2010, 1, 2));
+        assert.isNull(p("jan 1, 1990"));
+      },
+      "parses locale date and time": function(format) {
+        var p = format("%c").parse;
+        assert.deepEqual(p("Mon Jan  1 00:00:00 1990"), utc(1990, 0, 1));
+        assert.deepEqual(p("Sun Jan  1 00:00:00 1990"), utc(1990, 0, 1));
+        assert.deepEqual(p("Mon Jan 01 00:00:00 1990"), utc(1990, 0, 1));
+        assert.deepEqual(p("Mon Jan 1 00:00:00 1990"), utc(1990, 0, 1));
+        assert.deepEqual(p("Mon Jan 1 0:0:0 1990"), utc(1990, 0, 1));
+      },
+      "parses twenty-four hour, minute and second": function(format) {
+        var p = format("%H:%M:%S").parse;
+        assert.deepEqual(p("00:00:00"), utc(1900, 0, 1, 0, 0, 0));
+        assert.deepEqual(p("11:59:59"), utc(1900, 0, 1, 11, 59, 59));
+        assert.deepEqual(p("12:00:00"), utc(1900, 0, 1, 12, 0, 0));
+        assert.deepEqual(p("12:00:01"), utc(1900, 0, 1, 12, 0, 1));
+        assert.deepEqual(p("23:59:59"), utc(1900, 0, 1, 23, 59, 59));
+      },
+      "parses locale time": function(format) {
+        var p = format("%X").parse;
+        assert.deepEqual(p("00:00:00"), utc(1900, 0, 1, 0, 0, 0));
+        assert.deepEqual(p("11:59:59"), utc(1900, 0, 1, 11, 59, 59));
+        assert.deepEqual(p("12:00:00"), utc(1900, 0, 1, 12, 0, 0));
+        assert.deepEqual(p("12:00:01"), utc(1900, 0, 1, 12, 0, 1));
+        assert.deepEqual(p("23:59:59"), utc(1900, 0, 1, 23, 59, 59));
+      },
+      "parses twelve hour, minute and second": function(format) {
+        var p = format("%I:%M:%S %p").parse;
+        assert.deepEqual(p("12:00:00 am"), utc(1900, 0, 1, 0, 0, 0));
+        assert.deepEqual(p("11:59:59 AM"), utc(1900, 0, 1, 11, 59, 59));
+        assert.deepEqual(p("12:00:00 pm"), utc(1900, 0, 1, 12, 0, 0));
+        assert.deepEqual(p("12:00:01 pm"), utc(1900, 0, 1, 12, 0, 1));
+        assert.deepEqual(p("11:59:59 PM"), utc(1900, 0, 1, 23, 59, 59));
+      }
+    },
+    "ISO": {
+      topic: function(format) {
+        return format.iso;
+      },
+      "parses as ISO 8601": function(format) {
+        var p = format.parse;
+        assert.deepEqual(p("1990-01-01T00:00:00.000Z"), utc(1990, 0, 1, 0, 0, 0));
+        assert.deepEqual(p("2011-12-31T23:59:59.000Z"), utc(2011, 11, 31, 23, 59, 59));
+        assert.isNull(p("1990-01-01T00:00:00.000X"));
+      }
+    }
+  }
+});
+
+suite.export(module);

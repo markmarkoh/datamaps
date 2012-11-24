@@ -1,1 +1,7 @@
-d3_selectionPrototype.text=function(e){return arguments.length<1?this.node().textContent:this.each(typeof e=="function"?function(){var t=e.apply(this,arguments);this.textContent=t==null?"":t}:e==null?function(){this.textContent=""}:function(){this.textContent=e})}
+d3_selectionPrototype.text = function(value) {
+  return arguments.length < 1
+      ? this.node().textContent : this.each(typeof value === "function"
+      ? function() { var v = value.apply(this, arguments); this.textContent = v == null ? "" : v; } : value == null
+      ? function() { this.textContent = ""; }
+      : function() { this.textContent = value; });
+};

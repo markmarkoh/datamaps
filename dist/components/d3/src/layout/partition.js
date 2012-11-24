@@ -1,1 +1,48 @@
-d3.layout.partition=function(){function n(e,t,r,i){var s=e.children;e.x=t,e.y=e.depth*i,e.dx=r,e.dy=i;if(s&&(u=s.length)){var o=-1,u,a,f;r=e.value?r/e.value:0;while(++o<u)n(a=s[o],t,f=a.value*r,i),t+=f}}function r(e){var t=e.children,n=0;if(t&&(s=t.length)){var i=-1,s;while(++i<s)n=Math.max(n,r(t[i]))}return 1+n}function i(i,s){var o=e.call(this,i,s);return n(o[0],0,t[0],t[1]/r(o[0])),o}var e=d3.layout.hierarchy(),t=[1,1];return i.size=function(e){return arguments.length?(t=e,i):t},d3_layout_hierarchyRebind(i,e)}
+d3.layout.partition = function() {
+  var hierarchy = d3.layout.hierarchy(),
+      size = [1, 1]; // width, height
+
+  function position(node, x, dx, dy) {
+    var children = node.children;
+    node.x = x;
+    node.y = node.depth * dy;
+    node.dx = dx;
+    node.dy = dy;
+    if (children && (n = children.length)) {
+      var i = -1,
+          n,
+          c,
+          d;
+      dx = node.value ? dx / node.value : 0;
+      while (++i < n) {
+        position(c = children[i], x, d = c.value * dx, dy);
+        x += d;
+      }
+    }
+  }
+
+  function depth(node) {
+    var children = node.children,
+        d = 0;
+    if (children && (n = children.length)) {
+      var i = -1,
+          n;
+      while (++i < n) d = Math.max(d, depth(children[i]));
+    }
+    return 1 + d;
+  }
+
+  function partition(d, i) {
+    var nodes = hierarchy.call(this, d, i);
+    position(nodes[0], 0, size[0], size[1] / depth(nodes[0]));
+    return nodes;
+  }
+
+  partition.size = function(x) {
+    if (!arguments.length) return size;
+    size = x;
+    return partition;
+  };
+
+  return d3_layout_hierarchyRebind(partition, hierarchy);
+};

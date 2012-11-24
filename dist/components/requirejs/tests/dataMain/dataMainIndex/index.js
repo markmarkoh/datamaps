@@ -1,1 +1,15 @@
-define("a",{name:"a"}),define("index",["a"],function(e){doh.register("dataMainIndex",[function(n){n.is("a",e.name)}]),doh.run()})
+define('a', {
+    name: 'a'
+});
+
+define('index', ['a'], function (a) {
+    doh.register(
+        "dataMainIndex",
+        [
+            function dataMainIndex(t){
+                t.is("a", a.name);
+            }
+        ]
+    );
+    doh.run();
+});

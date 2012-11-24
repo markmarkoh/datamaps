@@ -1,1 +1,5 @@
-define("funcSet",["require","exports","module"],function(e,t,n){n.exports="funcSet"})
+define("funcSet",
+            ["require", "exports", "module"],
+            function (require, exports, module) {
+    module.exports = "funcSet";
+});

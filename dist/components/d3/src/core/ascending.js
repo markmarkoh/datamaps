@@ -1,1 +1,3 @@
-d3.ascending=function(e,t){return e<t?-1:e>t?1:e>=t?0:NaN}
+d3.ascending = function(a, b) {
+  return a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
+};

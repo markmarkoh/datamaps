@@ -1,1 +1,3 @@
-define({name:"foo/second"})
+define({
+    name: 'foo/second'
+});

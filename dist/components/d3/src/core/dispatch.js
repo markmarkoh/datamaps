@@ -1,1 +1,60 @@
-function d3_dispatch(){}function d3_dispatch_event(e){function r(){var n=t,r=-1,i=n.length,s;while(++r<i)(s=n[r].on)&&s.apply(this,arguments);return e}var t=[],n=new d3_Map;return r.on=function(r,i){var s=n.get(r),o;return arguments.length<2?s&&s.on:(s&&(s.on=null,t=t.slice(0,o=t.indexOf(s)).concat(t.slice(o+1)),n.remove(r)),i&&t.push(n.set(r,{on:i})),e)},r}d3.dispatch=function(){var e=new d3_dispatch,t=-1,n=arguments.length;while(++t<n)e[arguments[t]]=d3_dispatch_event(e);return e},d3_dispatch.prototype.on=function(e,t){var n=e.indexOf("."),r="";return n>0&&(r=e.substring(n+1),e=e.substring(0,n)),arguments.length<2?this[e].on(r):this[e].on(r,t)}
+d3.dispatch = function() {
+  var dispatch = new d3_dispatch,
+      i = -1,
+      n = arguments.length;
+  while (++i < n) dispatch[arguments[i]] = d3_dispatch_event(dispatch);
+  return dispatch;
+};
+
+function d3_dispatch() {}
+
+d3_dispatch.prototype.on = function(type, listener) {
+  var i = type.indexOf("."),
+      name = "";
+
+  // Extract optional namespace, e.g., "click.foo"
+  if (i > 0) {
+    name = type.substring(i + 1);
+    type = type.substring(0, i);
+  }
+
+  return arguments.length < 2
+      ? this[type].on(name)
+      : this[type].on(name, listener);
+};
+
+function d3_dispatch_event(dispatch) {
+  var listeners = [],
+      listenerByName = new d3_Map;
+
+  function event() {
+    var z = listeners, // defensive reference
+        i = -1,
+        n = z.length,
+        l;
+    while (++i < n) if (l = z[i].on) l.apply(this, arguments);
+    return dispatch;
+  }
+
+  event.on = function(name, listener) {
+    var l = listenerByName.get(name),
+        i;
+
+    // return the current listener, if any
+    if (arguments.length < 2) return l && l.on;
+
+    // remove the old listener, if any (with copy-on-write)
+    if (l) {
+      l.on = null;
+      listeners = listeners.slice(0, i = listeners.indexOf(l)).concat(listeners.slice(i + 1));
+      listenerByName.remove(name);
+    }
+
+    // add the new listener, if any
+    if (listener) listeners.push(listenerByName.set(name, {on: listener}));
+
+    return dispatch;
+  };
+
+  return event;
+}

@@ -1,1 +1,225 @@
-(function(){science={version:"1.7.0"},science.ascending=function(e,t){return e-t},science.EULER=.5772156649015329,science.expm1=function(e){return e<1e-5&&e>-0.00001?e+.5*e*e:Math.exp(e)-1},science.functor=function(e){return typeof e=="function"?e:function(){return e}},science.hypot=function(e,t){e=Math.abs(e),t=Math.abs(t);var n,r;e>t?(n=e,r=t):(n=t,r=e);var i=r/n;return n*Math.sqrt(1+i*i)},science.quadratic=function(){function t(t,n,r){var i=n*n-4*t*r;return i>0?(i=Math.sqrt(i)/(2*t),e?[{r:-n-i,i:0},{r:-n+i,i:0}]:[-n-i,-n+i]):i===0?(i=-n/(2*t),e?[{r:i,i:0}]:[i]):e?(i=Math.sqrt(-i)/(2*t),[{r:-n,i:-i},{r:-n,i:i}]):[]}var e=!1;return t.complex=function(n){return arguments.length?(e=n,t):e},t},science.zeroes=function(e){var t=-1,n=[];if(arguments.length===1)while(++t<e)n[t]=0;else while(++t<e)n[t]=science.zeroes.apply(this,Array.prototype.slice.call(arguments,1));return n},science.vector={},science.vector.cross=function(e,t){return[e[1]*t[2]-e[2]*t[1],e[2]*t[0]-e[0]*t[2],e[0]*t[1]-e[1]*t[0]]},science.vector.dot=function(e,t){var n=0,r=-1,i=Math.min(e.length,t.length);while(++r<i)n+=e[r]*t[r];return n},science.vector.length=function(e){return Math.sqrt(science.vector.dot(e,e))},science.vector.normalize=function(e){var t=science.vector.length(e);return e.map(function(e){return e/t})},science.vector.determinant=function(e){var t=e[0].concat(e[1]).concat(e[2]).concat(e[3]);return t[12]*t[9]*t[6]*t[3]-t[8]*t[13]*t[6]*t[3]-t[12]*t[5]*t[10]*t[3]+t[4]*t[13]*t[10]*t[3]+t[8]*t[5]*t[14]*t[3]-t[4]*t[9]*t[14]*t[3]-t[12]*t[9]*t[2]*t[7]+t[8]*t[13]*t[2]*t[7]+t[12]*t[1]*t[10]*t[7]-t[0]*t[13]*t[10]*t[7]-t[8]*t[1]*t[14]*t[7]+t[0]*t[9]*t[14]*t[7]+t[12]*t[5]*t[2]*t[11]-t[4]*t[13]*t[2]*t[11]-t[12]*t[1]*t[6]*t[11]+t[0]*t[13]*t[6]*t[11]+t[4]*t[1]*t[14]*t[11]-t[0]*t[5]*t[14]*t[11]-t[8]*t[5]*t[2]*t[15]+t[4]*t[9]*t[2]*t[15]+t[8]*t[1]*t[6]*t[15]-t[0]*t[9]*t[6]*t[15]-t[4]*t[1]*t[10]*t[15]+t[0]*t[5]*t[10]*t[15]},science.vector.gaussjordan=function(e,t){t||(t=1e-10);var n=e.length,r=e[0].length,i=-1,s,o;while(++i<n){var u=i;s=i;while(++s<n)Math.abs(e[s][i])>Math.abs(e[u][i])&&(u=s);var a=e[i];e[i]=e[u],e[u]=a;if(Math.abs(e[i][i])<=t)return!1;s=i;while(++s<n){var f=e[s][i]/e[i][i];o=i-1;while(++o<r)e[s][o]-=e[i][o]*f}}i=n;while(--i>=0){var f=e[i][i];s=-1;while(++s<i){o=r;while(--o>=i)e[s][o]-=e[i][o]*e[s][i]/f}e[i][i]/=f,o=n-1;while(++o<r)e[i][o]/=f}return!0},science.vector.inverse=function(e){var t=e.length;i=-1;if(t!==e[0].length)return;e=e.map(function(e,r){var i=new Array(t),s=-1;while(++s<t)i[s]=r===s?1:0;return e.concat(i)}),science.vector.gaussjordan(e);while(++i<t)e[i]=e[i].slice(t);return e},science.vector.multiply=function(e,t){var n=e.length,r=t[0].length,i=t.length,s=-1,o,u;if(i!==e[0].length)throw{error:"columns(a) != rows(b); "+e[0].length+" != "+i};var a=new Array(n);while(++s<n){a[s]=new Array(r),o=-1;while(++o<r){var f=0;u=-1;while(++u<i)f+=e[s][u]*t[u][o];a[s][o]=f}}return a},science.vector.transpose=function(e){var t=e.length,n=e[0].length,r=-1,i,s=new Array(n);while(++r<n){s[r]=new Array(t),i=-1;while(++i<t)s[r][i]=e[i][r]}return s}})()
+(function(){science = {version: "1.7.0"}; // semver
+science.ascending = function(a, b) {
+  return a - b;
+};
+// Euler's constant.
+science.EULER = .5772156649015329;
+// Compute exp(x) - 1 accurately for small x.
+science.expm1 = function(x) {
+  return (x < 1e-5 && x > -1e-5) ? x + .5 * x * x : Math.exp(x) - 1;
+};
+science.functor = function(v) {
+  return typeof v === "function" ? v : function() { return v; };
+};
+// Based on:
+// http://www.johndcook.com/blog/2010/06/02/whats-so-hard-about-finding-a-hypotenuse/
+science.hypot = function(x, y) {
+  x = Math.abs(x);
+  y = Math.abs(y);
+  var max,
+      min;
+  if (x > y) { max = x; min = y; }
+  else       { max = y; min = x; }
+  var r = min / max;
+  return max * Math.sqrt(1 + r * r);
+};
+science.quadratic = function() {
+  var complex = false;
+
+  function quadratic(a, b, c) {
+    var d = b * b - 4 * a * c;
+    if (d > 0) {
+      d = Math.sqrt(d) / (2 * a);
+      return complex
+        ? [{r: -b - d, i: 0}, {r: -b + d, i: 0}]
+        : [-b - d, -b + d];
+    } else if (d === 0) {
+      d = -b / (2 * a);
+      return complex ? [{r: d, i: 0}] : [d];
+    } else {
+      if (complex) {
+        d = Math.sqrt(-d) / (2 * a);
+        return [
+          {r: -b, i: -d},
+          {r: -b, i: d}
+        ];
+      }
+      return [];
+    }
+  }
+
+  quadratic.complex = function(x) {
+    if (!arguments.length) return complex;
+    complex = x;
+    return quadratic;
+  };
+
+  return quadratic;
+};
+// Constructs a multi-dimensional array filled with zeroes.
+science.zeroes = function(n) {
+  var i = -1,
+      a = [];
+  if (arguments.length === 1)
+    while (++i < n)
+      a[i] = 0;
+  else
+    while (++i < n)
+      a[i] = science.zeroes.apply(
+        this, Array.prototype.slice.call(arguments, 1));
+  return a;
+};
+science.vector = {};
+science.vector.cross = function(a, b) {
+  // TODO how to handle non-3D vectors?
+  // TODO handle 7D vectors?
+  return [
+    a[1] * b[2] - a[2] * b[1],
+    a[2] * b[0] - a[0] * b[2],
+    a[0] * b[1] - a[1] * b[0]
+  ];
+};
+science.vector.dot = function(a, b) {
+  var s = 0,
+      i = -1,
+      n = Math.min(a.length, b.length);
+  while (++i < n) s += a[i] * b[i];
+  return s;
+};
+science.vector.length = function(p) {
+  return Math.sqrt(science.vector.dot(p, p));
+};
+science.vector.normalize = function(p) {
+  var length = science.vector.length(p);
+  return p.map(function(d) { return d / length; });
+};
+// 4x4 matrix determinant.
+science.vector.determinant = function(matrix) {
+  var m = matrix[0].concat(matrix[1]).concat(matrix[2]).concat(matrix[3]);
+  return (
+    m[12] * m[9]  * m[6]  * m[3]  - m[8] * m[13] * m[6]  * m[3]  -
+    m[12] * m[5]  * m[10] * m[3]  + m[4] * m[13] * m[10] * m[3]  +
+    m[8]  * m[5]  * m[14] * m[3]  - m[4] * m[9]  * m[14] * m[3]  -
+    m[12] * m[9]  * m[2]  * m[7]  + m[8] * m[13] * m[2]  * m[7]  +
+    m[12] * m[1]  * m[10] * m[7]  - m[0] * m[13] * m[10] * m[7]  -
+    m[8]  * m[1]  * m[14] * m[7]  + m[0] * m[9]  * m[14] * m[7]  +
+    m[12] * m[5]  * m[2]  * m[11] - m[4] * m[13] * m[2]  * m[11] -
+    m[12] * m[1]  * m[6]  * m[11] + m[0] * m[13] * m[6]  * m[11] +
+    m[4]  * m[1]  * m[14] * m[11] - m[0] * m[5]  * m[14] * m[11] -
+    m[8]  * m[5]  * m[2]  * m[15] + m[4] * m[9]  * m[2]  * m[15] +
+    m[8]  * m[1]  * m[6]  * m[15] - m[0] * m[9]  * m[6]  * m[15] -
+    m[4]  * m[1]  * m[10] * m[15] + m[0] * m[5]  * m[10] * m[15]);
+};
+// Performs in-place Gauss-Jordan elimination.
+//
+// Based on Jarno Elonen's Python version (public domain):
+// http://elonen.iki.fi/code/misc-notes/python-gaussj/index.html
+science.vector.gaussjordan = function(m, eps) {
+  if (!eps) eps = 1e-10;
+
+  var h = m.length,
+      w = m[0].length,
+      y = -1,
+      y2,
+      x;
+
+  while (++y < h) {
+    var maxrow = y;
+
+    // Find max pivot.
+    y2 = y; while (++y2 < h) {
+      if (Math.abs(m[y2][y]) > Math.abs(m[maxrow][y]))
+        maxrow = y2;
+    }
+
+    // Swap.
+    var tmp = m[y];
+    m[y] = m[maxrow];
+    m[maxrow] = tmp;
+
+    // Singular?
+    if (Math.abs(m[y][y]) <= eps) return false;
+
+    // Eliminate column y.
+    y2 = y; while (++y2 < h) {
+      var c = m[y2][y] / m[y][y];
+      x = y - 1; while (++x < w) {
+        m[y2][x] -= m[y][x] * c;
+      }
+    }
+  }
+
+  // Backsubstitute.
+  y = h; while (--y >= 0) {
+    var c = m[y][y];
+    y2 = -1; while (++y2 < y) {
+      x = w; while (--x >= y) {
+        m[y2][x] -=  m[y][x] * m[y2][y] / c;
+      }
+    }
+    m[y][y] /= c;
+    // Normalize row y.
+    x = h - 1; while (++x < w) {
+      m[y][x] /= c;
+    }
+  }
+  return true;
+};
+// Find matrix inverse using Gauss-Jordan.
+science.vector.inverse = function(m) {
+  var n = m.length
+      i = -1;
+
+  // Check if the matrix is square.
+  if (n !== m[0].length) return;
+
+  // Augment with identity matrix I to get AI.
+  m = m.map(function(row, i) {
+    var identity = new Array(n),
+        j = -1;
+    while (++j < n) identity[j] = i === j ? 1 : 0;
+    return row.concat(identity);
+  });
+
+  // Compute IA^-1.
+  science.vector.gaussjordan(m);
+
+  // Remove identity matrix I to get A^-1.
+  while (++i < n) {
+    m[i] = m[i].slice(n);
+  }
+
+  return m;
+};
+science.vector.multiply = function(a, b) {
+  var m = a.length,
+      n = b[0].length,
+      p = b.length,
+      i = -1,
+      j,
+      k;
+  if (p !== a[0].length) throw {"error": "columns(a) != rows(b); " + a[0].length + " != " + p};
+  var ab = new Array(m);
+  while (++i < m) {
+    ab[i] = new Array(n);
+    j = -1; while(++j < n) {
+      var s = 0;
+      k = -1; while (++k < p) s += a[i][k] * b[k][j];
+      ab[i][j] = s;
+    }
+  }
+  return ab;
+};
+science.vector.transpose = function(a) {
+  var m = a.length,
+      n = a[0].length,
+      i = -1,
+      j,
+      b = new Array(n);
+  while (++i < n) {
+    b[i] = new Array(m);
+    j = -1; while (++j < m) b[i][j] = a[j][i];
+  }
+  return b;
+};
+})()

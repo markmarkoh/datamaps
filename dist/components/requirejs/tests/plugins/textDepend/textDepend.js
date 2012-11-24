@@ -1,1 +1,7 @@
-define(["text!test.txt"],function(e){return{load:function(t,n,r,i){r(e)}}})
+define(['text!test.txt'], function (text) {
+    return {
+        load: function (name, req, load, config) {
+            load(text);
+        }
+    };
+});

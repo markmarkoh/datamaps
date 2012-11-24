@@ -1,1 +1,69 @@
-function monthPath(e){var t=new Date(e.getFullYear(),e.getMonth()+1,0),n=+day(e),r=+week(e),i=+day(t),s=+week(t);return"M"+(r+1)*cellSize+","+n*cellSize+"H"+r*cellSize+"V"+7*cellSize+"H"+s*cellSize+"V"+(i+1)*cellSize+"H"+(s+1)*cellSize+"V"+0+"H"+(r+1)*cellSize+"Z"}var margin={top:19,right:20,bottom:20,left:19},width=960-margin.right-margin.left,height=136-margin.top-margin.bottom,cellSize=17,day=d3.time.format("%w"),week=d3.time.format("%U"),percent=d3.format(".1%"),format=d3.time.format("%Y-%m-%d"),color=d3.scale.quantize().domain([-0.05,.05]).range(d3.range(9)),svg=d3.select("#chart").selectAll("svg").data(d3.range(1990,2011)).enter().append("svg").attr("width",width+margin.right+margin.left).attr("height",height+margin.top+margin.bottom).attr("class","RdYlGn").append("g").attr("transform","translate("+(margin.left+(width-cellSize*53)/2)+","+(margin.top+(height-cellSize*7)/2)+")");svg.append("text").attr("transform","translate(-6,"+cellSize*3.5+")rotate(-90)").attr("text-anchor","middle").text(String);var rect=svg.selectAll("rect.day").data(function(e){return d3.time.days(new Date(e,0,1),new Date(e+1,0,1))}).enter().append("rect").attr("class","day").attr("width",cellSize).attr("height",cellSize).attr("x",function(e){return week(e)*cellSize}).attr("y",function(e){return day(e)*cellSize}).datum(format);rect.append("title").text(function(e){return e}),svg.selectAll("path.month").data(function(e){return d3.time.months(new Date(e,0,1),new Date(e+1,0,1))}).enter().append("path").attr("class","month").attr("d",monthPath),d3.csv("dji.csv",function(e){var t=d3.nest().key(function(e){return e.Date}).rollup(function(e){return(e[0].Close-e[0].Open)/e[0].Open}).map(e);rect.filter(function(e){return e in t}).attr("class",function(e){return"day q"+color(t[e])+"-9"}).select("title").text(function(e){return e+": "+percent(t[e])})})
+var margin = {top: 19, right: 20, bottom: 20, left: 19},
+    width = 960 - margin.right - margin.left, // width
+    height = 136 - margin.top - margin.bottom, // height
+    cellSize = 17; // cell size
+
+var day = d3.time.format("%w"),
+    week = d3.time.format("%U"),
+    percent = d3.format(".1%"),
+    format = d3.time.format("%Y-%m-%d");
+
+var color = d3.scale.quantize()
+    .domain([-.05, .05])
+    .range(d3.range(9));
+
+var svg = d3.select("#chart").selectAll("svg")
+    .data(d3.range(1990, 2011))
+  .enter().append("svg")
+    .attr("width", width + margin.right + margin.left)
+    .attr("height", height + margin.top + margin.bottom)
+    .attr("class", "RdYlGn")
+  .append("g")
+    .attr("transform", "translate(" + (margin.left + (width - cellSize * 53) / 2) + "," + (margin.top + (height - cellSize * 7) / 2) + ")");
+
+svg.append("text")
+    .attr("transform", "translate(-6," + cellSize * 3.5 + ")rotate(-90)")
+    .attr("text-anchor", "middle")
+    .text(String);
+
+var rect = svg.selectAll("rect.day")
+    .data(function(d) { return d3.time.days(new Date(d, 0, 1), new Date(d + 1, 0, 1)); })
+  .enter().append("rect")
+    .attr("class", "day")
+    .attr("width", cellSize)
+    .attr("height", cellSize)
+    .attr("x", function(d) { return week(d) * cellSize; })
+    .attr("y", function(d) { return day(d) * cellSize; })
+    .datum(format);
+
+rect.append("title")
+    .text(function(d) { return d; });
+
+svg.selectAll("path.month")
+    .data(function(d) { return d3.time.months(new Date(d, 0, 1), new Date(d + 1, 0, 1)); })
+  .enter().append("path")
+    .attr("class", "month")
+    .attr("d", monthPath);
+
+d3.csv("dji.csv", function(csv) {
+  var data = d3.nest()
+    .key(function(d) { return d.Date; })
+    .rollup(function(d) { return (d[0].Close - d[0].Open) / d[0].Open; })
+    .map(csv);
+
+  rect.filter(function(d) { return d in data; })
+      .attr("class", function(d) { return "day q" + color(data[d]) + "-9"; })
+    .select("title")
+      .text(function(d) { return d + ": " + percent(data[d]); });
+});
+
+function monthPath(t0) {
+  var t1 = new Date(t0.getFullYear(), t0.getMonth() + 1, 0),
+      d0 = +day(t0), w0 = +week(t0),
+      d1 = +day(t1), w1 = +week(t1);
+  return "M" + (w0 + 1) * cellSize + "," + d0 * cellSize
+      + "H" + w0 * cellSize + "V" + 7 * cellSize
+      + "H" + w1 * cellSize + "V" + (d1 + 1) * cellSize
+      + "H" + (w1 + 1) * cellSize + "V" + 0
+      + "H" + (w0 + 1) * cellSize + "Z";
+}

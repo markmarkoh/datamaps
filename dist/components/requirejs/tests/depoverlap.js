@@ -1,1 +1,35 @@
-require(["require","uno"],function(e,t){doh.register("depoverlap",[function(n){var r=document.getElementsByTagName("script"),i,s={},o,u,a;for(var i=r.length-1;i>-1;i--)o=r[i].getAttribute("data-requiremodule"),o&&(o in s||(s[o]=0),s[o]+=1);for(prop in s)n.is(1,s[prop]);n.is("uno",t.name),a=t.doSomething(),n.is("dos",a.dosName),n.is("tres",a.tresName)}]),doh.run()})
+require(["require", "uno"],
+function (require,   uno) {
+    doh.register(
+        "depoverlap",
+        [
+            function depoverlap(t){
+                //First confirm there is only one script tag for each
+                //module:
+                var scripts = document.getElementsByTagName("script"),
+                    i, counts = {}, modName, props, something;
+                for (var i = scripts.length - 1; i > -1; i--) {
+                    modName = scripts[i].getAttribute("data-requiremodule");
+                    if (modName) {
+                        if (!(modName in counts)) {
+                            counts[modName] = 0;
+                        }
+                        counts[modName] += 1;
+                    }
+                }
+
+                //Now that we counted all the modules make sure count
+                //is always one.
+                for (prop in counts) {
+                    t.is(1, counts[prop]);
+                }
+
+                t.is("uno", uno.name);
+                something = uno.doSomething();
+                t.is("dos", something.dosName);
+                t.is("tres", something.tresName);
+            }
+        ]
+    );
+    doh.run();
+});
