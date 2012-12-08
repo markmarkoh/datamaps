@@ -1,21 +1,46 @@
 define(['jquery', 'underscore', 'app/views/MapUsOnly'], function ($, _, Map) {
-    // Load any app-specific modules
-    // with a relative require call,
-    // like:
-    // var util = require('./util');
 
-
-    //var Map = require('views/MapBuild');
-
-    //var plots = new Backbone.Collection([{count: 10, longitude: -97.42, latitude: 30.42},{count: 20, longitude: -74.14, latitude: 41.31} ]);
+    var plots = new Backbone.Collection([
+        {fillKey: 'DEM', size: 10, longitude: -97.42, latitude: 30.42, text: 'hi'},
+        {fillKey: 'REP', size: 20, longitude: -74.14, latitude: 41.31, text: 'hey'}
+    ]);
 
     /* Scope (continent) */
+
+   new Map({
+        el: $("#container1"),
+        scope: 'usa',
+        plots: plots,
+        plot: {
+            popupTemplate: _.template('<div class="hoverinfo">oh man <%= data.text %></div>')
+        },
+        geography: {
+            popupOnHover: false,
+            highlightOnHover: false
+        },
+        fills: {
+            'DEM': '#306596',
+            'REP': '#CC4731',
+            defaultFill: '#EDDC4E'
+        },
+        data: {
+            'NY': {
+                fillKey: 'DEM'
+            }
+        }
+    }).render();
+
+    return null;
     new Map({
       el: $('#container1'),
       scope: 'usa',
-      highlightBorderColor: '#222',
-      highlightOnHover: true,
-      popupTemplate: _.template('<div class="hoverinfo"><strong><%= geography.properties.name %></strong> <% if (data.electoralVotes) { %><hr/>  Electoral Votes: <%= data.electoralVotes %> <% } %></div>'),
+      geography: {
+          highlightBorderColor: '#222',
+          highlightBorderWidth: 5,
+          highlightOnHover: true,
+          popupTemplate: _.template('<div class="hoverinfo"><strong>hi<%= geography.properties.name %></strong> <% if (data.electoralVotes) { %><hr/>  Electoral Votes: <%= data.electoralVotes %> <% } %></div>')
+      },
+      plots: plots,
 
       fills: {
         'REP': '#CC4731',

@@ -2,16 +2,32 @@ define(['underscore'], function(_) {
   return {
       projection: 'equirectangular',
       scope: 'world', // 'usa', 'northAmerica', 'southAmerica', 'europe', 'asia'
-      highlightOnHover: true,
-      showPopupOnHover: true,
-      popupTemplate: _.template('<div class="hoverinfo"><%= geography.properties.name %></div>'),
 
-      /* highlight defaults */
-      highlightBorderColor: '#FA0FA0',
-      highlightBorderWidth: 2,
+      _geography: {
+        borderWidth: 1,
+        borderColor: '#FFFFFF',
 
-      borderColor: '#FFFFFF',
-      borderWidth: 1,
+        popupTemplate: _.template('<div class="hoverinfo"><%= geography.properties.name %></div>'),
+        popupOnHover: true,
+
+        highlightOnHover: true,
+        highlightBorderColor: '#FA0FA0',
+        highlightBorderWidth: 2
+      },
+
+      /* plots */
+      _plot: {
+        borderWidth: 2,
+        popupOnHover: true,
+        popupTemplate: _.template(''),
+        fillOpacity: 0.75,
+        animate: true,
+        highlightOnHover: true,
+        highlightBorderColor: '#FA0FA0',
+        highlightFillColor: '#FA0FA0',
+        highlightBorderWidth: 5,
+        highlightFillOpacity: 0.85
+      },
 
       /* fill settings */
       pathData: {},

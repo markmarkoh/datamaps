@@ -1,13 +1,6 @@
 define(['jquery', 'underscore', 'app/views/MapUsOnly'], function ($, _, Map) {
-    // Load any app-specific modules
-    // with a relative require call,
-    // like:
-    // var util = require('./util');
 
-
-    //var Map = require('views/MapBuild');
-
-    //var plots = new Backbone.Collection([{count: 10, longitude: -97.42, latitude: 30.42},{count: 20, longitude: -74.14, latitude: 41.31} ]);
+    var plots = new Backbone.Collection([{count: 10, longitude: -97.42, latitude: 30.42},{count: 20, longitude: -74.14, latitude: 41.31} ]);
 
     /* Scope (continent) */
     new Map({
@@ -15,6 +8,7 @@ define(['jquery', 'underscore', 'app/views/MapUsOnly'], function ($, _, Map) {
       scope: 'usa',
       highlightBorderColor: '#222',
       highlightOnHover: true,
+      plots: plots,
       popupTemplate: _.template('<div class="hoverinfo"><strong><%= geography.properties.name %></strong> <% if (data.electoralVotes) { %><hr/>  Electoral Votes: <%= data.electoralVotes %> <% } %></div>'),
 
       fills: {
