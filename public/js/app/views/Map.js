@@ -106,10 +106,10 @@ define([
 
                 if (options.highlightOnHover) {
                   d3.select(this)
-                  .style('fill', options.highlightFillColor)
-                  .style('stroke', options.highlightBorderColor)
-                  .style('stroke-width', options.highlightBorderWidth)
-                  .style('fill-opacity', options.highlightFillOpacity);
+                    .style('fill', options.highlightFillColor)
+                    .style('stroke', options.highlightBorderColor)
+                    .style('stroke-width', options.highlightBorderWidth)
+                    .style('fill-opacity', options.highlightFillOpacity);
                 }
                 self.$el.trigger($.Event("plot-mouseover"), eventData);
               })
@@ -132,11 +132,11 @@ define([
                       .style('fill-opacity', options.fillOpacity);
                 }
               })
+              .on('touchstart', function(datum) {
+                self.$el.trigger($.Event("plot-touchstart"), {data: datum});
+              })
               .on('click', function(datum) {
-                var eventData = {
-                    data: datum
-                };
-                self.$el.trigger($.Event("plot-click"), eventData);
+                self.$el.trigger($.Event("plot-click"), {data: datum});
               })
               .attr('cx', function(datum) {
                 return projection([datum.longitude, datum.latitude])[0];
@@ -227,7 +227,6 @@ define([
             });
 
       if (this.options.geography.popupOnHover || this.options.plot.popupOnHover) {
-        console.log('yo');
         $('<div class="hoverover" style="z-index: 1001;"/>').appendTo(this.$el);
       }
 

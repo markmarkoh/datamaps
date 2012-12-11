@@ -23,15 +23,16 @@ define(['underscore'], function(_) {
         fillOpacity: 0.75,
         animate: true,
         highlightOnHover: true,
-        highlightBorderColor: '#FA0FA0',
-        highlightFillColor: '#FA0FA0',
-        highlightBorderWidth: 5,
+        highlightBorderColor: '#667FAF',
+        highlightFillColor: '#667FAF',
+        highlightBorderWidth: 2,
         highlightFillOpacity: 0.85
       },
 
       /* fill settings */
       pathData: {},
       data: {},
+      plots: [],
       fills: {
         defaultFill: '#BADA55'
       }

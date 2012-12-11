@@ -2,9 +2,11 @@ function makeMap($el) {
     var map = new Map({
       scope: 'usa',
       el: $el,
-      highlightBorderColor: '#222',
-      highlightOnHover: true,
-      popupTemplate: _.template('<div class="hoverinfo"><strong><%= geography.properties.name %></strong> <% if (data.electoralVotes) { %><hr/>  Electoral Votes: <%= data.electoralVotes %> <% } %></div>'),
+      geography: {
+          highlightBorderColor: '#222',
+          highlightOnHover: true,
+          popupTemplate: _.template('<div class="hoverinfo"><strong><%= geography.properties.name %></strong> <% if (data.electoralVotes) { %><hr/>  Electoral Votes: <%= data.electoralVotes %> <% } %></div>')
+      },
 
       fills: {
         'REP': '#CC4731',
