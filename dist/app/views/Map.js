@@ -80,7 +80,7 @@ define([
     addPlots: function(plots) {
       var self = this;
       if (_.isUndefined(plots.length)) {
-        plots = new Backbone.Collection([plots]);
+        plots = [];
       }
 
       var projection = this._map.get('projection');
@@ -89,7 +89,7 @@ define([
       var plotContainer = this.svg.append('g').attr('class', 'plots');
 
         plotContainer.selectAll('circle.plot')
-          .data(plots.toJSON())
+          .data(plots)
           .enter()
             .append('svg:circle')
               .on('mouseover', function(datum) {
@@ -127,7 +127,7 @@ define([
                 if (options.highlightOnHover) {
                   var el = d3.select(this);
                     el.style('fill', el.attr('data-fill'))
-                      .style('stroke', el.attr('data-fill'))
+                      .style('stroke', options.borderColor)
                       .style('stroke-width', options.borderWidth)
                       .style('fill-opacity', options.fillOpacity);
                 }
@@ -151,7 +151,7 @@ define([
                 return fillColor;
               })
               .style('stroke', function(datum) {
-                return self.getFillColor(datum);
+                return options.borderColor; //self.getFillColor(datum);
               })
               .style('stroke-width', options.borderWidth)
               .attr('fill-opacity', options.fillOpacity)
@@ -159,7 +159,7 @@ define([
               .transition()
                 .duration(400)
                 .attr('r', function(datum) {
-                  return datum.size;
+                  return datum.radius;
                 });
     },
 
@@ -168,6 +168,7 @@ define([
       var hoverover = this.$el.find('.hoverover');
 
       hoverover.css({
+        width: 'auto',
         top: position[1] + 20,
         left: position[0] - hoverover.data('width') / 2
       });

@@ -18,6 +18,7 @@ define(['underscore'], function(_) {
       /* plots */
       _plot: {
         borderWidth: 2,
+        borderColor: '#FFFFFF',
         popupOnHover: true,
         popupTemplate: _.template(''),
         fillOpacity: 0.75,
