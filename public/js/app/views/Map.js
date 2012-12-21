@@ -86,7 +86,7 @@ define([
       var projection = this._map.get('projection');
       var options = this.options.plot;
 
-      var plotContainer = this.svg.append('g').attr('class', 'plots');
+      var plotContainer = d3.select('dm-wrapper').append('g').attr('class', 'plots');
 
         plotContainer.selectAll('circle.plot')
           .data(plots)
@@ -200,7 +200,7 @@ define([
 
       var projection = this.projection = this._map.get('projection')
                         .scale(width)
-                        .translate([width / 2, height / 2]);
+                        .translate([0, 0]);
 
 
       var path = this.path = this._map.get('path');
@@ -209,7 +209,11 @@ define([
                     .attr('width', width)
                     .attr('height', height);
 
-      var states = svg.append('svg:g')
+      var wrapper = svg.append('svg:g')
+                        .attr('id', 'dm-wrapper')
+                        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
+
+      var states = wrapper.append('svg:g')
                         .attr('id', 'states');
 
       var node = states.selectAll('path')
@@ -297,6 +301,20 @@ define([
         //this.options.plots.on('add', this.addPlots, this);
         this.addPlots(this.options.plots);
       }
+var s = [-64.68, -16.62];
+//      var d = this._map.get('projection')([ this.options.centerOn.longitude, this.options.centerOn.latitude]);
+      var d = projection(s);
+      var k = this.options.zoom;
+      console.log(d, this.options.centerOn);
+      d= [-215.60000000000002, 55.4];
+      x = -d[0];
+      y = -d[1];
+
+      states
+        .transition(500)
+          .attr("transform", "translate(" + x/2 + "," + y/2 + ")")
+          .style("stroke-width", (.0005) + "px");
+
     }
   });
 

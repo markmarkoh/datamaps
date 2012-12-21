@@ -249,7 +249,7 @@ var bombs = new Backbone.Collection([
                 '</div>'].join(''))
         },
         geography: {
-            popupOnHover: false,
+            popupOnHover: true,
             highlightOnHover: false
         },
         fills: {
