@@ -1,4 +1,4 @@
-define(['jquery', 'underscore', 'app/views/MapCountriesOnly', 'd3'], function ($, _, Map, d3) {
+define(['jquery', 'underscore', 'app/views/MapUsOnly', 'd3'], function ($, _, Map, d3) {
 
     var plots = new Backbone.Collection([
         {fillKey: 'DEM', size: 10, longitude: -97.42, latitude: 30.42, text: 'hi'},
@@ -236,11 +236,11 @@ var bombs = new Backbone.Collection([
         bombs.at(idx).set('radius', scale(val.get('yeild')));
     });
 
-   new Map({
+  /* new Map({
         el: $("#container1"),
         scope: 'world',
-        plots: bombs.toJSON(),
-        plot: {
+        bubbles: bombs.toJSON(),
+        bubble_config: {
             popupTemplate: _.template([
                 '<div class="hoverinfo"><strong><%= data.name %></strong>',
                 '<br/>Payload: <%= data.yeild %> kilotons',
@@ -248,7 +248,18 @@ var bombs = new Backbone.Collection([
                 '<br/>Date: <%= data.date %>',
                 '</div>'].join(''))
         },
-        geography: {
+        data: {
+            'RUS': {fillKey: 'RUS'},
+            'PRK': {fillKey: 'PRK'},
+            'PRC': {fillKey: 'PRC'},
+            'IND': {fillKey: 'IND'},
+            'GBR': {fillKey: 'GBR'},
+            'FRA': {fillKey: 'FRA'},
+            'PAK': {fillKey: 'PAK'},
+            'USA': {fillKey: 'USA'}
+        },
+        
+        geography_config: {
             popupOnHover: false,
             highlightOnHover: false
         },
@@ -263,29 +274,19 @@ var bombs = new Backbone.Collection([
             'PAK': '#7f7f7f',
             defaultFill: '#EDDC4E'
         },
-        data: {
-            'RUS': {fillKey: 'RUS'},
-            'PRK': {fillKey: 'PRK'},
-            'PRC': {fillKey: 'PRC'},
-            'IND': {fillKey: 'IND'},
-            'GBR': {fillKey: 'GBR'},
-            'FRA': {fillKey: 'FRA'},
-            'PAK': {fillKey: 'PAK'},
-            'USA': {fillKey: 'USA'}
-        }
-    }).render();
 
-    return null;
+    }); //.render(); */
     new Map({
       el: $('#container1'),
       scope: 'usa',
-      geography: {
-          highlightBorderColor: '#222',
-          highlightBorderWidth: 5,
+      geography_config: {
+          highlightBorderColor: '#000',
+          highlightBorderWidth: 1,
+          borderColor: '#222222',
           highlightOnHover: true,
-          popupTemplate: _.template('<div class="hoverinfo"><strong>hi<%= geography.properties.name %></strong> <% if (data.electoralVotes) { %><hr/>  Electoral Votes: <%= data.electoralVotes %> <% } %></div>')
+          popupTemplate: _.template('<div class="hoverinfo"><strong><%= geography.properties.name %></strong> <% if (data.electoralVotes) { %><hr/>  Electoral Votes: <%= data.electoralVotes %> <% } %></div>')
       },
-      plots: plots,
+      //bubbles: plots,
 
       fills: {
         'REP': '#CC4731',

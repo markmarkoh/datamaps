@@ -32,8 +32,8 @@ define([
       }
 
       //set defaults(for complex/nested objects, which backbone doesn't handle too well)
-      this.options.geography = _.defaults(this.options.geography || {}, this.options._geography);
-      this.options.plot = _.defaults(this.options.plot || {}, this.options._plot);
+      this.options.geography_config = _.defaults(this.options.geography_config || {}, this.options._geography_config);
+      this.options.bubble_config = _.defaults(this.options.bubble_config || {}, this.options._bubble_config);
 
       this._map.set('projection', d3.geo[this.options.projection]());
       this._map.set('path', d3.geo.path().projection( this._map.get('projection')) );
@@ -50,15 +50,15 @@ define([
       var el = d3.select(e.currentTarget);
       var parentEl = el[0][0].parentElement;
 
-      el.style('stroke-width', self.options.geography.highlightBorderWidth)
-          .style('stroke', self.options.geography.highlightBorderColor);
+      el.style('stroke-width', self.options.geography_config.highlightBorderWidth)
+          .style('stroke', self.options.geography_config.highlightBorderColor);
 
       el.selectAll('.label').style('display', 'block');
 
       el.remove();
 
-      if (self.options.geography.highlightFillColor) {
-        el.style('fill', self.options.geography.highlightFillColor);
+      if (self.options.geography_config.highlightFillColor) {
+        el.style('fill', self.options.geography_config.highlightFillColor);
       }
 
 
@@ -68,8 +68,8 @@ define([
     mouseoutPath: function(e) {
       var self = this;
       d3.select(e.currentTarget)
-        .style('stroke-width', this.options.geography.borderWidth)
-        .style('stroke', this.options.geography.borderColor)
+        .style('stroke-width', this.options.geography_config.borderWidth)
+        .style('stroke', this.options.geography_config.borderColor)
         .style('fill', function() {
           return d3.select(this).attr('data-fill');
         });
@@ -77,19 +77,19 @@ define([
       this.$el.find('.hoverover').hide();
     },
 
-    addPlots: function(plots) {
+    addBubbles: function(bubbles) {
       var self = this;
-      if (_.isUndefined(plots.length)) {
-        plots = [];
+      if (_.isUndefined(bubbles.length)) {
+        bubbles = [];
       }
 
       var projection = this._map.get('projection');
-      var options = this.options.plot;
+      var options = this.options.bubble_config;
 
-      var plotContainer = this.svg.append('g').attr('class', 'plots');
+      var bubbleContainer = this.svg.append('g').attr('class', 'bubbles');
 
-        plotContainer.selectAll('circle.plot')
-          .data(plots)
+        bubbleContainer.selectAll('circle.bubble')
+          .data(bubbles)
           .enter()
             .append('svg:circle')
               .on('mouseover', function(datum) {
@@ -111,7 +111,7 @@ define([
                     .style('stroke-width', options.highlightBorderWidth)
                     .style('fill-opacity', options.highlightFillOpacity);
                 }
-                self.$el.trigger($.Event("plot-mouseover"), eventData);
+                self.$el.trigger($.Event("bubble-mouseover"), eventData);
               })
               .on('mousemove', function() {
                 self.updateHoverOverPosition(this);
@@ -122,7 +122,7 @@ define([
                     data: datum
                 };
 
-                self.$el.trigger($.Event("plot-mouseout"), eventData);
+                self.$el.trigger($.Event("bubble-mouseout"), eventData);
 
                 if (options.highlightOnHover) {
                   var el = d3.select(this);
@@ -133,10 +133,10 @@ define([
                 }
               })
               .on('touchstart', function(datum) {
-                self.$el.trigger($.Event("plot-touchstart"), {data: datum});
+                self.$el.trigger($.Event("bubble-touchstart"), {data: datum});
               })
               .on('click', function(datum) {
-                self.$el.trigger($.Event("plot-click"), {data: datum});
+                self.$el.trigger($.Event("bubble-click"), {data: datum});
               })
               .attr('cx', function(datum) {
                 return projection([datum.longitude, datum.latitude])[0];
@@ -144,7 +144,6 @@ define([
               .attr('cy', function(datum, index) {
                 return projection([datum.longitude, datum.latitude])[1];
               })
-              .attr('class', 'plot')
               .style('fill', function(datum) {
                 var fillColor = self.getFillColor(datum);
                 d3.select(this).attr('data-fill', fillColor);
@@ -153,6 +152,7 @@ define([
               .style('stroke', function(datum) {
                 return options.borderColor; //self.getFillColor(datum);
               })
+              .attr('class', 'bubble')
               .style('stroke-width', options.borderWidth)
               .attr('fill-opacity', options.fillOpacity)
               .attr('r', 0)
@@ -219,19 +219,19 @@ define([
       var feature = node.append('path')
             .attr('d', path)
             .attr('data-type', 'country')
-            .style('stroke', self.options.geography.borderColor)
-            .style('stroke-width', self.options.geography.borderWidth)
+            .style('stroke', self.options.geography_config.borderColor)
+            .style('stroke-width', self.options.geography_config.borderWidth)
             .style('fill', function(datum) {
               var fillColor = self.getFillColor(self.options.data[datum.id]);
               d3.select(this).attr('data-fill', fillColor);
               return fillColor;
             });
 
-      if (this.options.geography.popupOnHover || this.options.plot.popupOnHover) {
+      if (this.options.geography_config.popupOnHover || this.options.bubble_config.popupOnHover) {
         $('<div class="hoverover" style="z-index: 1001;"/>').appendTo(this.$el);
       }
 
-      if (this.options.geography.popupOnHover) {
+      if (this.options.geography_config.popupOnHover) {
         feature.on('mouseover', function(d) {
           var hoverover = self.$el.find('.hoverover');
           var eventData = {
@@ -239,7 +239,7 @@ define([
               data: self.options.data[d.id] || {}
           };
           hoverover.css({position:'absolute'})
-            .html(self.options.geography.popupTemplate( eventData )).show();
+            .html(self.options.geography_config.popupTemplate( eventData )).show();
 
           //set width data so we can grab it to do the offset quickly
           hoverover.data('width', self.$el.find('.hoverover').width());
@@ -254,7 +254,7 @@ define([
               data: self.options.data[d.id] || {}
           };
           hoverover.css({position:'absolute'})
-            .html(self.options.geography.popupTemplate( eventData )).show();
+            .html(self.options.geography_config.popupTemplate( eventData )).show();
 
           //set width data so we can grab it to do the offset quickly
           hoverover.data('width', self.$el.find('.hoverover').width());
@@ -286,16 +286,16 @@ define([
         });
       }
 
-      if (this.options.geography.highlightOnHover) {
+      if (this.options.geography_config.highlightOnHover) {
         self.$el.on('mouseover', '[data-type="country"]', _.bind(this.mouseoverPath, this));
         self.$el.on('mouseout', '[data-type="country"]', _.bind(this.mouseoutPath, this));
       }
 
-      if (this.options.plots.length) {
-        //TODO: set listener for new plots
+      if (this.options.bubbles.length) {
+        //TODO: set listener for new bubbles
         //first make it bb collection
-        //this.options.plots.on('add', this.addPlots, this);
-        this.addPlots(this.options.plots);
+        //this.options.bubbles.on('add', this.addbubbles, this);
+        this.addBubbles(this.options.bubbles);
       }
     }
   });

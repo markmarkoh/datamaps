@@ -3,7 +3,7 @@ define(['underscore'], function(_) {
       projection: 'equirectangular',
       scope: 'world', // 'usa', 'northAmerica', 'southAmerica', 'europe', 'asia'
 
-      _geography: {
+      _geography_config: {
         borderWidth: 1,
         borderColor: '#FFFFFF',
 
@@ -15,8 +15,8 @@ define(['underscore'], function(_) {
         highlightBorderWidth: 2
       },
 
-      /* plots */
-      _plot: {
+      /* bubbles */
+      _bubble_config: {
         borderWidth: 2,
         borderColor: '#FFFFFF',
         popupOnHover: true,
@@ -33,7 +33,7 @@ define(['underscore'], function(_) {
       /* fill settings */
       pathData: {},
       data: {},
-      plots: [],
+      bubbles: [],
       fills: {
         defaultFill: '#BADA55'
       }
