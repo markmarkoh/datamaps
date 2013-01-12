@@ -18,27 +18,24 @@ define([
         this.options.projection = 'albersUsa'; //change this default
       }
 
-      if ( this.options.scope === 'world' ) {
+      if ( this.options.scope === 'usa' ) {
         this._map.set('pathData', _.reject(worldCountries.features, function(val) {
-          return val.properties.continent === "USA";
-        }));
-      }
-      else if (this.options.scope === 'usa' ) {
-        this._map.set('pathData', _.reject(worldCountries.features, function(val) {
+          console.log(val.properties.continent);
           return val.properties.continent !== "USA";
         }));
-
-        this.options.projection = 'albersUsa'; //override them
+      }
+      else {
+        this._map.set('pathData', _.reject(worldCountries.features, function(val) {
+          console.log(val.properties.continent);
+          return val.properties.continent === "USA";
+        }));
       }
 
       //set defaults(for complex/nested objects, which backbone doesn't handle too well)
       this.options.geography = _.defaults(this.options.geography || {}, this.options._geography);
       this.options.plot = _.defaults(this.options.plot || {}, this.options._plot);
 
-      this._map.set('projection', d3.geo[this.options.projection]());
-      this._map.set('path', d3.geo.path().projection( this._map.get('projection')) );
-
-      this._map.get('projection').scale(10000);
+      //this._map.get('projection').scale(10000);
     },
 
     mouseoverPath: function(e) {
@@ -189,25 +186,89 @@ define([
     render: function() {
       var self = this;
       var width, height;
-      
-      width = this.$el.width();
-      height = this.$el.height();
 
       //add inner wrapper div so we can position:relative it
-      var div =  $('<div/>').css({position:'relative'});
+      var div =  $('<div/>').css({width: '100%', height: '100%', position:'relative'});
       this.$el.append( div );
       this.setElement(div);
 
-      var projection = this.projection = this._map.get('projection')
-                        .scale(width)
-                        .translate([width / 2, height / 2]);
+      width = this.$el.width();
+      height = this.$el.height();
 
 
-      var path = this.path = this._map.get('path');
+      var projection, path;
 
-      var svg = this.svg = d3.select( this.el ).append('svg:svg')
+      var scope = this.options.scope.toLowerCase();
+
+      //ugh, revisit
+      switch (scope) {
+        case 'world':
+          projection = d3.geo['equirectangular']()
+            .scale(width / 6);
+          break;
+
+        case 'usa':
+          projection = d3.geo['albersUsa']()
+          .scale(width);
+          break;
+
+        case 'southamerica':
+          projection = d3.geo['equirectangular']()
+            .scale(width * 1.1)
+            .center([-60.117187, -20.96144]);
+          break;
+
+        case 'africa':
+          projection = d3.geo['equirectangular']()
+            .scale(width * 0.80)
+            .center([17.547656, 2.740675]);
+          break;
+
+        case 'europe':
+          projection = d3.geo['mercator']()
+            .scale(3000)
+            .center([15.996094, 54.95122]);
+          break;
+
+        case 'southeastasia':
+          projection = d3.geo['equirectangular']()
+            .scale(width * 0.80)
+            .center([122.039063, 5.35156]);
+          break;
+
+        case 'middleeast':
+          projection = d3.geo['equirectangular']()
+            .scale(width * 0.90)
+            .center([54.140625, 31.653381]);
+          break;
+
+        case 'asia':
+          projection = d3.geo['equirectangular']()
+           .scale(width * 0.45)
+           .center([88.375, 40.930432]);
+          break;
+
+        case 'australia':
+          projection = d3.geo['equirectangular']()
+            .scale(width * 0.45)
+            .center([88.375, 40.930432]);
+          break;
+
+        default:
+          projection = d3.geo['equirectangular']();
+      }
+
+      projection = projection.translate([width / 2, height / 2]);
+
+      path = this.path = d3.geo.path().projection( projection );
+      this.projection = projection;
+
+      this._map.set('projection', projection);
+      this._map.set('path', path);
+     var svg = this.svg = d3.select( this.el ).append('svg:svg')
                     .attr('width', width)
-                    .attr('height', height);
+                    .attr('height', height)
+                    .style('box-sizing', 'border-box');
 
       var states = svg.append('svg:g')
                         .attr('id', 'states');

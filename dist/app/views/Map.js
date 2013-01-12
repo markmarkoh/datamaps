@@ -38,7 +38,7 @@ define([
       this._map.set('projection', d3.geo[this.options.projection]());
       this._map.set('path', d3.geo.path().projection( this._map.get('projection')) );
 
-      this._map.get('projection').scale(10000);
+      //this._map.get('projection').scale(10000);
     },
 
     mouseoverPath: function(e) {
@@ -199,7 +199,7 @@ define([
       this.setElement(div);
 
       var projection = this.projection = this._map.get('projection')
-                        .scale(width)
+                        .scale(100)
                         .translate([width / 2, height / 2]);
 
 
