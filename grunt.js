@@ -8,7 +8,7 @@ module.exports = function(grunt) {
         paths: {
           'requireLib': 'components/requirejs/require',
           'almondLib': '../../build/almond',
-          'd3': 'components/d3/d3.v2',
+          'd3': 'components/d3/d3',
           'underscore': 'components/underscore-amd/underscore',
           'jquery': 'components/zepto/dist/zepto',
           'backbone': 'components/backbone-amd/backbone'

@@ -238,7 +238,10 @@ var bombs = new Backbone.Collection([
 
    new Map({
         el: $("#container1"),
-        scope: 'middleeast',
+        scope: 'world',
+
+    }).render();
+   /*
         plots: bombs.toJSON(),
         plot: {
             popupTemplate: _.template([
@@ -273,7 +276,7 @@ var bombs = new Backbone.Collection([
             'PAK': {fillKey: 'PAK'},
             'USA': {fillKey: 'USA'}
         }
-    }).render();
+    }).render();*/
 
     return null;
     new Map({

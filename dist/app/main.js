@@ -1,4 +1,4 @@
-define(['jquery', 'underscore', 'app/views/MapCountriesOnly', 'd3'], function ($, _, Map, d3) {
+define(['jquery', 'underscore', 'app/views/MapWorldAndUsStates', 'd3'], function ($, _, Map, d3) {
 
     var plots = new Backbone.Collection([
         {fillKey: 'DEM', size: 10, longitude: -97.42, latitude: 30.42, text: 'hi'},
@@ -239,6 +239,9 @@ var bombs = new Backbone.Collection([
    new Map({
         el: $("#container1"),
         scope: 'world',
+
+    }).render();
+   /*
         plots: bombs.toJSON(),
         plot: {
             popupTemplate: _.template([
@@ -273,7 +276,7 @@ var bombs = new Backbone.Collection([
             'PAK': {fillKey: 'PAK'},
             'USA': {fillKey: 'USA'}
         }
-    }).render();
+    }).render();*/
 
     return null;
     new Map({

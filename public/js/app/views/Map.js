@@ -20,13 +20,11 @@ define([
 
       if ( this.options.scope === 'usa' ) {
         this._map.set('pathData', _.reject(worldCountries.features, function(val) {
-          console.log(val.properties.continent);
           return val.properties.continent !== "USA";
         }));
       }
       else {
         this._map.set('pathData', _.reject(worldCountries.features, function(val) {
-          console.log(val.properties.continent);
           return val.properties.continent === "USA";
         }));
       }
@@ -195,7 +193,6 @@ define([
       width = this.$el.width();
       height = this.$el.height();
 
-
       var projection, path;
 
       var scope = this.options.scope.toLowerCase();
@@ -204,7 +201,7 @@ define([
       switch (scope) {
         case 'world':
           projection = d3.geo['equirectangular']()
-            .scale(width / 6);
+            .scale(width / 6.5);
           break;
 
         case 'usa':
@@ -214,19 +211,19 @@ define([
 
         case 'southamerica':
           projection = d3.geo['equirectangular']()
-            .scale(width * 1.1)
+            .scale(width * 1.20)
             .center([-60.117187, -20.96144]);
           break;
 
         case 'africa':
           projection = d3.geo['equirectangular']()
-            .scale(width * 0.80)
+            .scale(width * 0.75)
             .center([17.547656, 2.740675]);
           break;
 
         case 'europe':
           projection = d3.geo['mercator']()
-            .scale(3000)
+            .scale(2000)
             .center([15.996094, 54.95122]);
           break;
 
@@ -251,7 +248,7 @@ define([
         case 'australia':
           projection = d3.geo['equirectangular']()
             .scale(width * 0.45)
-            .center([88.375, 40.930432]);
+            .center([134.824219, -25.799891]);
           break;
 
         default:
@@ -265,7 +262,8 @@ define([
 
       this._map.set('projection', projection);
       this._map.set('path', path);
-     var svg = this.svg = d3.select( this.el ).append('svg:svg')
+console.log('w/h', width, height);
+      var svg = this.svg = d3.select( this.el ).append('svg:svg')
                     .attr('width', width)
                     .attr('height', height)
                     .style('box-sizing', 'border-box');
