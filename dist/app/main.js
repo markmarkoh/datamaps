@@ -1,4 +1,4 @@
-define(['jquery', 'underscore', 'app/views/MapUsOnly', 'd3'], function ($, _, Map, d3) {
+define(['jquery', 'underscore', 'app/views/MapWorldAndUsStates', 'd3'], function ($, _, Map, d3) {
 
     var plots = new Backbone.Collection([
         {fillKey: 'DEM', size: 10, longitude: -97.42, latitude: 30.42, text: 'hi'},
@@ -236,7 +236,7 @@ var bombs = new Backbone.Collection([
         bombs.at(idx).set('radius', scale(val.get('yeild')));
     });
 
-  /* new Map({
+   new Map({
         el: $("#container1"),
         scope: 'world',
         bubbles: bombs.toJSON(),
@@ -273,9 +273,12 @@ var bombs = new Backbone.Collection([
             'FRA': '#d62728',
             'PAK': '#7f7f7f',
             defaultFill: '#EDDC4E'
-        },
+        }
 
-    }); //.render(); */
+    }).render();
+
+return;
+
     new Map({
       el: $('#container1'),
       scope: 'usa',
