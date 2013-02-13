@@ -249,6 +249,12 @@ define([
             .center([134.824219, -25.799891]);
           break;
 
+        case 'canada':
+          projection = d3.geo['equirectangular']()
+            .scale(width * 0.4)
+            .center([-104.589844, 57.610107]);
+          break;
+
         default:
           projection = d3.geo['equirectangular']();
       }

@@ -238,7 +238,7 @@ var bombs = new Backbone.Collection([
 
    new Map({
         el: $("#container1"),
-        scope: 'world',
+        scope: 'canada',
         bubbles: bombs.toJSON(),
         bubble_config: {
             popupTemplate: _.template([
