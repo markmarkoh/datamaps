@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    </head>
+    <body>
+
+        <div id="container1" style="border:1px dotted blue; width: 800px; height: 400px;"></div>
+
+        <script src="/public/js/components/d3/d3.min.js"></script>
+        <script src="/public/js/components/topojson/topojson.js"></script>
+        <script src="/public/js/datamaps.js"></script>
+        <script>
+          //$("#container1").datamap({scope: 'world'})
+
+
+/*   new Map({
+        el: $("#container1"),
+        scope: 'world',
+
+    }).render();*/
+        datamaps.draw({
+            element: document.getElementById('container1'),
+            scope: 'usa',
+            geographyConfig: {
+                highlightOnHover: true,
+                highlightFillColor: '#fa0fa0'
+            }
+        })
+        </script>
+    </body>
+</html>
+
