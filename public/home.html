@@ -12,29 +12,76 @@
         <script>
         datamaps.draw({
             element: document.getElementById('container1'),
-            scope: 'usa',
+            scope: 'world',
             geographyConfig: {
+                hideAntarctica: true,
                 highlightOnHover: true,
                 highlightBorderColor: '#00ff00',
-                highlightBorderWidth: 2,
+                highlightBorderWidth: 1,
                 highlightFillColor: '#fa0fa0',
-                borderWidth: 1,
-                borderColor: '#555555',
+                borderWidth: 0,
+                borderColor: 'rgba(0,0,0,0)',
                 popupOnHover: true,
                 popupTemplate: function(geography, data) {
                     return '<div class="hoverinfo"><strong>' + geography.properties.name + '</strong><br/>Electoral Votes: ' + data.electoralVotes + '</div>';
                 }
             },
+
+            bubbleConfig: {
+                borderWidth: 2,
+                borderColor: '#FFFFFF',
+                popupOnHover: true,
+                popupTemplate: function() { return '' },
+                fillOpacity: 0.75,
+                animate: true,
+                highlightOnHover: true,
+                highlightBorderColor: '#667FAF',
+                highlightFillColor: '#667FAF',
+                highlightBorderWidth: 2,
+                highlightFillOpacity: 0.85
+            },
+
             fills: {
-                defaultFill: '#bada55',
-                REP: '#ff0000'
+                defaultFill: '#666666',
+                REP: '#ff0000',
+                DEM: '#fa0fa0'
             },
             data:{
                 "AZ": {
                     "fillKey": "REP",
                     "electoralVotes": 5
+                },
+                "CA": {
+                    "fillKey": "DEM",
+                    "electoralVotes": 10
+                },
+                "USA": {
+                    "fillKey": "DEM"
                 }
-            }
+            },
+            bubbles: [
+                 {
+                    name: 'Gerboise Bleue',
+                    radius: 76,
+                    yeild: 70,
+                    country: 'France',
+                    significance: 'First fission weapon test by France',
+                    date: '1960-02-13',
+                    fillKey: 'FRA',
+                    latitude: -0.325,
+                    longitude: 26.1840
+                  }, {
+                    name: 'Canopus',
+                    radius: 10,
+                    yeild: 2600,
+                    country: 'France',
+                    significance: 'First "staged" thermonuclear test by France',
+                    fillKey: 'REP',
+                    date: '1968-08-24',
+                    latitude: -22.15,
+                    longitude: -138.45
+                  }
+            ]
         });
         </script>
     </body>
