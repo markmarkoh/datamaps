@@ -10,22 +10,32 @@
         <script src="/public/js/components/topojson/topojson.js"></script>
         <script src="/public/js/datamaps.js"></script>
         <script>
-          //$("#container1").datamap({scope: 'world'})
-
-
-/*   new Map({
-        el: $("#container1"),
-        scope: 'world',
-
-    }).render();*/
         datamaps.draw({
             element: document.getElementById('container1'),
             scope: 'usa',
             geographyConfig: {
                 highlightOnHover: true,
-                highlightFillColor: '#fa0fa0'
+                highlightBorderColor: '#00ff00',
+                highlightBorderWidth: 2,
+                highlightFillColor: '#fa0fa0',
+                borderWidth: 1,
+                borderColor: '#555555',
+                popupOnHover: true,
+                popupTemplate: function(geography, data) {
+                    return '<div class="hoverinfo"><strong>' + geography.properties.name + '</strong><br/>Electoral Votes: ' + data.electoralVotes + '</div>';
+                }
+            },
+            fills: {
+                defaultFill: '#bada55',
+                REP: '#ff0000'
+            },
+            data:{
+                "AZ": {
+                    "fillKey": "REP",
+                    "electoralVotes": 5
+                }
             }
-        })
+        });
         </script>
     </body>
 </html>
