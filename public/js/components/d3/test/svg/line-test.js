@@ -1,15 +1,12 @@
-require("../env");
-
 var vows = require("vows"),
-    assert = require("assert");
+    load = require("../load"),
+    assert = require("../assert");
 
 var suite = vows.describe("d3.svg.line");
 
 suite.addBatch({
   "line": {
-    topic: function() {
-      return d3.svg.line;
-    },
+    topic: load("svg/line").expression("d3.svg.line"),
 
     "x defaults to a function accessor": function(line) {
       var l = line();
@@ -95,6 +92,12 @@ suite.addBatch({
         assert.pathEqual(l([[0, 0]]), "M0,0");
         assert.pathEqual(l([[0, 0], [1, 1]]), "M0,0V1H1");
         assert.pathEqual(l([[0, 0], [1, 1], [2, 0]]), "M0,0V1H1V0H2");
+      },
+      "supports step interpolation": function(line) {
+        var l = line().interpolate("step");
+        assert.pathEqual(l([[0, 0]]), "M0,0");
+        assert.pathEqual(l([[0, 0], [1, 1]]), "M0,0H0.5V1H1");
+        assert.pathEqual(l([[0, 0], [1, 1], [2, 0]]), "M0,0H0.5V1H1.5V0H2");
       },
       "supports step-after interpolation": function(line) {
         var l = line().interpolate("step-after");

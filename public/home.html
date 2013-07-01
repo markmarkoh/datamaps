@@ -4,86 +4,114 @@
     </head>
     <body>
 
-        <div id="container1" style="border:1px dotted blue; width: 800px; height: 400px;"></div>
-
+        <div id="container1" style="border:1px dotted blue; width: 800px; height: 375px;"></div>
+<div id="container2" style="width: 500px; height: 300px"></div>
         <script src="/public/js/components/d3/d3.min.js"></script>
         <script src="/public/js/components/topojson/topojson.js"></script>
         <script src="/public/js/datamaps.js"></script>
         <script>
-        datamaps.draw({
-            element: document.getElementById('container1'),
-            scope: 'world',
-            geographyConfig: {
-                hideAntarctica: true,
-                highlightOnHover: true,
-                highlightBorderColor: '#00ff00',
-                highlightBorderWidth: 1,
-                highlightFillColor: '#fa0fa0',
-                borderWidth: 0,
-                borderColor: 'rgba(0,0,0,0)',
-                popupOnHover: true,
-                popupTemplate: function(geography, data) {
-                    return '<div class="hoverinfo"><strong>' + geography.properties.name + '</strong><br/>Electoral Votes: ' + data.electoralVotes + '</div>';
-                }
-            },
 
-            bubbleConfig: {
-                borderWidth: 2,
-                borderColor: '#FFFFFF',
-                popupOnHover: true,
-                popupTemplate: function() { return '' },
-                fillOpacity: 0.75,
-                animate: true,
-                highlightOnHover: true,
-                highlightBorderColor: '#667FAF',
-                highlightFillColor: '#667FAF',
-                highlightBorderWidth: 2,
-                highlightFillOpacity: 0.85
-            },
+        // new Datamap().draw({
+        //     element: document.getElementById('container1'),
+        //     scope: 'world',
+        //     geographyConfig: {
+        //         popupTemplate: function(geography, data) {
+        //             return '<div class="hoverinfo"><strong>' + geography.properties.name + '</strong><br/>Electoral Votes: ' + data.electoralVotes + '</div>';
+        //         }
+        //     },
 
-            fills: {
-                defaultFill: '#666666',
-                REP: '#ff0000',
-                DEM: '#fa0fa0'
-            },
-            data:{
-                "AZ": {
-                    "fillKey": "REP",
-                    "electoralVotes": 5
-                },
-                "CA": {
-                    "fillKey": "DEM",
-                    "electoralVotes": 10
-                },
-                "USA": {
-                    "fillKey": "DEM"
-                }
-            },
+        //     bubbleConfig: {
+        //         popupTemplate: function(geography, data) {
+        //             return '<div class="hoverinfo"><strong>' + data.name + '</strong></div>';
+        //         },
+        //         highlightFillOpacity: .85,
+        //     },
+        //     fills: {
+        //         defaultFill: '#BADA55',
+        //         REP: '#ff0000',
+        //         DEM: '#00ffdd'
+        //     },
+        //     data:{
+        //         "AZ": {
+        //             "fillKey": "REP",
+        //             "electoralVotes": 5
+        //         },
+        //         "CA": {
+        //             "fillKey": "DEM",
+        //             "electoralVotes": 10
+        //         },
+        //         "USA": {
+        //             "fillKey": "REP",
+        //             "neat": 1991
+        //         }
+        //     },
             bubbles: [
                  {
                     name: 'Gerboise Bleue',
-                    radius: 76,
+                    radius: 20,
                     yeild: 70,
                     country: 'France',
                     significance: 'First fission weapon test by France',
                     date: '1960-02-13',
-                    fillKey: 'FRA',
-                    latitude: -0.325,
-                    longitude: 26.1840
+                    fillKey: 'DEM',
+                    latitude: 30.99128,
+                    longitude: -97.13858
                   }, {
                     name: 'Canopus',
                     radius: 10,
                     yeild: 2600,
                     country: 'France',
                     significance: 'First "staged" thermonuclear test by France',
-                    fillKey: 'REP',
+                    fillKey: 'DEM',
                     date: '1968-08-24',
-                    latitude: -22.15,
-                    longitude: -138.45
+                    latitude: 30.29128,
+                    longitude: -97.73858
+
                   }
-            ]
-        });
+            ],
+
+        //     done: function(svg) {
+        //         svg.selectAll('.datamaps-bubble').on('mouseenter', function(d) {
+        //             console.log('yeahhh', d);
+        //         });
+
+        //         svg.selectAll('.datamaps-subunit').on('click', function(d) {
+        //             document.querySelector('.info').innerText = d.properties.name;
+        //         })
+        //     }
+        // });
+
+        new Datamap({
+            element: document.getElementById('container2'),
+            scope: 'world'
+        }).draw().setBubbles([
+                 {
+                    name: 'Gerboise Bleue',
+                    radius: 20,
+                    yeild: 70,
+                    country: 'France',
+                    significance: 'First fission weapon test by France',
+                    date: '1960-02-13',
+                    fillKey: 'DEM',
+                    latitude: 30.99128,
+                    longitude: -97.13858
+                  }, {
+                    name: 'Canopus',
+                    radius: 10,
+                    yeild: 2600,
+                    country: 'France',
+                    significance: 'First "staged" thermonuclear test by France',
+                    fillKey: 'DEM',
+                    date: '1968-08-24',
+                    latitude: 30.29128,
+                    longitude: -97.73858
+
+                  }
+            ])
+
+
         </script>
+        <h2 class="info"></h2>
     </body>
 </html>
 
