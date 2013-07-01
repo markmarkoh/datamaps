@@ -1,50 +1,51 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <style>.active { fill: blue !important;}</style>
     </head>
     <body>
 
-        <div id="container1" style="border:1px dotted blue; width: 800px; height: 375px;"></div>
-<div id="container2" style="width: 500px; height: 300px"></div>
+        <div id="container1" style="border:1px dotted blue; width: 800px; height: 375px; float:right; position: relative;"></div>
+<div id="container2" style="width: 500px; height: 300px; position: relative;"></div>
         <script src="/public/js/components/d3/d3.min.js"></script>
         <script src="/public/js/components/topojson/topojson.js"></script>
         <script src="/public/js/datamaps.js"></script>
         <script>
 
-        // new Datamap().draw({
-        //     element: document.getElementById('container1'),
-        //     scope: 'world',
-        //     geographyConfig: {
-        //         popupTemplate: function(geography, data) {
-        //             return '<div class="hoverinfo"><strong>' + geography.properties.name + '</strong><br/>Electoral Votes: ' + data.electoralVotes + '</div>';
-        //         }
-        //     },
+         new Datamap({
+            element: document.getElementById('container1'),
+            scope: 'world',
+            geographyConfig: {
+                popupTemplate: function(geography, data) {
+                    return '<div class="hoverinfo"><strong>' + geography.properties.name + '</strong><br/>Electoral Votes: ' + data.electoralVotes + '</div>';
+                }
+            },
 
-        //     bubbleConfig: {
-        //         popupTemplate: function(geography, data) {
-        //             return '<div class="hoverinfo"><strong>' + data.name + '</strong></div>';
-        //         },
-        //         highlightFillOpacity: .85,
-        //     },
-        //     fills: {
-        //         defaultFill: '#BADA55',
-        //         REP: '#ff0000',
-        //         DEM: '#00ffdd'
-        //     },
-        //     data:{
-        //         "AZ": {
-        //             "fillKey": "REP",
-        //             "electoralVotes": 5
-        //         },
-        //         "CA": {
-        //             "fillKey": "DEM",
-        //             "electoralVotes": 10
-        //         },
-        //         "USA": {
-        //             "fillKey": "REP",
-        //             "neat": 1991
-        //         }
-        //     },
+            bubbleConfig: {
+                popupTemplate: function(geography, data) {
+                    return '<div class="hoverinfo"><strong>' + data.name + '</strong></div>';
+                },
+                highlightFillOpacity: .85,
+            },
+            fills: {
+                defaultFill: '#BADA55',
+                REP: '#ff0000',
+                DEM: '#00ffdd'
+            },
+            data:{
+                "AZ": {
+                    "fillKey": "REP",
+                    "electoralVotes": 5
+                },
+                "CA": {
+                    "fillKey": "DEM",
+                    "electoralVotes": 10
+                },
+                "USA": {
+                    "fillKey": "REP",
+                    "neat": 1991
+                }
+            },
             bubbles: [
                  {
                     name: 'Gerboise Bleue',
@@ -70,20 +71,20 @@
                   }
             ],
 
-        //     done: function(svg) {
-        //         svg.selectAll('.datamaps-bubble').on('mouseenter', function(d) {
-        //             console.log('yeahhh', d);
-        //         });
+            done: function(svg) {
+                svg.selectAll('.datamaps-bubble').on('mouseenter', function(d) {
+                    console.log('yeahhh', d);
+                });
 
-        //         svg.selectAll('.datamaps-subunit').on('click', function(d) {
-        //             document.querySelector('.info').innerText = d.properties.name;
-        //         })
-        //     }
-        // });
+                svg.selectAll('.datamaps-subunit').on('click', function(d) {
+                   d3.select(this).classed('active');
+                })
+            }
+        }).draw();
 
         new Datamap({
             element: document.getElementById('container2'),
-            scope: 'world'
+            scope: 'world',
         }).draw().setBubbles([
                  {
                     name: 'Gerboise Bleue',

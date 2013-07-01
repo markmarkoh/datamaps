@@ -1,10 +1,10 @@
-var datamaps = {};
 (function() {
   // Leak datamaps object globally
   var svg;
 
   var defaultOptions = {
     scope: 'world',
+    projection: 'equirectangular',
     done: function() {},
     fills: {
       defaultFill: '#BADA55'
@@ -94,9 +94,9 @@ var datamaps = {};
 
   function handleGeographyConfig ( options ) {
     var hoverover;
-
+    var svg = this.svg;
     if ( options.highlightOnHover || options.popupOnHover ) {
-      this.svg.selectAll('.datamaps-subunit')
+      svg.selectAll('.datamaps-subunit')
         .on('mouseover', function(d) {
           var $this = d3.select(this);
 
@@ -124,7 +124,7 @@ var datamaps = {};
           }
 
           if ( options.popupOnHover ) {
-            updatePopup($this, d, options);
+            updatePopup($this, d, options, svg);
           }
         })
         .on('mouseout', function() {
@@ -143,35 +143,36 @@ var datamaps = {};
 
   }
 
-  function updatePopup(element, d, options) {
+  function updatePopup(element, d, options, svg) {
     element.on('mousemove', function() {
       var position = d3.mouse(this);
-      d3.select('.datamaps-hoverover')
-        .style('top', (position[1] + 30) + "px")
+      d3.select(svg[0][0].parentNode).select('.datamaps-hoverover')
+        .style('top', ( (position[1] + 30)) + "px")
         .html(function() {
           var data = JSON.parse(element.attr('data-info'));
           if ( !data ) return '';
           return options.popupTemplate(d, data);
         })
-        .style('left', position[0] + "px");
+        .style('left', ( position[0]) + "px");
     });
 
-    d3.select('.datamaps-hoverover').style('display', 'block');
+    d3.select(svg[0][0].parentNode).select('.datamaps-hoverover').style('display', 'block');
 
   }
 
   function handleBubbles ( bubbleData ) {
     var self = this,
         fillData = this.options.fills,
-        options = this.options.bubbleConfig;
+        options = this.options.bubbleConfig,
+        svg = this.svg;
 
     if ( !bubbleData || (bubbleData && !bubbleData.slice) ) {
       throw "Datamaps Error - bubbles must be an array";
     }
 
-    var bubblesContainer = this.svg.select('g.bubbles-container');
+    var bubblesContainer = svg.select('g.bubbles-container');
     if ( bubblesContainer.empty() ) {
-      bubblesContainer = this.svg.append('g').attr('class', 'bubbles-container');
+      bubblesContainer = svg.append('g').attr('class', 'bubbles-container');
     }
 
     var bubbles = bubblesContainer.selectAll('circle.datamaps-bubble').data( bubbleData, JSON.stringify );
@@ -219,7 +220,7 @@ var datamaps = {};
           }
 
           if (options.popupOnHover) {
-            updatePopup($this, datum, options);
+            updatePopup($this, datum, options, svg);
           }
         })
         .on('mouseout', function ( datum ) {
@@ -247,14 +248,14 @@ var datamaps = {};
 
   }
 
-  function setProjection( scope, element ) {
+  function setProjection( scope, element, projection) {
     if ( scope === 'usa' ) {
       this.projection = d3.geo.albersUsa()
         .scale(element.offsetWidth)
         .translate([element.offsetWidth / 2, element.offsetHeight / 2]);
     }
     else if ( scope === 'world' ) {
-      this.projection = d3.geo.equirectangular()
+      this.projection = d3.geo[projection]()
         .scale((element.offsetWidth + 1) / 2 / Math.PI)
         .translate([element.offsetWidth / 2, element.offsetHeight / 1.8]);
     }
@@ -291,11 +292,13 @@ var datamaps = {};
   }
 
   Datamap.prototype.setBubbles = function ( bubbles ) {
+    console.log('setting bubbles');
     handleBubbles.call(this, bubbles);
   };
 
   Datamap.prototype.draw = function() {
     //save off in a closure
+    console.log('drawing');
     var self = this;
     var options = self.options;
 
@@ -308,17 +311,15 @@ var datamaps = {};
     addStyle();
 
     //set projections and paths based on scope
-    setProjection.apply(self, [options.scope, options.element] );
+    setProjection.apply(self, [options.scope, options.element, options.projection] );
 
-    d3.json('/public/js/app/data/' + options.scope + '.topo.json', function(error, result) {
+    d3.json('/public/js/data/' + options.scope + '.topo.json', function(error, result) {
         drawSubunits.apply(self, [result, self.options] );
         handleGeographyConfig.call(self, self.options.geographyConfig );
-        if (options.bubbles) {
-          self.setBubbles ( options.bubbles );
-        }
+        self.setBubbles ( options.bubbles || [] );
 
-        if ( self.options.geographyConfig.popupOnHover || self.options.bubbleConfig.popupOnHover ) {
-          hoverover = d3.select( 'body' ).append('div')
+        if ( self.options.geographyConfig.popupOnHover || self.options.bubbleConfig.popupOnHover) {
+          hoverover = d3.select( self.options.element ).append('div')
             .attr('class', 'datamaps-hoverover')
             .style('z-index', 10001)
             .style('position', 'absolute');
@@ -331,6 +332,4 @@ var datamaps = {};
 
   window.Datamap = Datamap;
 
-
-
-}).apply(datamaps);
+})();
