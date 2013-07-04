@@ -14,9 +14,22 @@
 
          var b= new Datamap({
             element: document.getElementById('container1'),
-            scope: 'usa',
+            scope: 'subunits',
+            setProjection: function(element, options) {
+                var projection = d3.geo.albers()
+                    .center([0, 55.4])
+                    .rotate([4.4, 0])
+                    .parallels([50, 60])
+                    .scale(2000)
+                    .translate([element.offsetWidth / 2, element.offsetHeight / 2]);
+
+                var path =  d3.geo.path()
+                        .projection(projection);
+
+                return {path: path, projection: projection};
+            },
             geographyConfig: {
-               // dataUrl: '//' + window.location.host + '/public/js/data/usa.topo.json',
+                dataUrl: '//' + window.location.host + '/public/js/data/uk.topo.json',
                 popupTemplate: function(geography, data) {
                     return '<div class="hoverinfo"><strong>' + geography.properties.name + '</strong><br/>Electoral Votes: ' + data.electoralVotes + '</div>';
                 }
@@ -47,30 +60,6 @@
                     "neat": 1991
                 }
             },
-            bubbles: [
-                 {
-                    name: 'Gerboise Bleue',
-                    radius: 20,
-                    yeild: 70,
-                    country: 'France',
-                    significance: 'First fission weapon test by France',
-                    date: '1960-02-13',
-                    fillKey: 'DEM',
-                    latitude: 30.99128,
-                    longitude: -97.13858
-                  }, {
-                    name: 'Canopus',
-                    radius: 10,
-                    yeild: 2600,
-                    country: 'France',
-                    significance: 'First "staged" thermonuclear test by France',
-                    fillKey: 'DEM',
-                    date: '1968-08-24',
-                    latitude: 30.29128,
-                    longitude: -97.73858
-
-                  }
-            ],
 
             done: function(svg) {
                 svg.selectAll('.datamaps-bubble').on('mouseenter', function(d) {
@@ -79,9 +68,51 @@
 
                 svg.selectAll('.datamaps-subunit').on('click', function(d) {
                    d3.select(this).classed('active');
-                })
+                });
+
+                b.bubbles([{
+                    name: 'Gerboise Bleue',
+                    radius: 20,
+                    yeild: 70,
+                    country: 'France',
+                    significance: 'First fission weapon test by France',
+                    date: '1960-02-13',
+                    fillKey: 'DEM',
+                    longitude: -0.1275,
+                    latitude: 51.507222
+          }], {
+        borderWidth: 2,
+        borderColor: '#FFFFFF',
+        popupOnHover: true,
+        popupTemplate: function(geography, data) {
+          return '<div class="hoverinfo"><strong>' + data.name + '</strong></div>';
+        },
+        fillOpacity: 0.75,
+        animate: true,
+        highlightOnHover: true,
+        highlightFillColor: '#FA0FA0',
+        highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
+        highlightBorderWidth: 2,
+        highlightFillOpacity: 0.85
+    });
             }
         }).draw();
+
+window.setTimeout(function() {
+b.bubbles([{
+                    name: 'Gerboise Bleue',
+                    radius: 35,
+                    yeild: 70,
+                    country: 'France',
+                    significance: 'First fission weapon test by France',
+                    date: '1960-02-13',
+                    fillKey: 'DEM',
+                    longitude: -0.2275,
+                    latitude: 51.807222
+          }], function(layer) { console.log('layer!', layer); });
+}, 500);
+
+        
 
         var world = new Datamap({
             element: document.getElementById('container2'),
@@ -107,6 +138,8 @@
                 hideAntarctica: false
             }
         });
+
+
 
         world.draw();
 

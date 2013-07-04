@@ -368,6 +368,7 @@
 
   //add <g> layer to root SVG
   Datamap.prototype.addLayer = function( className, id ) {
+    d3.select()
     return this.svg.append('g')
       .attr('id', id || '')
       .attr('class', className || '');
@@ -394,9 +395,31 @@
   Datamap.prototype.addPlugin = function( name, pluginFn ) {
     var self = this;
     if ( typeof Datamap.prototype[name] === "undefined" ) {
-      Datamap.prototype[name] = function(data, options) {
-        var layer = this.addLayer(name);
+      Datamap.prototype[name] = function(data, options, callback, createNewLayer) {
+        var layer;
+        if ( typeof createNewLayer === "undefined" ) {
+          createNewLayer = false;
+        }
+
+        if ( typeof options === 'function' ) {
+          callback = options;
+          options = undefined;
+        }
+
+        //add a single layer, reuse the old layer
+        if ( !createNewLayer && this.options[name + 'Layer'] ) {
+          layer = this.options[name + 'Layer'];
+          options = options || this.options[name + 'Options'];
+        }
+        else {
+          layer = this.addLayer(name);
+          this.options[name + 'Layer'] = layer;
+          this.options[name + 'Options'] = options;
+        }
         pluginFn.apply(this, [layer, data, options]);
+        if ( callback ) {
+          callback(layer);
+        }
       };
     }
   };
