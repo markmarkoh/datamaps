@@ -12,10 +12,11 @@
         <script src="/public/js/datamaps.js"></script>
         <script>
 
-         new Datamap({
+         var b= new Datamap({
             element: document.getElementById('container1'),
-            scope: 'world',
+            scope: 'usa',
             geographyConfig: {
+                dataUrl: '//' + window.location.host + '/public/js/data/usa.topo.json',
                 popupTemplate: function(geography, data) {
                     return '<div class="hoverinfo"><strong>' + geography.properties.name + '</strong><br/>Electoral Votes: ' + data.electoralVotes + '</div>';
                 }
@@ -85,7 +86,8 @@
         new Datamap({
             element: document.getElementById('container2'),
             scope: 'world',
-        }).draw().setBubbles([
+            projection: 'mercator'
+        }).draw();/*.setBubbles([
                  {
                     name: 'Gerboise Bleue',
                     radius: 20,
@@ -108,7 +110,7 @@
                     longitude: -97.73858
 
                   }
-            ])
+            ])*/
 
 
         </script>

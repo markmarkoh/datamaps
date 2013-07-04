@@ -10,6 +10,7 @@
       defaultFill: '#BADA55'
     },
     geographyConfig: {
+        dataUrl: null,
         hideAntarctica: true,
         borderWidth: 1,
         borderColor: '#FDFDFD',
@@ -43,14 +44,17 @@
     this.svg = d3.select( element ).append('svg')
       .attr('width', element.offsetWidth)
       .attr('height', element.offsetHeight);
+
+    return this.svg;
   }
 
-  function addStyle() {
+  function addStyleBlock() {
     d3.select('head').append('style')
       .html('path {stroke: #FFFFFF; stroke-width: 1px;} .datamaps-hoverover {display: none; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; } .hoverinfo {padding: 4px; border-radius: 1px; background-color: #FFF; box-shadow: 1px 1px 5px #CCC; font-size: 12px; border: 1px solid #CCC; } .hoverinfo hr {border:1px dotted #CCC; }');
   }
 
   function drawSubunits( data ) {
+    console.log(this.options.scope);
     var fillData = this.options.fills,
         colorCodeData = this.options.data || {},
         geoConfig = this.options.geographyConfig;
@@ -58,7 +62,7 @@
 
     var subunits = this.svg.select('g.datamaps-subunits');
     if ( subunits.empty() ) {
-      subunits = this.svg.append('g').attr('class', 'datamaps-subunits');
+      subunits = this.addLayer('datamaps-subunits');
     }
 
     var geoData = topojson.feature( data, data.objects[ this.options.scope ] ).features;
@@ -92,9 +96,12 @@
       .style('stroke', geoConfig.borderColor);
   }
 
-  function handleGeographyConfig ( options ) {
+  function handleGeographyConfig () {
     var hoverover;
     var svg = this.svg;
+    var self = this;
+    var options = this.options.geographyConfig;
+
     if ( options.highlightOnHover || options.popupOnHover ) {
       svg.selectAll('.datamaps-subunit')
         .on('mouseover', function(d) {
@@ -124,7 +131,7 @@
           }
 
           if ( options.popupOnHover ) {
-            updatePopup($this, d, options, svg);
+            self.updatePopup($this, d, options, svg);
           }
         })
         .on('mouseout', function() {
@@ -172,7 +179,7 @@
 
     var bubblesContainer = svg.select('g.bubbles-container');
     if ( bubblesContainer.empty() ) {
-      bubblesContainer = svg.append('g').attr('class', 'bubbles-container');
+      bubblesContainer = this.addLayer('bubbles-container');
     }
 
     var bubbles = bubblesContainer.selectAll('circle.datamaps-bubble').data( bubbleData, JSON.stringify );
@@ -183,10 +190,10 @@
         .attr('class', 'datamaps-bubble')
         .attr('cx', function ( datum ) {
           console.log('calc', datum);
-          return self.projection([datum.longitude, datum.latitude])[0];
+          return self.latLngToXY(datum.latitude, datum.longitude)[0];
         })
         .attr('cy', function ( datum ) {
-          return self.projection([datum.longitude, datum.latitude])[1];
+          return self.latLngToXY(datum.latitude, datum.longitude)[1];
         })
         .attr('r', 0) //for animation purposes
         .attr('data-info', function(d) {
@@ -220,7 +227,7 @@
           }
 
           if (options.popupOnHover) {
-            updatePopup($this, datum, options, svg);
+            self.updatePopup($this, datum, options, svg);
           }
         })
         .on('mouseout', function ( datum ) {
@@ -244,7 +251,7 @@
     bubbles.exit()
       .transition()
         .attr("r", 0)
-        .remove()
+        .remove();
 
   }
 
@@ -264,9 +271,6 @@
       .projection( this.projection );
   }
 
-  /**************************************
-    Utilities
-  ***************************************/
   //stolen from underscore.js
   function defaults(obj) {
     Array.prototype.slice.call(arguments, 1).forEach(function(source) {
@@ -279,9 +283,7 @@
     return obj;
   }
   /**************************************
-
-    Global Functions
-
+             Public Functions
   ***************************************/
 
   function Datamap( options ) {
@@ -289,34 +291,44 @@
     this.options = defaults(options, defaultOptions);
     this.options.geographyConfig = defaults(options.geographyConfig, defaultOptions.geographyConfig);
     this.options.bubbleConfig = defaults(options.bubbleConfig, defaultOptions.bubbleConfig);
-  }
-
-  Datamap.prototype.setBubbles = function ( bubbles ) {
-    console.log('setting bubbles');
-    handleBubbles.call(this, bubbles);
-  };
-
-  Datamap.prototype.draw = function() {
-    //save off in a closure
-    console.log('drawing');
-    var self = this;
-    var options = self.options;
 
     //add the SVG container
-    if ( d3.select( options.element ).select('svg').length > 0 ) {
-      addContainer.call(self, options.element );
+    if ( d3.select( this.options.element ).select('svg').length > 0 ) {
+      addContainer.call(this, this.options.element );
     }
 
-    //add the style blocks for the hoverover
-    addStyle();
+    //append style block with basic hoverover styles
+    if ( ! this.options.disableDefaultStyles ) {
+      addStyleBlock();
+    }
+  }
+
+  // actually draw the features(states & countries)
+  Datamap.prototype.draw = function() {
+    //save off in a closure
+    var self = this;
+    var options = self.options;
 
     //set projections and paths based on scope
     setProjection.apply(self, [options.scope, options.element, options.projection] );
 
-    d3.json('/public/js/data/' + options.scope + '.topo.json', function(error, result) {
-        drawSubunits.apply(self, [result, self.options] );
-        handleGeographyConfig.call(self, self.options.geographyConfig );
-        self.setBubbles ( options.bubbles || [] );
+    //if custom URL for topojson data, retrieve it and render
+    if ( options.geographyConfig.dataUrl ) {
+      d3.json( options.geographyConfig.dataUrl, function(error, results) {
+        if ( error ) throw new Error(error);
+
+        draw( results );
+      });
+    }
+    else {
+      draw( this.data[options.scope] );
+    }
+    
+    return this;
+
+      function draw (data) {
+        drawSubunits.call(self, data);
+        handleGeographyConfig.call(self);
 
         if ( self.options.geographyConfig.popupOnHover || self.options.bubbleConfig.popupOnHover) {
           hoverover = d3.select( self.options.element ).append('div')
@@ -325,11 +337,60 @@
             .style('position', 'absolute');
         }
 
+        //fire off finished callback
         self.options.done(self.svg);
-    });
-    return this;
+      }
   };
 
-  window.Datamap = Datamap;
+  /**************************************
+                Utilities
+  ***************************************/
 
+  //convert lat/lng coords to X / Y coords
+  Datamap.prototype.latLngToXY = function(lat, lng) {
+     return this.projection([lng, lat]);
+  };
+
+  //add <g> layer to root SVG
+  Datamap.prototype.addLayer = function( className, id ) {
+    return this.svg.append('g')
+      .attr('id', id || '')
+      .attr('class', className || '');
+  };
+
+  Datamap.prototype.updatePopup = function (element, d, options) {
+    var self = this;
+    element.on('mousemove', null);
+    element.on('mousemove', function() {
+      var position = d3.mouse(this);
+      d3.select(self.svg[0][0].parentNode).select('.datamaps-hoverover')
+        .style('top', ( (position[1] + 30)) + "px")
+        .html(function() {
+          var data = JSON.parse(element.attr('data-info'));
+          if ( !data ) return '';
+          return options.popupTemplate(d, data);
+        })
+        .style('left', ( position[0]) + "px");
+    });
+
+    d3.select(self.svg[0][0].parentNode).select('.datamaps-hoverover').style('display', 'block');
+  };
+
+
+  /**************************************
+            Example Plugin
+  ***************************************/
+
+  Datamap.prototype.setBubbles = function ( bubbles ) {
+    handleBubbles.call(this, bubbles);
+  };
+
+
+  // expose library
+  if ( typeof define === "function" && define.amd ) {
+    define( "datamaps", [], function () { return Datamap; } );
+  }
+  else {
+    window.Datamap = Datamap;
+  }
 })();
