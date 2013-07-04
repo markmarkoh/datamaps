@@ -9,14 +9,14 @@
 <div id="container2" style="width: 500px; height: 300px; position: relative;"></div>
         <script src="/public/js/components/d3/d3.min.js"></script>
         <script src="/public/js/components/topojson/topojson.js"></script>
-        <script src="/public/js/datamaps.js"></script>
+        <script src="/public/rel/datamaps.all.js"></script>
         <script>
 
          var b= new Datamap({
             element: document.getElementById('container1'),
             scope: 'usa',
             geographyConfig: {
-                dataUrl: '//' + window.location.host + '/public/js/data/usa.topo.json',
+               // dataUrl: '//' + window.location.host + '/public/js/data/usa.topo.json',
                 popupTemplate: function(geography, data) {
                     return '<div class="hoverinfo"><strong>' + geography.properties.name + '</strong><br/>Electoral Votes: ' + data.electoralVotes + '</div>';
                 }
@@ -83,11 +83,34 @@
             }
         }).draw();
 
-        new Datamap({
+        var world = new Datamap({
             element: document.getElementById('container2'),
             scope: 'world',
-            projection: 'mercator'
-        }).draw();/*.setBubbles([
+            setProjection: function(element, options) {
+                var projection, path; 
+                projection = d3.geo['stereographic']()
+                    .scale((element.offsetWidth + 1) / 2 / Math.PI)
+                    .translate([element.offsetWidth / 2, element.offsetHeight / 1.8]);
+
+                path = d3.geo.path()
+                  .projection( projection );
+
+                return {path: path, projection: projection};
+
+            },
+            projection: 'mercator',
+            fills: {
+                defaultFill: 'green',
+                'DEM': 'blue'
+            },
+            geographyConfig: {
+                hideAntarctica: false
+            }
+        });
+
+        world.draw();
+
+        world.bubbles([
                  {
                     name: 'Gerboise Bleue',
                     radius: 20,
@@ -104,13 +127,27 @@
                     yeild: 2600,
                     country: 'France',
                     significance: 'First "staged" thermonuclear test by France',
-                    fillKey: 'DEM',
+                    fillKey: 'REP',
                     date: '1968-08-24',
                     latitude: 30.29128,
                     longitude: -97.73858
 
                   }
-            ])*/
+            ], {
+        borderWidth: 2,
+        borderColor: '#FFFFFF',
+        popupOnHover: true,
+        popupTemplate: function(geography, data) {
+          return '<div class="hoverinfo"><strong>' + data.name + '</strong></div>';
+        },
+        fillOpacity: 0.75,
+        animate: true,
+        highlightOnHover: true,
+        highlightFillColor: '#FA0FA0',
+        highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
+        highlightBorderWidth: 2,
+        highlightFillOpacity: 0.85
+    })
 
 
         </script>

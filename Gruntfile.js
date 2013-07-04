@@ -3,16 +3,47 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     replace: {
+      world: {
+        src: ['public/js/datamaps.js'],
+        dest: 'public/rel/datamaps.world.js',
+        replacements: [{
+          from: '\'__WORLD__\'',
+          to: '<%= grunt.file.read("public/js/data/world.topo.json") %>'
+        }]
+      },
+      usa: {
+        src: ['public/js/datamaps.js'],
+        dest: 'public/rel/datamaps.usa.js',
+        replacements: [{
+          from: '\'__USA__\'',
+          to: '<%= grunt.file.read("public/js/data/usa.topo.json") %>'
+        }]
+      },
+      all: {
+        src: ['public/js/datamaps.js'],
+        dest: 'public/rel/datamaps.all.js',
+        replacements: [{
+          from: '\'__USA__\'',
+          to: '<%= grunt.file.read("public/js/data/usa.topo.json") %>'
+        }, {
+          from: '\'__WORLD__\'',
+          to: '<%= grunt.file.read("public/js/data/world.topo.json") %>'
+        }]
+      }
+    },
+    watch: {
+      datamap: {
+        files: ['public/js/datamaps.js'],
+        tasks: ['replace'],
+    }
+  },
+   uglify: {
       dist: {
-        options: {
-          variables: {
-            'key': 'poop'
-          },
-          prefix: '$$'
-        },
-        files: [
-          {expand: true, flatten: true, src: ['public/js/datamaps.js'], dest: 'word/'}
-        ]
+        files: {
+          'public/rel/datamaps.world.min.js': ['public/rel/datamaps.world.js'],
+          'public/rel/datamaps.usa.min.js': ['public/rel/datamaps.usa.js'],
+          'public/rel/datamaps.all.min.js': ['public/rel/datamaps.all.js']
+        }
       }
     },
     jasmine: {
@@ -28,6 +59,12 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.loadNpmTasks('grunt-replace');
+  grunt.loadNpmTasks('grunt-text-replace');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-watch');
+
+
+  grunt.registerTask('dev', ['replace']);
+  grunt.registerTask('build', ['replace', 'uglify:dist']);
 
 };

@@ -1,9 +1,8 @@
 (function() {
-  // Leak datamaps object globally
   var svg;
-
   var defaultOptions = {
     scope: 'world',
+    setProjection: setProjection,
     projection: 'equirectangular',
     done: function() {},
     fills: {
@@ -48,13 +47,36 @@
     return this.svg;
   }
 
+  // setProjection takes the svg element and options
+  function setProjection( element, options ) {
+    var projection, path;
+    if ( options && typeof options.scope === 'undefined') {
+      options.scope = 'world';
+    }
+
+    if ( options.scope === 'usa' ) {
+      projection = d3.geo.albersUsa()
+        .scale(element.offsetWidth)
+        .translate([element.offsetWidth / 2, element.offsetHeight / 2]);
+    }
+    else if ( options.scope === 'world' ) {
+      projection = d3.geo[options.projection]()
+        .scale((element.offsetWidth + 1) / 2 / Math.PI)
+        .translate([element.offsetWidth / 2, element.offsetHeight / 1.8]);
+    }
+
+    path = d3.geo.path()
+      .projection( projection );
+
+    return {path: path, projection: projection};
+  }
+
   function addStyleBlock() {
     d3.select('head').append('style')
       .html('path {stroke: #FFFFFF; stroke-width: 1px;} .datamaps-hoverover {display: none; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; } .hoverinfo {padding: 4px; border-radius: 1px; background-color: #FFF; box-shadow: 1px 1px 5px #CCC; font-size: 12px; border: 1px solid #CCC; } .hoverinfo hr {border:1px dotted #CCC; }');
   }
 
   function drawSubunits( data ) {
-    console.log(this.options.scope);
     var fillData = this.options.fills,
         colorCodeData = this.options.data || {},
         geoConfig = this.options.geographyConfig;
@@ -167,29 +189,22 @@
 
   }
 
-  function handleBubbles ( bubbleData ) {
+  function handleBubbles (layer, data, options ) {
     var self = this,
         fillData = this.options.fills,
-        options = this.options.bubbleConfig,
         svg = this.svg;
 
-    if ( !bubbleData || (bubbleData && !bubbleData.slice) ) {
+    if ( !data || (data && !data.slice) ) {
       throw "Datamaps Error - bubbles must be an array";
     }
 
-    var bubblesContainer = svg.select('g.bubbles-container');
-    if ( bubblesContainer.empty() ) {
-      bubblesContainer = this.addLayer('bubbles-container');
-    }
-
-    var bubbles = bubblesContainer.selectAll('circle.datamaps-bubble').data( bubbleData, JSON.stringify );
+    var bubbles = layer.selectAll('circle.datamaps-bubble').data( data, JSON.stringify );
 
     bubbles
       .enter()
         .append('svg:circle')
         .attr('class', 'datamaps-bubble')
         .attr('cx', function ( datum ) {
-          console.log('calc', datum);
           return self.latLngToXY(datum.latitude, datum.longitude)[0];
         })
         .attr('cy', function ( datum ) {
@@ -255,22 +270,6 @@
 
   }
 
-  function setProjection( scope, element, projection) {
-    if ( scope === 'usa' ) {
-      this.projection = d3.geo.albersUsa()
-        .scale(element.offsetWidth)
-        .translate([element.offsetWidth / 2, element.offsetHeight / 2]);
-    }
-    else if ( scope === 'world' ) {
-      this.projection = d3.geo[projection]()
-        .scale((element.offsetWidth + 1) / 2 / Math.PI)
-        .translate([element.offsetWidth / 2, element.offsetHeight / 1.8]);
-    }
-
-    this.path = d3.geo.path()
-      .projection( this.projection );
-  }
-
   //stolen from underscore.js
   function defaults(obj) {
     Array.prototype.slice.call(arguments, 1).forEach(function(source) {
@@ -287,6 +286,11 @@
   ***************************************/
 
   function Datamap( options ) {
+
+    if ( typeof d3 === 'undefined' || typeof topojson === 'undefined' ) {
+      throw new Error('Include d3.js (v3.0.3 or greater) and topojson on this page before creating a new map');
+   }
+
     //set options for global use
     this.options = defaults(options, defaultOptions);
     this.options.geographyConfig = defaults(options.geographyConfig, defaultOptions.geographyConfig);
@@ -296,6 +300,9 @@
     if ( d3.select( this.options.element ).select('svg').length > 0 ) {
       addContainer.call(this, this.options.element );
     }
+
+    /* Add core plugins to this instance */
+    this.addPlugin('bubbles', handleBubbles);
 
     //append style block with basic hoverover styles
     if ( ! this.options.disableDefaultStyles ) {
@@ -310,7 +317,10 @@
     var options = self.options;
 
     //set projections and paths based on scope
-    setProjection.apply(self, [options.scope, options.element, options.projection] );
+    var pathAndProjection = options.setProjection.apply(self, [options.element, options] );
+
+    this.path = pathAndProjection.path;
+    this.projection = pathAndProjection.projection;
 
     //if custom URL for topojson data, retrieve it and render
     if ( options.geographyConfig.dataUrl ) {
@@ -321,9 +331,9 @@
       });
     }
     else {
-      draw( this.data[options.scope] );
+      draw( this[options.scope + 'Topo'] );
     }
-    
+
     return this;
 
       function draw (data) {
@@ -341,6 +351,11 @@
         self.options.done(self.svg);
       }
   };
+  /**************************************
+                TopoJSON
+  ***************************************/
+  Datamap.prototype.worldTopo = '__WORLD__';
+  Datamap.prototype.usaTopo = '__USA__';
 
   /**************************************
                 Utilities
@@ -376,15 +391,19 @@
     d3.select(self.svg[0][0].parentNode).select('.datamaps-hoverover').style('display', 'block');
   };
 
+  Datamap.prototype.addPlugin = function( name, pluginFn ) {
+    var self = this;
+    if ( typeof Datamap.prototype[name] === "undefined" ) {
+      Datamap.prototype[name] = function(data, options) {
+        var layer = this.addLayer(name);
+        pluginFn.apply(this, [layer, data, options]);
+      };
+    }
+  };
 
   /**************************************
             Example Plugin
   ***************************************/
-
-  Datamap.prototype.setBubbles = function ( bubbles ) {
-    handleBubbles.call(this, bubbles);
-  };
-
 
   // expose library
   if ( typeof define === "function" && define.amd ) {
