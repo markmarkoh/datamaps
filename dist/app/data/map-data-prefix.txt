@@ -1,2 +1,0 @@
-define(function(require) {
- return {"type":"FeatureCollection","features":[
