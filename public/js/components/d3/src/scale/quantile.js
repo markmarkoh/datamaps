@@ -1,3 +1,8 @@
+import "../arrays/ascending";
+import "../arrays/bisect";
+import "../arrays/quantile";
+import "scale";
+
 d3.scale.quantile = function() {
   return d3_scale_quantile([], []);
 };
@@ -14,8 +19,7 @@ function d3_scale_quantile(domain, range) {
   }
 
   function scale(x) {
-    if (isNaN(x = +x)) return NaN;
-    return range[d3.bisect(thresholds, x)];
+    if (!isNaN(x = +x)) return range[d3.bisect(thresholds, x)];
   }
 
   scale.domain = function(x) {

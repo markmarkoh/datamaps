@@ -1,45 +1,41 @@
+import "../core/source";
+import "../core/target";
+import "geo";
+import "distance";
+
+// @deprecated use {type: "LineString"} or d3.geo.distance instead.
 d3.geo.greatArc = function() {
-  var source = d3_source, s,
-      target = d3_target, t,
-      precision = 6 * d3_radians,
-      interpolate;
+  var source = d3_source, source_,
+      target = d3_target, target_;
 
   function greatArc() {
-    var p0 = s || source.apply(this, arguments),
-        p1 = t || target.apply(this, arguments),
-        i = interpolate || d3.geo.interpolate(p0, p1),
-        t = 0,
-        dt = precision / i.distance,
-        coordinates = [p0];
-    while ((t += dt) < 1) coordinates.push(i(t));
-    coordinates.push(p1);
-    return {type: "LineString", coordinates: coordinates};
+    return {type: "LineString", coordinates: [
+      source_ || source.apply(this, arguments),
+      target_ || target.apply(this, arguments)
+    ]};
   }
 
-  // Length returned in radians; multiply by radius for distance.
   greatArc.distance = function() {
-    return (interpolate || d3.geo.interpolate(s || source.apply(this, arguments), t || target.apply(this, arguments))).distance;
+    return d3.geo.distance(
+      source_ || source.apply(this, arguments),
+      target_ || target.apply(this, arguments)
+    );
   };
 
   greatArc.source = function(_) {
     if (!arguments.length) return source;
-    source = _, s = typeof _ === "function" ? null : _;
-    interpolate = s && t ? d3.geo.interpolate(s, t) : null;
+    source = _, source_ = typeof _ === "function" ? null : _;
     return greatArc;
   };
 
   greatArc.target = function(_) {
     if (!arguments.length) return target;
-    target = _, t = typeof _ === "function" ? null : _;
-    interpolate = s && t ? d3.geo.interpolate(s, t) : null;
+    target = _, target_ = typeof _ === "function" ? null : _;
     return greatArc;
   };
 
-  // Precision is specified in degrees.
-  greatArc.precision = function(_) {
-    if (!arguments.length) return precision / d3_radians;
-    precision = _ * d3_radians;
-    return greatArc;
+  greatArc.precision = function() {
+    return arguments.length ? greatArc : 0;
   };
 
   return greatArc;
