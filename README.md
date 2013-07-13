@@ -8,9 +8,16 @@ It heavily relies on the amazing [D3.js](https://github.com/mbostock/d3) library
 
 Out of the box in includes support for choropleths and bubble maps (see [demos](https://datamaps.github.io)), but it's not limited to just that. It's new plugin system allows for the addition of any type of visualization over the map.
 
+#### Demos at http://datamaps.github.io
+
 ---
 
-#### Demos at http://datamaps.github.io
+Downloads:
+
+ - [World map (94kb, 36.7kb gzip'd)](http://datamaps.github.io/scripts/datamaps.world.min.js)
+ - [USA only (35kb, 13.9kb gzip'd)](http://datamaps.github.io/scripts/datamaps.usa.min.js)
+ - [USA & World (131kb, 47.1kb gzip'd)](http://datamaps.github.io/scripts/datamaps.all.min.js)
+ - [No preset topojson (6.8kb, 2.3kb gzip'd)](http://datamaps.github.io/scripts/datamaps.none.min.js)
 
 
 ###Documentation
@@ -336,13 +343,6 @@ All events are bubbled up to the root `svg` element and to listen to events, use
     }
 ```
 ---
-
-Downloads:
-
- - [World map](http://datamaps.github.io/scripts/datamaps.world.min.js)
- - [USA only](http://datamaps.github.io/scripts/datamaps.usa.min.js)
- - [USA & World](http://datamaps.github.io/scripts/datamaps.all.min.js)
- - [No preset topojson](http://datamaps.github.io/scripts/datamaps.none.min.js)
 
 Examples:
 
