@@ -86,6 +86,7 @@ A map of the USA with an Albers based projection will be default if you only inc
         geographyConfig: {
             dataUrl: '/custom.json'
         },
+        scope: 'custom',
         setProjection: function(element, options) {
             var projection, path;
             projection = d3.geo.albersUsa()
@@ -109,12 +110,16 @@ If you are using a custom map, you'll probably want to specify your own `setProj
 
 The example above will result in albersUsa projection.
 
+![custom UK based data](http://datamaps.github.io/images/custom.png)
+
 [Read about other D3.js projections](https://github.com/mbostock/d3/wiki/Geo-Projections)
+
 [Read more about TopoJSON](https://github.com/mbostock/topojson/wiki)
 
 #### Creating a Choropleth
 
 Probably the most common type of map visualization, where different states or countries are color coded.
+![US election map, example of a choropleth](http://datamaps.github.io/images/choropleth.png)
 
 You'll need to know the 2 letter state code ('NY' for New York) or the 3 letter country code ('SCT' for Scotland) to fill in areas.
 ```html
@@ -260,7 +265,9 @@ bombMap.bubbles(bombs, {
     }
 });
 ```
-    
+
+![bubble map](http://datamaps.github.io/images/bubbles.png)
+
 The first parameter to `bubbles` should be an array of objects, each with **at least** 3 properties:
 
   - `latitude`
