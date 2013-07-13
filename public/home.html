@@ -150,9 +150,16 @@ window.setTimeout(function() {
             scope: 'world',
             setProjection: function(element, options) {
                 var projection, path; 
-                projection = d3.geo['stereographic']()
-                    .scale((element.offsetWidth + 1) / 2 / Math.PI)
-                    .translate([element.offsetWidth / 2, element.offsetHeight / 1.8]);
+                var width = element.offsetWidth,
+                    height = element.offsetHeight;
+
+                var projection = d3.geo.orthographic()
+                    .scale(width / 4)
+                    .rotate([50,0,0])
+                    .translate([width / 2, height / 2])
+                    .clipAngle(90)
+                    .precision(.1);
+
 
                 path = d3.geo.path()
                   .projection( projection );
