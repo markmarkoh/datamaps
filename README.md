@@ -3,14 +3,19 @@ Datamaps
 
 #### Interactive maps for data visualizations. Bundled into a single Javascript file.
 
+Datamaps is intended to provide some data visualizations based on geogrpahical data. It's SVG-based, can scale to any screen size, and includes everything inside of 1 script file.
+It heavily relies on the amazing [D3.js](https://github.com/mbostock/d3) library.
+
+Out of the box in includes support for choropleths and bubble maps (see [demos](https://datamaps.github.io)), but it's not limited to just that. It's new plugin system allows for the addition of any type of visualization over the map.
+
 ---
 
-### Demos at http://datamaps.github.io
+#### Demos at http://datamaps.github.io
 
 
-##Documentation
+###Documentation
 
-### Getting Started
+#### Getting Started
 
 1. Include D3.js and Topojson on your page
 2. Include Datamaps.js on your page
@@ -30,7 +35,7 @@ Example:
 
 This should render a new world map with a standard projection.
 
-### USA Only Map
+#### USA Only Map
 A map of the USA with an Albers based projection will be default if you only include `datamaps.usa.min.js`, but in case you include `datamaps.all.min.js`:
 ```html
 <script>
@@ -41,7 +46,7 @@ A map of the USA with an Albers based projection will be default if you only inc
 </script>
 ```
 
-### Changing the default fill colors
+#### Changing the default fill colors
 ```html
 <script>
     var map = new Datamap({
@@ -53,7 +58,7 @@ A map of the USA with an Albers based projection will be default if you only inc
 </script>
 ```
 
-### Disabling popup or hover effects
+#### Disabling popup or hover effects
 ```html
 <script>
     var map = new Datamap({
@@ -66,13 +71,13 @@ A map of the USA with an Albers based projection will be default if you only inc
 </script>
 ```
     
-### Using custom maps
+#### Using custom maps
 ```html
 <script>
     var map = new Datamap({
         element: document.getElementById('container'),
         geographyConfig: {
-            dataUrl: '/custom.json'd=
+            dataUrl: '/custom.json'
         },
         setProjection: function(element, options) {
             var projection, path;
@@ -89,7 +94,7 @@ A map of the USA with an Albers based projection will be default if you only inc
 </script>
 ```
 
-By specifying a dataUrl, Datamaps will attempt to fetch that resource as TopoJSON.
+By specifying a `dataUrl`, Datamaps will attempt to fetch that resource as TopoJSON.
 
 If you are using a custom map, you'll probably want to specify your own `setProjection` method as well.
 
@@ -98,8 +103,9 @@ If you are using a custom map, you'll probably want to specify your own `setProj
 The example above will result in albersUsa projection.
 
 [Read about other D3.js projections](https://github.com/mbostock/d3/wiki/Geo-Projections)
+[Read more about TopoJSON](https://github.com/mbostock/topojson/wiki)
 
-### Creating a Choropleth
+#### Creating a Choropleth
 
 Probably the most common type of map visualization, where different states or countries are color coded.
 
@@ -131,7 +137,7 @@ You'll need to know the 2 letter state code ('NY' for New York) or the 3 letter 
 
 This will draw a world map and fill in IRL (Ireland) with the corresponding `fills.LOW` and USA with `fills.MEDIUM`.
 
-### Custom popup on hover
+#### Custom popup on hover
 
 Expanding on the previous example of using `data`, any property passed into `data` will be sent to the `popupTemplate` function, which can be overriden to display custom messages.
 ```html
@@ -170,7 +176,7 @@ Expanding on the previous example of using `data`, any property passed into `dat
 `geographyConfig.popupTemplate` just needs to return an HTML string, so feel free to use [Handlebars](https://github.com/wycats/handlebars.js/) or [Underscore](http://underscorejs.org/#template) templates (instead of the terrible Array.join method above).
 
 
-### Bubbles
+#### Bubbles
 Bubbles in a core plugin that will render circles('bubbles') on different parts of the map. Each of these bubbles can be color coded in the same way a choropleth is color coded (see above 'Choropleth' example).
 ```js
 var bombMap = new Datamap({
@@ -259,22 +265,37 @@ Optionally, pass in `fillKey` to color code the bubble, and pass in any other da
 The second parameter is the `options` param, where you can overide any of the default options (documented below)
 
 
-### Live updating of bubbles
+#### Live updating of bubbles
 You can continue to call `bubbles` on the same map instance and the map will auto update itself. Any bubble previously drawn that's **not included** in subsequent calls will be removed from the UI.
 
 `map.bubbles([])` will erase all bubbles.
 
-### Using with jQuery
+#### Using with jQuery
 If jQuery is present on the page when the Datamaps library loads, it'll automatically create a jQuery plugin called `datamaps` that can be used like:
 ```html
     <script>
         $("#container").datamaps(options);
     </script>
 ```
-    
+
+#### Events
+All events are bubbled up to the root `svg` element and to listen to events, use the `done` callback.
+
+```html
+<script>
+    var map = new Datamap({
+        element: document.getElementById('container'),
+        done: function(datamap) {
+            datamap.svg.selectAll('.subunits').on('click', function(geography) {
+                alert(geography.properties.name);
+            });
+        }
+    });
+</script>
+```  
 ---
 
-### Default Options
+#### Default Options
 ```js
     {
         scope: 'world', //currently supports 'usa' and 'world', however with custom map data you can specify your own
