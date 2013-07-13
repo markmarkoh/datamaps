@@ -1,7 +1,0 @@
-.DS_Store
-pkg
-*.swp
-docs/*
-.jhw-cache
-.rbenv-version
-public/
