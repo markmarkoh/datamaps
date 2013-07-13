@@ -6,7 +6,7 @@
     projection: 'equirectangular',
     done: function() {},
     fills: {
-      defaultFill: '#BADA55'
+      defaultFill: '#ABDDA4'
     },
     geographyConfig: {
         dataUrl: null,
@@ -18,7 +18,7 @@
         },
         popupOnHover: true,
         highlightOnHover: true,
-        highlightFillColor: '#FA0FA0',
+        highlightFillColor: '#FC8D59',
         highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
         highlightBorderWidth: 2
     },
@@ -32,7 +32,7 @@
         fillOpacity: 0.75,
         animate: true,
         highlightOnHover: true,
-        highlightFillColor: '#FA0FA0',
+        highlightFillColor: '#FC8D59',
         highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
         highlightBorderWidth: 2,
         highlightFillOpacity: 0.85
@@ -166,26 +166,10 @@
               $this.style(attr, previousAttributes[attr]);
             }
           }
-          d3.select('.datamaps-hoverover').style('display', 'none');
+          $this.on('mousemove', null);
+          d3.selectAll('.datamaps-hoverover').style('display', 'none');
         });
     }
-
-  }
-
-  function updatePopup(element, d, options, svg) {
-    element.on('mousemove', function() {
-      var position = d3.mouse(this);
-      d3.select(svg[0][0].parentNode).select('.datamaps-hoverover')
-        .style('top', ( (position[1] + 30)) + "px")
-        .html(function() {
-          var data = JSON.parse(element.attr('data-info'));
-          if ( !data ) return '';
-          return options.popupTemplate(d, data);
-        })
-        .style('left', ( position[0]) + "px");
-    });
-
-    d3.select(svg[0][0].parentNode).select('.datamaps-hoverover').style('display', 'block');
 
   }
 
@@ -256,7 +240,7 @@
             }
           }
 
-          d3.select('.datamaps-hoverover').style('display', 'none');
+          d3.selectAll('.datamaps-hoverover').style('display', 'none');
         })
         .transition().duration(400)
           .attr('r', function ( datum ) {
@@ -308,6 +292,8 @@
     if ( ! this.options.disableDefaultStyles ) {
       addStyleBlock();
     }
+
+    return this.draw();
   }
 
   // actually draw the features(states & countries)
@@ -348,7 +334,7 @@
         }
 
         //fire off finished callback
-        self.options.done(self.svg);
+        self.options.done(self);
       }
   };
   /**************************************
@@ -383,7 +369,7 @@
         .style('top', ( (position[1] + 30)) + "px")
         .html(function() {
           var data = JSON.parse(element.attr('data-info'));
-          if ( !data ) return '';
+          //if ( !data ) return '';
           return options.popupTemplate(d, data);
         })
         .style('left', ( position[0]) + "px");
@@ -406,6 +392,8 @@
           options = undefined;
         }
 
+        options = defaults(options || {}, defaultOptions.bubbleConfig);
+
         //add a single layer, reuse the old layer
         if ( !createNewLayer && this.options[name + 'Layer'] ) {
           layer = this.options[name + 'Layer'];
@@ -424,15 +412,23 @@
     }
   };
 
-  /**************************************
-            Example Plugin
-  ***************************************/
-
   // expose library
   if ( typeof define === "function" && define.amd ) {
     define( "datamaps", [], function () { return Datamap; } );
   }
   else {
-    window.Datamap = Datamap;
+    window.Datamap = window.Datamaps = Datamap;
+  }
+
+  if ( window.jQuery ) {
+    window.jQuery.fn.datamaps = function(options, callback) {
+      options = options || {};
+      options.element = this[0];
+      var datamap = new Datamap(options);
+      if ( typeof callback === "function" ) {
+        callback(datamap, options);
+      }
+      return this;
+    };
   }
 })();

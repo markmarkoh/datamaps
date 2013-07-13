@@ -42,7 +42,8 @@ module.exports = function(grunt) {
         files: {
           'public/rel/datamaps.world.min.js': ['public/rel/datamaps.world.js'],
           'public/rel/datamaps.usa.min.js': ['public/rel/datamaps.usa.js'],
-          'public/rel/datamaps.all.min.js': ['public/rel/datamaps.all.js']
+          'public/rel/datamaps.all.min.js': ['public/rel/datamaps.all.js'],
+          'public/rel/datamaps.none.min.js': ['public/js/datamaps.js']
         }
       }
     },

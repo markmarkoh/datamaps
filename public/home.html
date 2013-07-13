@@ -6,11 +6,40 @@
     <body>
 
         <div id="container1" style="border:1px dotted blue; width: 800px; height: 375px; float:right; position: relative;"></div>
-<div id="container2" style="width: 500px; height: 300px; position: relative;"></div>
+        <div id="container2" style="width: 500px; height: 300px; position: relative;"></div>
+        <div id="container3" style="width: 500px; height: 300px; position: relative;"></div>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
         <script src="/public/js/components/d3/d3.min.js"></script>
         <script src="/public/js/components/topojson/topojson.js"></script>
         <script src="/public/rel/datamaps.all.js"></script>
         <script>
+
+        $('#container3').datamaps({
+            geographyConfig: {
+                highlightOnHover: false,
+                popupTemplate: function(geography, data) {
+                    if (data) {
+                        return "<div class='hoverinfo'>Name of War: " + data.warName + "</div>";
+                    }
+                }
+            },
+            fills: {
+                defaultFill: 'blue',
+                war: 'red'
+            },
+            data: {
+                'USA': {
+                    fillKey: 'war',
+                    warName: 'USA/Afgan War'
+                }
+            },
+            done: function(datamap) {
+                var svg = datamap.svg;
+                svg.selectAll('.datamaps-subunit').on('click', function(d) {
+                    debugger;
+                })
+            }
+        });
 
          var b= new Datamap({
             element: document.getElementById('container1'),
@@ -31,6 +60,7 @@
             geographyConfig: {
                 dataUrl: '//' + window.location.host + '/public/js/data/uk.topo.json',
                 popupTemplate: function(geography, data) {
+                    data = data || {};
                     return '<div class="hoverinfo"><strong>' + geography.properties.name + '</strong><br/>Electoral Votes: ' + data.electoralVotes + '</div>';
                 }
             },
@@ -42,7 +72,7 @@
                 highlightFillOpacity: .85,
             },
             fills: {
-                defaultFill: '#BADA55',
+                defaultFill: '#ABDDA4',
                 REP: '#ff0000',
                 DEM: '#00ffdd'
             },
@@ -61,7 +91,8 @@
                 }
             },
 
-            done: function(svg) {
+            done: function(datamap) {
+                var svg = datamap.svg;
                 svg.selectAll('.datamaps-bubble').on('mouseenter', function(d) {
                     console.log('yeahhh', d);
                 });
@@ -96,21 +127,21 @@
         highlightFillOpacity: 0.85
     });
             }
-        }).draw();
+        });
 
 window.setTimeout(function() {
-b.bubbles([{
-                    name: 'Gerboise Bleue',
-                    radius: 35,
-                    yeild: 70,
-                    country: 'France',
-                    significance: 'First fission weapon test by France',
-                    date: '1960-02-13',
-                    fillKey: 'DEM',
-                    longitude: -0.2275,
-                    latitude: 51.807222
-          }], function(layer) { console.log('layer!', layer); });
-}, 500);
+                b.bubbles([{
+                                name: 'Gerboise Bleue',
+                                radius: 55,
+                                yeild: 70,
+                                country: 'France',
+                                significance: 'First fission weapon test by France',
+                                date: '1960-02-13',
+                                fillKey: 'DEM',
+                                longitude: -0.2275,
+                                latitude: 51.807222
+                      }], function(layer) { console.log('layer!', layer); });
+            }, 5000);
 
         
 
@@ -131,17 +162,13 @@ b.bubbles([{
             },
             projection: 'mercator',
             fills: {
-                defaultFill: 'green',
+                defaultFill: '#ABDDA4',
                 'DEM': 'blue'
             },
             geographyConfig: {
                 hideAntarctica: false
             }
         });
-
-
-
-        world.draw();
 
         world.bubbles([
                  {
