@@ -300,7 +300,7 @@ All events are bubbled up to the root `svg` element and to listen to events, use
     var map = new Datamap({
         element: document.getElementById('container'),
         done: function(datamap) {
-            datamap.svg.selectAll('.subunits').on('click', function(geography) {
+            datamap.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
                 alert(geography.properties.name);
             });
         }
