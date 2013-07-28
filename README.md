@@ -144,10 +144,15 @@ You'll need to know the 2 letter state code ('NY' for New York) or the 3 letter 
             }
         }
     });
+    
+    //draw a legend for this map
+    map.legend();
 </script>
 ```
 
 This will draw a world map and fill in IRL (Ireland) with the corresponding `fills.LOW` and USA with `fills.MEDIUM`.
+
+You can also add a map legend with the `legend` plugin (used above)
 
 #### Custom popup on hover
 
