@@ -72,8 +72,10 @@
   }
 
   function addStyleBlock() {
-    d3.select('head').append('style')
-      .html('path {stroke: #FFFFFF; stroke-width: 1px;} .datamaps-hoverover {display: none; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; } .hoverinfo {padding: 4px; border-radius: 1px; background-color: #FFF; box-shadow: 1px 1px 5px #CCC; font-size: 12px; border: 1px solid #CCC; } .hoverinfo hr {border:1px dotted #CCC; }');
+    if ( d3.select('.datamaps-style-block').empty() ) {
+      d3.select('head').attr('class', 'datamaps-style-block').append('style')
+      .html('path {stroke: #FFFFFF; stroke-width: 1px;} .datamaps-legend dt, .datamaps-legend dd { float: left; margin: 0 3px 0 0;} .datamaps-legend dd {width: 20px; margin-right: 6px; border-radius: 3px;} .datamaps-legend {padding-bottom: 20px; z-index: 1001; position: absolute; left: 4px; font-size: 12px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;} .datamaps-hoverover {display: none; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; } .hoverinfo {padding: 4px; border-radius: 1px; background-color: #FFF; box-shadow: 1px 1px 5px #CCC; font-size: 12px; border: 1px solid #CCC; } .hoverinfo hr {border:1px dotted #CCC; }');
+    }
   }
 
   function drawSubunits( data ) {
@@ -171,6 +173,40 @@
         });
     }
 
+  }
+
+  //plugin to add a simple map legend
+  function addLegend(layer, data, options) {
+    data = data || {};
+    if ( !this.options.fills ) {
+      return;
+    }
+
+    var html = '<dl>';
+    if ( data.legendTitle ) {
+      html = '<h2>' + data.legendTitle + '</h2>' + html;
+    }
+    for ( var fillKey in this.options.fills ) {
+
+      if ( fillKey === 'defaultFill') {
+        if ( data.defaultFillName ) {
+          html += '<dt>' + data.defaultFillName + ': </dt>';
+        }
+        else {
+          continue;
+        }
+      }
+      else {
+        html += '<dt>' + fillKey + ': </dt>';
+      }
+
+      html += '<dd style="background-color:' +  this.options.fills[fillKey] + '">&nbsp;</dd>';
+    }
+    html += '</dl>';
+
+    var hoverover = d3.select( this.options.element ).append('div')
+      .attr('class', 'datamaps-legend')
+      .html(html);
   }
 
   function handleBubbles (layer, data, options ) {
@@ -287,6 +323,7 @@
 
     /* Add core plugins to this instance */
     this.addPlugin('bubbles', handleBubbles);
+    this.addPlugin('legend', addLegend);
 
     //append style block with basic hoverover styles
     if ( ! this.options.disableDefaultStyles ) {
