@@ -8,6 +8,8 @@ It heavily relies on the amazing [D3.js](https://github.com/mbostock/d3) library
 
 Out of the box in includes support for choropleths and bubble maps (see [demos](https://datamaps.github.io)), but it's not limited to just that. It's new plugin system allows for the addition of any type of visualization over the map.
 
+##### For feature requests, open an issue!
+
 #### Demos at http://datamaps.github.io
 
 ---
