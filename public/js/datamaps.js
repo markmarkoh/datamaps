@@ -22,7 +22,7 @@
         highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
         highlightBorderWidth: 2
     },
-    bubbleConfig: {
+    bubblesConfig: {
         borderWidth: 2,
         borderColor: '#FFFFFF',
         popupOnHover: true,
@@ -36,6 +36,12 @@
         highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
         highlightBorderWidth: 2,
         highlightFillOpacity: 0.85
+    },
+    arcConfig: {
+      strokeColor: '#DD1C77',
+      strokeWidth: 1,
+      arcSharpness: 1,
+      animationSpeed: 600
     }
   };
 
@@ -62,7 +68,7 @@
     else if ( options.scope === 'world' ) {
       projection = d3.geo[options.projection]()
         .scale((element.offsetWidth + 1) / 2 / Math.PI)
-        .translate([element.offsetWidth / 2, element.offsetHeight / 1.8]);
+        .translate([element.offsetWidth / 2, element.offsetHeight / (options.projection === "mercator" ? 1.45 : 1.8)]);
     }
 
     path = d3.geo.path()
@@ -209,6 +215,68 @@
       .html(html);
   }
 
+  function handleArcs (layer, data, options) {
+    var self = this,
+        svg = this.svg;
+
+    if ( !data || (data && !data.slice) ) {
+      throw "Datamaps Error - arcs must be an array";
+    }
+
+    console.log(options);
+    if ( typeof options === "undefined" ) {
+      options = defaultOptions.arcConfig;
+    }
+
+    var arcs = layer.selectAll('path.datamaps-arc').data( data, JSON.stringify );
+
+    arcs
+      .enter()
+        .append('svg:path')
+        .attr('class', 'datamaps-arc')
+        .style('stroke-linecap', 'round')
+        .style('stroke', function(datum) {
+          if ( datum.options && datum.options.strokeColor) {
+            return datum.options.strokeColor;
+          }
+          return  options.strokeColor
+        })
+        .style('fill', 'none')
+        .style('stroke-width', function(datum) {
+          if ( datum.options && datum.options.strokeWidth) {
+            return datum.options.strokeWidth;
+          }
+          return options.strokeWidth;
+        })
+        .attr('d', function(datum) {
+            var originXY = self.latLngToXY(datum.origin.latitude, datum.origin.longitude);
+            var destXY = self.latLngToXY(datum.destination.latitude, datum.destination.longitude);
+            var midXY = [ (originXY[0] + destXY[0]) / 2, (originXY[1] + destXY[1]) / 2];
+            return "M" + originXY[0] + ',' + originXY[1] + "S" + (midXY[0] + (50 * options.arcSharpness)) + "," + (midXY[1] - (75 * options.arcSharpness)) + "," + destXY[0] + "," + destXY[1];
+        })
+        .transition()
+          .delay(100)
+          .style('fill', function() {
+            /*
+              Thank you Jake Archibald, this is awesome.
+              Source: http://jakearchibald.com/2013/animated-line-drawing-svg/
+            */
+            var length = this.getTotalLength();
+            this.style.transition = this.style.WebkitTransition = 'none';
+            this.style.strokeDasharray = length + ' ' + length;
+            this.style.strokeDashoffset = length;
+            this.getBoundingClientRect();
+            this.style.transition = this.style.WebkitTransition = 'stroke-dashoffset ' + options.animationSpeed + 'ms ease-out';
+            this.style.strokeDashoffset = '0';
+            return 'none';
+          })
+
+    arcs.exit()
+      .transition()
+      .style('opacity', 0)
+      .remove();
+  }
+
   function handleBubbles (layer, data, options ) {
     var self = this,
         fillData = this.options.fills,
@@ -314,7 +382,8 @@
     //set options for global use
     this.options = defaults(options, defaultOptions);
     this.options.geographyConfig = defaults(options.geographyConfig, defaultOptions.geographyConfig);
-    this.options.bubbleConfig = defaults(options.bubbleConfig, defaultOptions.bubbleConfig);
+    this.options.bubblesConfig = defaults(options.bubblesConfig, defaultOptions.bubblesConfig);
+    this.options.arcConfig = defaults(options.arcConfig, defaultOptions.arcConfig);
 
     //add the SVG container
     if ( d3.select( this.options.element ).select('svg').length > 0 ) {
@@ -324,6 +393,7 @@
     /* Add core plugins to this instance */
     this.addPlugin('bubbles', handleBubbles);
     this.addPlugin('legend', addLegend);
+    this.addPlugin('arc', handleArcs);
 
     //append style block with basic hoverover styles
     if ( ! this.options.disableDefaultStyles ) {
@@ -363,7 +433,7 @@
         drawSubunits.call(self, data);
         handleGeographyConfig.call(self);
 
-        if ( self.options.geographyConfig.popupOnHover || self.options.bubbleConfig.popupOnHover) {
+        if ( self.options.geographyConfig.popupOnHover || self.options.bubblesConfig.popupOnHover) {
           hoverover = d3.select( self.options.element ).append('div')
             .attr('class', 'datamaps-hoverover')
             .style('z-index', 10001)
@@ -429,7 +499,7 @@
           options = undefined;
         }
 
-        options = defaults(options || {}, defaultOptions.bubbleConfig);
+        options = defaults(options || {}, defaultOptions[name + 'Config']);
 
         //add a single layer, reuse the old layer
         if ( !createNewLayer && this.options[name + 'Layer'] ) {

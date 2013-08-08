@@ -9,235 +9,189 @@
     </head>
     <body>
 
-        <div id="container1" style="border:1px dotted blue; width: 800px; height: 375px; position: relative;"></div>
+        <div id="container1" style="border:1px dotted blue; width: 700px; height: 475px; position: relative;"></div>
         <script src="/public/js/components/d3/d3.min.js"></script>
         <script src="/public/js/components/topojson/topojson.js"></script>
         <script src="/public/rel/datamaps.all.js"></script>
         <script>
 
       var election = new Datamap({
-        scope: 'usa',
+        scope: 'world',
         element: document.getElementById('container1'),
+        projection: 'mercator',
         geographyConfig: {
           highlightBorderColor: '#bada55',
          popupTemplate: function(geography, data) {
-            return '<div class="hoverinfo"><strong>' + geography.properties.name + '</strong> <br />Electoral Votes:' +  data.electoralVotes + ' </div>'
+            if ( data )
+                return '<div class="hoverinfo" style="max-width: 300px;"><strong>' + geography.properties.name + '</strong> <br />' +  data.desc + ' </div>'
           },
-          highlightBorderWidth: 3
+          highlightBorderWidth: 1
         },
 
+
         fills: {
-        'Republican': '#CC4731',
-        'Democrat': '#306596',
-        'Heavy Democrat': '#667FAF',
-        'Light Democrat': '#A9C0DE',
-        'Heavy Republican': '#CA5E5B',
-        'Light Republican': '#EAA9A8',
+        'Visited': '#306596',
         defaultFill: '#EDDC4E'
       },
       data:{
-        "AZ": {
-            "fillKey": "Republican",
-            "electoralVotes": 5
+        "ISR": {
+            "fillKey": "Visited",
+            desc: "Upon arriving in Tel Aviv, President Obama examined a battery of the \"Iron Dome\" defense system before traveling to Jerusalem for bilateral talks with Israeli President Shimon Peres and Prime Minister Benjamin Netanyahu, after which they held a joint press conference and attended a working dinner together."
         },
-        "CO": {
-            "fillKey": "Light Democrat",
-            "electoralVotes": 5
+        "GBR": {
+            "fillKey": "Visited",
+            desc: "The President attended the 39th G8 summit at Lough Erne Resort in County Fermanagh, Northern Ireland."
         },
-        "DE": {
-            "fillKey": "Democrat",
-            "electoralVotes": 32
+        "ZAF": {
+            "fillKey": "Visited",
+            desc: "On Saturday morning he was hosted for a bilateral visit by President Jacob Zuma to discuss development, peace and security issues, and the promotion of democracy in Africa, followed by a joint press conference."
         },
-        "FL": {
-            "fillKey": "UNDECIDED",
-            "electoralVotes": 29
+        "CRI": {
+            "fillKey": "Visited",
+            desc: "President Obama met with Central American and Dominican leaders attending the SICA summit in San José. Trade and security were the major topics of discussion."
         },
-        "GA": {
-            "fillKey": "Republican",
-            "electoralVotes": 32
+        "DEU": {
+            "fillKey": "Visited",
+            desc: "He met with German President Joachim Gauck at Schloss Bellevue, followed by a working lunch and joint press conference with Chancellor Angela Merkel at the Bundeskanzleramt."
         },
-        "HI": {
-            "fillKey": "Democrat",
-            "electoralVotes": 32
+        "SEN": {
+            "fillKey": "Visited",
+            desc: "He held a bilateral meeting with President Macky Sall, after which he visited Senegal's supreme court for a meeting with regional judicial leaders."
         },
-        "ID": {
-            "fillKey": "Republican",
-            "electoralVotes": 32
+        "SWE": {
+            "fillKey": "Visited",
+            desc: "The trip replaces a planned bilateral visit to Moscow, which was canceled after Russia's granting of temporary asylum to Edward Snowden, the former NSA and CIA employee who revealed classified American intelligence programs utilizing extensive mass surveillance."
         },
-        "IL": {
-            "fillKey": "Democrat",
-            "electoralVotes": 32
+        "TZA": {
+            "fillKey": "Visited",
+            desc: "The First Lady met with Tanzanian First Lady Salma Kikwete, after which she visited the memorial to victims of the 1998 embassy bombing. She then attended the performance of a local dance troupe before joining the President for a state dinner."
         },
-        "IN": {
-            "fillKey": "Republican",
-            "electoralVotes": 11
+        "RUS": {
+            "fillKey": "Visited",
+            desc: "G-20 summit"
         },
-        "IA": {
-            "fillKey": "Light Democrat",
-            "electoralVotes": 11
-        },
-        "KS": {
-            "fillKey": "Republican",
-            "electoralVotes": 32
-        },
-        "KY": {
-            "fillKey": "Republican",
-            "electoralVotes": 32
-        },
-        "LA": {
-            "fillKey": "Republican",
-            "electoralVotes": 32
-        },
-        "MD": {
-            "fillKey": "Democrat",
-            "electoralVotes": 32
-        },
-        "ME": {
-            "fillKey": "Democrat",
-            "electoralVotes": 32
-        },
-        "MA": {
-            "fillKey": "Democrat",
-            "electoralVotes": 32
-        },
-        "MN": {
-            "fillKey": "Democrat",
-            "electoralVotes": 32
-        },
-        "MI": {
-            "fillKey": "Democrat",
-            "electoralVotes": 32
-        },
-        "MS": {
-            "fillKey": "Republican",
-            "electoralVotes": 32
-        },
-        "MO": {
-            "fillKey": "Republican",
-            "electoralVotes": 13
-        },
-        "MT": {
-            "fillKey": "Republican",
-            "electoralVotes": 32
-        },
-        "NC": {
-            "fillKey": "Light Republican",
-            "electoralVotes": 32
-        },
-        "NE": {
-            "fillKey": "Republican",
-            "electoralVotes": 32
-        },
-        "NV": {
-            "fillKey": "Heavy Democrat",
-            "electoralVotes": 32
-        },
-        "NH": {
-            "fillKey": "Light Democrat",
-            "electoralVotes": 32
-        },
-        "NJ": {
-            "fillKey": "Democrat",
-            "electoralVotes": 32
-        },
-        "NY": {
-            "fillKey": "Democrat",
-            "electoralVotes": 32
-        },
-        "ND": {
-            "fillKey": "Republican",
-            "electoralVotes": 32
-        },
-        "NM": {
-            "fillKey": "Democrat",
-            "electoralVotes": 32
-        },
-        "OH": {
-            "fillKey": "UNDECIDED",
-            "electoralVotes": 32
-        },
-        "OK": {
-            "fillKey": "Republican",
-            "electoralVotes": 32
-        },
-        "OR": {
-            "fillKey": "Democrat",
-            "electoralVotes": 32
-        },
-        "PA": {
-            "fillKey": "Democrat",
-            "electoralVotes": 32
-        },
-        "RI": {
-            "fillKey": "Democrat",
-            "electoralVotes": 32
-        },
-        "SC": {
-            "fillKey": "Republican",
-            "electoralVotes": 32
-        },
-        "SD": {
-            "fillKey": "Republican",
-            "electoralVotes": 32
-        },
-        "TN": {
-            "fillKey": "Republican",
-            "electoralVotes": 32
-        },
-        "TX": {
-            "fillKey": "Republican",
-            "electoralVotes": 32
-        },
-        "UT": {
-            "fillKey": "Republican",
-            "electoralVotes": 32
-        },
-        "WI": {
-            "fillKey": "Democrat",
-            "electoralVotes": 32
-        },
-        "VA": {
-            "fillKey": "Light Democrat",
-            "electoralVotes": 32
-        },
-        "VT": {
-            "fillKey": "Democrat",
-            "electoralVotes": 32
-        },
-        "WA": {
-            "fillKey": "Democrat",
-            "electoralVotes": 32
-        },
-        "WV": {
-            "fillKey": "Republican",
-            "electoralVotes": 32
-        },
-        "WY": {
-            "fillKey": "Republican",
-            "electoralVotes": 32
-        },
-        "CA": {
-            "fillKey": "Democrat",
-            "electoralVotes": 32
-        },
-        "CT": {
-            "fillKey": "Democrat",
-            "electoralVotes": 32
-        },
-        "AK": {
-            "fillKey": "Republican",
-            "electoralVotes": 32
-        },
-        "AR": {
-            "fillKey": "Republican",
-            "electoralVotes": 32
-        },
-        "AL": {
-            "fillKey": "Republican",
-            "electoralVotes": 32
-        }
+        "MEX": {
+            "fillKey": "Visited",
+            desc: "The President met with Mexican President Enrique Peña Nieto for private talks that emphasized trade, cultural and educational exchange, innovation, and research, but also touched on border security and illegal narcotics trafficking.[451]."
+            }
 }
       });
+
+
+    var presidentialTrips = [
+        {
+            origin: {
+                latitude: 38.895111,
+                longitude: -77.036667
+            },
+            destination: {
+                latitude: 32.066667,
+                longitude: 34.783333 
+            }
+        },
+        {
+            origin: {
+                latitude: 38.895111,
+                longitude: -77.036667
+            },
+            destination: {
+                latitude: 19.433333,
+                longitude: -99.133333
+            }
+        },
+        {
+            origin: {
+                latitude: 38.895111,
+                longitude: -77.036667
+            },
+            destination: {
+                latitude: 9.933333,
+                longitude: -84.083333
+            }
+        },
+        {
+            origin: {
+                latitude: 38.895111,
+                longitude: -77.036667
+            },
+            destination: {
+                latitude: 54.597 ,
+                longitude: -5.93
+            }
+        },
+        {
+            origin: {
+                latitude: 38.895111,
+                longitude: -77.036667
+            },
+            destination: {
+                latitude: 52.516667,
+                longitude: 13.383333 
+            }
+        },
+        {
+            origin: {
+                latitude: 38.895111,
+                longitude: -77.036667
+            },
+            destination: {
+                latitude: 14.692778,
+                longitude: -17.446667
+            }
+        },
+        {
+            origin: {
+                latitude: 38.895111,
+                longitude: -77.036667
+            },
+            destination: {
+                latitude: -26.204444,
+                longitude: 28.045556
+            }
+        },
+                {
+            origin: {
+                latitude: 38.895111,
+                longitude: -77.036667
+            },
+            destination: {
+                latitude: -6.8,
+                longitude: 39.283333 
+            }
+        },
+                {
+            origin: {
+                latitude: 38.895111,
+                longitude: -77.036667
+            },
+            destination: {
+                latitude: 59.329444,
+                longitude: 18.068611
+            }
+        },
+                {
+            origin: {
+                latitude: 38.895111,
+                longitude: -77.036667
+            },
+            destination: {
+                latitude: 59.95 ,
+                longitude: 30.3
+            }
+        }
+    ];
+
+    function addArcs(index) {
+        election.arc( presidentialTrips.slice(0, index) , {strokeWidth: 2});
+        if ( index < presidentialTrips.length ) {
+            window.setTimeout(function() {
+                addArcs(++index)
+            }, 750);
+        }
+    }
+
+    addArcs(1);
+
 
       election.legend();
       </script>

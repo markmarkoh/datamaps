@@ -214,11 +214,19 @@ window.setTimeout(function() {
         highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
         highlightBorderWidth: 2,
         highlightFillOpacity: 0.85
-    })
+    });
+
+        world.arc([
+            {origin: {latitude: 30.29, longitude: -97.738}, destination: {longitude: 35.99, latitude: -107.7}}
+        ]);
 
 
         </script>
         <h2 class="info"></h2>
+
+        <svg width="500" height="500">
+            <path class="squiggles" style="stroke:black;fill:none;" stroke="black" d="M0,250Q250,125,250,250"></path>
+        </svg>
     </body>
 </html>
 
