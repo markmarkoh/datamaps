@@ -223,7 +223,6 @@
       throw "Datamaps Error - arcs must be an array";
     }
 
-    console.log(options);
     if ( typeof options === "undefined" ) {
       options = defaultOptions.arcConfig;
     }
