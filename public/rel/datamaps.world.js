@@ -154,10 +154,12 @@
 
             /* remove the element and place it at the bottom
                 of the parent since the borders will likely be clipped */
-            var parentEl = $this[0][0].parentElement;
+            var parentEl = $this[0][0].parentNode;
             var el = $this[0][0];
-            $this.remove();
-            parentEl.appendChild(el);
+            if ( parentEl ) {
+              $this.remove();
+              parentEl.appendChild(el);
+            }
           }
 
           if ( options.popupOnHover ) {
