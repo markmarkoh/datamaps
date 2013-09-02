@@ -152,13 +152,9 @@
               .style('fill-opacity', options.highlightFillOpacity)
               .attr('data-previousAttributes', JSON.stringify(previousAttributes));
 
-            /* remove the element and place it at the bottom
-                of the parent since the borders will likely be clipped */
-            var parentEl = $this[0][0].parentNode;
-            var el = $this[0][0];
-            if ( parentEl ) {
-              $this.remove();
-              parentEl.appendChild(el);
+            //as per discussion on https://github.com/markmarkoh/datamaps/issues/19
+            if ( ! /MSIE/.test(navigator.userAgent) ) {
+             moveToFront.call(this);
             }
           }
 
@@ -180,7 +176,10 @@
           d3.selectAll('.datamaps-hoverover').style('display', 'none');
         });
     }
-
+    
+    function moveToFront() {
+      this.parentNode.appendChild(this);
+    }
   }
 
   //plugin to add a simple map legend
