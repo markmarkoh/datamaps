@@ -64,8 +64,8 @@
   function setCode ( options ) {
     var code = _.clone(options);
     code.element = '__GETTER__';
-    var prefix = 'var map = new Datamap({';
-    var suffix = '});'
+    var prefix = 'var map = new Datamap(';
+    var suffix = ');'
     var code = js_beautify(prefix + JSON.stringify(code) + suffix, {indent_size: 2});
     code = code.replace("\"__GETTER__\"", 'document.getElementById("map")')
     $("#getcode").val( code );
