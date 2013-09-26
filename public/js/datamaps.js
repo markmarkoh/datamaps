@@ -113,6 +113,9 @@
       .attr('data-info', function(d) {
         return JSON.stringify( colorCodeData[d.id]);
       })
+      .attr('data-geography', function(d) {
+        return d.id;
+      })
       .style('fill', function(d) {
         var fillColor;
 
