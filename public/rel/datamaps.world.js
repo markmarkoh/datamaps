@@ -462,6 +462,10 @@
      return this.projection([lng, lat]);
   };
 
+  Datamap.prototype.XYtoLngLat = function (x, y) {
+    return this.projection.invert([x, y]);
+  };
+
   //add <g> layer to root SVG
   Datamap.prototype.addLayer = function( className, id ) {
     d3.select()

@@ -3,13 +3,16 @@
     D = {
       projection: 'equirectangular',
       scope: 'world',
-      geographConfig: {},
+      geographyConfig: {},
       fills: { defaultFill: '#ABDDA4'},
       data: {}
     },
     $map = $('#map'),
     $proj = $('#projections'),
-    $geoset = $('#geographyset');
+    $geoset = $('#geographyset'),
+    maps;
+
+    window.cool = D;
 
   var colorSets = {
     qualitative: formatColor('0x8DD3C7; 0xFFFFB3; 0xBEBADA; 0xFB8072; 0x80B1D3; 0xFDB462; 0xB3DE69; 0xFCCDE5; 0xD9D9D9; 0xBC80BD; 0xCCEBC5; 0xFFED6F;'),
@@ -52,7 +55,20 @@
     $map.html('');
     $map.attr('class', '').addClass(options.projection)
 
-    $map.datamaps( options );
+    options['element'] = $map[0];
+    map = new Datamap( options );
+
+    setCode( options );
+  }
+
+  function setCode ( options ) {
+    var code = _.clone(options);
+    code.element = '__GETTER__';
+    var prefix = 'var map = new Datamap({';
+    var suffix = '});'
+    var code = js_beautify(prefix + JSON.stringify(code) + suffix, {indent_size: 2});
+    code = code.replace("\"__GETTER__\"", 'document.getElementById("map")')
+    $("#getcode").val( code );
   }
 
 
@@ -152,16 +168,26 @@
       }
       else {
         _highlightOnHover = D.geographyConfig.highlightOnHover;
+        isTargetingBubble = true;
         D.geographyConfig.highlightOnHover = false;
         draw( D );
       }
     $('body').toggleClass('adding-bubbles');
   });
 
-  $("#map").on('click', '.datamaps-subunits', function(e) {
+  var bubbles = [];
+  $("#map").on('click', function(e) {
     if ( !isTargetingBubble ) return;
+    var lngLat = map.XYtoLngLat( e.offsetX, e.offsetY );
+    var bubble = {
+      longitude: lngLat[0],
+      latitude: lngLat[1],
+      radius: 50
+    };
 
+    bubbles.push(bubble)
 
+    map.bubbles(bubbles)
   });
 
   $('#map').on('click', '.datamaps-subunit', function(e) {

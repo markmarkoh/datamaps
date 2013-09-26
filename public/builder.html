@@ -28,6 +28,10 @@
         width: 90%;
       }
 
+      .wide {
+        width: 100%;
+      }
+
       path.selected {
         fill: #CD0200 !important;
         stroke: #CD0200 !important;
@@ -89,8 +93,9 @@
                 </div>
                 <ul class="nav nav-tabs">
                   <li class="active"><a href="#general" data-toggle="tab">General</a></li>
-                  <li><a href="#bubbles" data-toggle="tab">Bubbles</a></li>
-                  <li><a href="#arcs" data-toggle="tab">Arcs</a></li>
+                  <!--<li><a href="#bubbles" data-toggle="tab">Bubbles</a></li>
+                  <li><a href="#arcs" data-toggle="tab">Arcs</a></li>-->
+                  <li><a href="#code" data-toggle="tab">Get the Code</a></li>
                 </ul>
                 <div class="tab-content">
                   <div class="tab-pane  fade active in" id="general">
@@ -168,6 +173,9 @@
                       </div>
                       <div class="alert alert-info command-help hide">Command + Click to select multiple countries, <br/> then select a color.</div>
                     </div> <!-- /tab pane -->
+                    <div class="tab-pane fade" id="code">
+                      <textarea id="getcode" class="form-control" rows="25"></textarea>
+                    </div>
                     <div class="tab-pane  fade" id="bubbles">
                       <br/>
                       <div class="form-group">
@@ -186,9 +194,27 @@
                           </button>
                         </div>
                       </div>
+                        <div class="panel panel-default">
+                          <div class="panel-heading">New Bubble</div>
+                          <div class="panel-body">
+                            <div class="form-group">
+                              <label for="borderColor" class="col-lg-4 control-label">Fill</label>
+                              <div class="col-lg-8">
+                                <input class="regular" data-option="borderConfig" name="fill" id="fill" type="color" value="#FDFDFD" list="colors" />
+                              </div>
+                            </div>
+                            <div class="form-group">
+                              <label for="borderColor" class="col-lg-4 control-label">Radius</label>
+                              <div class="col-lg-8">
+                                <input class="regular wide" type="range" data-option="geographyConfig" name="borderWidth" id="borderWidth" name="points" min="0" max="3">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-
                   </div> <!-- /tab group -->
+
             </fieldset>
           </form>
         </div>
@@ -201,6 +227,7 @@
     <script src="/public/rel/datamaps.all.js"></script>
     <script src="/public/js/components/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="/public/js/components/lodash/dist/lodash.min.js"></script>
+    <script src="/public/js/components/beautify.js"></script>
     <script src="/public/js/builder.js"></script>
   </body>
 </html>
