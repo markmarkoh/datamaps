@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="/public/js/components/bootstrap/dist/css/bootstrap.spacelab.min.css" />
+    <style>
+      body {
+        padding: 0 10px;
+      }
+
+      /* Square */
+      #map.mercator, #map.orthographic {
+        max-width: 900px;
+        max-height: 700px;
+      }
+
+      /* Equirectangular, Wide */
+      #map.equirectangular {
+        max-width: 1200px;
+        max-height: 700px; 
+      }
+
+      .radio, .checkbox {
+        padding-left: 0;
+      }
+
+      input[type="color"], input[type="range"] {
+        margin-top: 10px;
+        width: 90%;
+      }
+
+      .wide {
+        width: 100%;
+      }
+
+      path.selected {
+        fill: #CD0200 !important;
+        stroke: #CD0200 !important;
+        stroke-width: 1px !important;
+        fill-opacity: 0.4 !important;
+      }
+
+      .adding-bubbles svg, .adding-colors path {
+        cursor: crosshair;
+      }
+
+      .tab-pane { 
+        padding: 5px;
+      }
+    </style>
+  </head>
+  <body class="co">
+    <div class="navbar navbar-inverse">
+      <div class="">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-inverse-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#"><span class="glyphicon glyphicon-globe"></span> <strong>Datamap Builder</strong></a>
+        </div>
+      </div><!-- /.container -->
+    </div>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-9">
+        <div id="map" class="equirectangular"></div>
+      </div>
+      <div class="col-xs-6 col-sm-6 col-md-3">
+        <div class="well">
+          <form class="bs-example form-horizontal">
+            <fieldset>
+              <legend>Configuration</legend>
+              <div class="form-group">
+                <label for="geographyset" class="col-lg-4 control-label">Scope</label>
+                <div class="col-lg-8">
+                  <select class="form-control" id="geographyset">
+                    <option value="world">World</option>
+                    <option value="usa">USA</option>
+                  </select>
+                </div>
+              </div>
+
+                <div class="form-group">
+                  <label for="projections" class="col-lg-4 control-label">Projections</label>
+                  <div class="col-lg-8">
+                    <select class="form-control" id="projections">
+                      <option value="equirectangular">Equirectangular</option>
+                      <option value="mercator">Mercator</option>
+                      <option value="albersUSA">AlbersUSA</option>
+                      <option value="orthographic">Orthographic</option>
+                    </select>
+                  </div>
+                </div>
+                <ul class="nav nav-tabs">
+                  <li class="active"><a href="#general" data-toggle="tab">General</a></li>
+                  <!--<li><a href="#bubbles" data-toggle="tab">Bubbles</a></li>
+                  <li><a href="#arcs" data-toggle="tab">Arcs</a></li>-->
+                  <li><a href="#code" data-toggle="tab">Get the Code</a></li>
+                </ul>
+                <div class="tab-content">
+                  <div class="tab-pane  fade active in" id="general">
+                    <div class="form-group">
+                        <label class="col-lg-4 control-label">Options</label>
+                        <div class="col-lg-8">
+                          <div class="radio">
+                            <label>
+                              <input type="checkbox" data-option="geographyConfig" name="highlightOnHover" id="highlightOnHover" checked="">
+                              Highlight On Hover
+                            </label>
+                          </div>
+                          <div class="radio">
+                            <label>
+                              <input type="checkbox" data-option="geographyConfig" name="popupOnHover" id="popupOnHover" checked="">
+                              Popup On Hover
+                            </label>
+                          </div>
+                          <div class="radio">
+                            <label>
+                              <!-- Seriously Antarctica -->
+                              <input type="checkbox" data-option="geographyConfig" name="hideAntarctica" id="hideAntarctica" checked="">
+                              Hide Antarctica
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="colorSets" class="col-lg-4 control-label">Color Sets</label>
+                        <div class="col-lg-8">
+                          <select class="form-control" id="colorSets">
+                          </select>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="defaultFill" class="col-lg-4 control-label">Default Fill</label>
+                        <div class="col-lg-8">
+                          <input class="regular" data-option="fills" name="defaultFill" id="defaultFill" type="color" value="#ABDDA4" list="colors" />
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="highlightFillColor" class="col-lg-4 control-label">Highlight Fill Color</label>
+                        <div class="col-lg-8">
+                          <input class="regular" data-option="geographyConfig" name="highlightFillColor" id="highlightFillColor" type="color" value="#FC8D59" list="colors"/>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="highlightBorderColor" class="col-lg-4 control-label">Highlight Border</label>
+                        <div class="col-lg-4">
+                          <input class="regular" data-option="geographyConfig" name="highlightBorderColor" id="highlightBorderColor" type="color" value="#FC8D59" list="colors" />
+                        </div>
+                        <div class="col-lg-4">
+                          <input class="regular" type="range" data-option="geographyConfig" name="highlightBorderWidth" id="highlightBorderWidth" min="0" max="3">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="borderColor" class="col-lg-4 control-label">Border</label>
+                        <div class="col-lg-4">
+                          <input class="regular" data-option="geographyConfig" name="borderColor" id="borderColor" type="color" value="#FDFDFD" list="colors" />
+                        </div>
+                        <div class="col-lg-4">
+                          <input class="regular" type="range" data-option="geographyConfig" name="borderWidth" id="borderWidth" name="points" min="0" max="3">
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label class="col-lg-4 control-label">Add Colors</label>
+                        <div class="col-lg-2">
+                          <button type="button" data-toggle="button" class="btn btn-primary add-colors"><span class="glyphicon glyphicon-tint"></span></button>
+                        </div>
+                        <div class="col-lg-6 command-help hide">
+                          <input data-option="data" name="currentColor" id="currentColor" type="color" list="colors" disabled/>
+                        </div>
+                      </div>
+                      <div class="alert alert-info command-help hide">Command + Click to select multiple countries, <br/> then select a color.</div>
+                    </div> <!-- /tab pane -->
+                    <div class="tab-pane fade" id="code">
+                      <textarea id="getcode" class="form-control" rows="25"></textarea>
+                    </div>
+                    <div class="tab-pane  fade" id="bubbles">
+                      <br/>
+                      <div class="form-group">
+                        <label for="highlightBorderColor" class="col-lg-4 control-label">Highlight Border</label>
+                        <div class="col-lg-4">
+                          <input class="regular" data-option="bubbleConfig" name="highlightBorderColor" id="highlightBorderColor" type="color" value="#FC8D59" list="colors" />
+                        </div>
+                        <div class="col-lg-4">
+                          <input class="regular" type="range" data-option="bubbleConfig" name="highlightBorderWidth" id="highlightBorderWidth" min="0" max="3">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="col-lg-8">
+                          <button data-toggle="button" class="btn btn-primary add-bubble">
+                            <span class="glyphicon glyphicon-plus-sign"></span> Add New Bubble
+                          </button>
+                        </div>
+                      </div>
+                        <div class="panel panel-default">
+                          <div class="panel-heading">New Bubble</div>
+                          <div class="panel-body">
+                            <div class="form-group">
+                              <label for="borderColor" class="col-lg-4 control-label">Fill</label>
+                              <div class="col-lg-8">
+                                <input class="regular" data-option="borderConfig" name="fill" id="fill" type="color" value="#FDFDFD" list="colors" />
+                              </div>
+                            </div>
+                            <div class="form-group">
+                              <label for="borderColor" class="col-lg-4 control-label">Radius</label>
+                              <div class="col-lg-8">
+                                <input class="regular wide" type="range" data-option="geographyConfig" name="borderWidth" id="borderWidth" name="points" min="0" max="3">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div> <!-- /tab group -->
+
+            </fieldset>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="/public/js/components/d3/d3.min.js"></script>
+    <script src="/public/js/components/topojson/topojson.js"></script>
+    <script src="/public/rel/datamaps.all.js"></script>
+    <script src="/public/js/components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="/public/js/components/lodash/dist/lodash.min.js"></script>
+    <script src="/public/js/components/beautify.js"></script>
+    <script src="/public/js/builder.js"></script>
+  </body>
+</html>
