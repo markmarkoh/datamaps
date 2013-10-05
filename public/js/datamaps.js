@@ -277,6 +277,50 @@
       .remove();
   }
 
+  function handleLabels ( layer, options ) {
+    var self = this;
+    options = options || {};
+    var labelStartCoodinates = this.projection([-67.707617, 42.722131]);
+    d3.selectAll(".datamaps-subunit")
+      .attr("data-foo", function(d) {
+        var center = self.path.centroid(d);
+        var xOffset = 7.5, yOffset = 5;
+
+        if ( ["FL", "KY", "MI"].indexOf(d.id) > -1 ) xOffset = -2.5;
+        if ( d.id === "NY" ) xOffset = -1;
+        if ( d.id === "MI" ) yOffset = 18;
+        if ( d.id === "LA" ) xOffset = 13;
+
+        var x,y;
+
+        x = center[0] - xOffset;
+        y = center[1] + yOffset;
+
+        var smallStateIndex = ["VT", "NH", "MA", "RI", "CT", "NJ", "DE", "MD", "DC"].indexOf(d.id);
+        if ( smallStateIndex > -1) {
+          var yStart = labelStartCoodinates[1];
+          x = labelStartCoodinates[0];
+          y = yStart + (smallStateIndex * (2+ (options.fontSize || 12)));
+          layer.append("line")
+            .attr("x1", x - 3)
+            .attr("y1", y - 5)
+            .attr("x2", center[0])
+            .attr("y2", center[1])
+            .style("stroke", options.labelColor || "#000")
+            .style("stroke-width", options.lineWidth || 1)
+        }
+
+        layer.append("text")
+          .attr("x", x)
+          .attr("y", y)
+          .style("font-size", options.fontSize || 10)
+          .style("font-family", options.fontFamily || "Verdana")
+          .style("fill", options.labelColor || "#000")
+          .text( d.id );
+      });
+  }
+
+
   function handleBubbles (layer, data, options ) {
     var self = this,
         fillData = this.options.fills,
@@ -394,6 +438,7 @@
     this.addPlugin('bubbles', handleBubbles);
     this.addPlugin('legend', addLegend);
     this.addPlugin('arc', handleArcs);
+    this.addPlugin('labels', handleLabels);
 
     //append style block with basic hoverover styles
     if ( ! this.options.disableDefaultStyles ) {
