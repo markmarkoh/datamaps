@@ -313,10 +313,11 @@
         layer.append("text")
           .attr("x", x)
           .attr("y", y)
-          .style("font-size", options.fontSize || 10)
+          .style("font-size", (options.fontSize || 10) + 'px')
           .style("font-family", options.fontFamily || "Verdana")
           .style("fill", options.labelColor || "#000")
           .text( d.id );
+        return "bar";
       });
   }
 
