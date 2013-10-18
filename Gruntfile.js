@@ -57,15 +57,27 @@ module.exports = function(grunt) {
         'public/tests/SpecRunner_AllGlobal.html',
         'public/tests/SpecRunner_jQueryPlugin.html'
       ]
+    },
+    copy: {
+      all: {
+        files: [
+          { src: ['public/rel/*.js'], dest: './', flatten: true, expand: true }
+        ]
+      }
+    },
+    clean: {
+      release: ['./datamaps.*.js']
     }
   });
 
+  grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-text-replace');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
 
 
   grunt.registerTask('dev', ['replace']);
-  grunt.registerTask('build', ['replace', 'uglify:dist']);
+  grunt.registerTask('build', ['replace', 'uglify:dist', 'copy']);
 
 };
