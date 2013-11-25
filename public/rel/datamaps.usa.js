@@ -281,7 +281,7 @@
     var self = this;
     options = options || {};
     var labelStartCoodinates = this.projection([-67.707617, 42.722131]);
-    d3.selectAll(".datamaps-subunit")
+    this.svg.selectAll(".datamaps-subunit")
       .attr("data-foo", function(d) {
         var center = self.path.centroid(d);
         var xOffset = 7.5, yOffset = 5;
