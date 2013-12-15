@@ -332,7 +332,7 @@ All events are bubbled up to the root `svg` element and to listen to events, use
             borderWidth: 1,
             borderColor: '#FDFDFD',
             popupTemplate: function(geography, data) { //this function should just return a string
-              return '<div class="hoverinfo"><strong>' + geography.properties.name + '</strong></div>';
+              return '<div class="hoverinfo"><strong>' + geo.properties.name + '</strong></div>';
             },
             popupOnHover: true, //disable the popup while hovering
             highlightOnHover: true,
