@@ -48,6 +48,7 @@
   function addContainer( element ) {
     this.svg = d3.select( element ).append('svg')
       .attr('width', element.offsetWidth)
+      .attr('class', 'datamap')
       .attr('height', element.offsetHeight);
 
     return this.svg;
@@ -80,7 +81,7 @@
   function addStyleBlock() {
     if ( d3.select('.datamaps-style-block').empty() ) {
       d3.select('head').attr('class', 'datamaps-style-block').append('style')
-      .html('path {stroke: #FFFFFF; stroke-width: 1px;} .datamaps-legend dt, .datamaps-legend dd { float: left; margin: 0 3px 0 0;} .datamaps-legend dd {width: 20px; margin-right: 6px; border-radius: 3px;} .datamaps-legend {padding-bottom: 20px; z-index: 1001; position: absolute; left: 4px; font-size: 12px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;} .datamaps-hoverover {display: none; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; } .hoverinfo {padding: 4px; border-radius: 1px; background-color: #FFF; box-shadow: 1px 1px 5px #CCC; font-size: 12px; border: 1px solid #CCC; } .hoverinfo hr {border:1px dotted #CCC; }');
+      .html('.datamap path {stroke: #FFFFFF; stroke-width: 1px;} .datamaps-legend dt, .datamaps-legend dd { float: left; margin: 0 3px 0 0;} .datamaps-legend dd {width: 20px; margin-right: 6px; border-radius: 3px;} .datamaps-legend {padding-bottom: 20px; z-index: 1001; position: absolute; left: 4px; font-size: 12px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;} .datamaps-hoverover {display: none; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; } .hoverinfo {padding: 4px; border-radius: 1px; background-color: #FFF; box-shadow: 1px 1px 5px #CCC; font-size: 12px; border: 1px solid #CCC; } .hoverinfo hr {border:1px dotted #CCC; }');
     }
   }
 
@@ -511,6 +512,28 @@
     return this.svg.append('g')
       .attr('id', id || '')
       .attr('class', className || '');
+  };
+
+  Datamap.prototype.updateChoropleth = function(data) {
+    var svg = this.svg;
+    for ( var subunit in data ) {
+      if ( data.hasOwnProperty(subunit) ) {
+        var color;
+        if ( typeof data[subunit] === "string" ) {
+          color = data[subunit];
+        }
+        else if ( typeof data[subunit].color === "string" ) {
+          color = data[subunit].color;
+        }
+        else {
+          color = this.options.fills[ data[subunit].fillKey ];
+        }
+        svg
+          .selectAll('.' + subunit)
+          .transition()
+            .style('fill', color);
+      }
+    }
   };
 
   Datamap.prototype.updatePopup = function (element, d, options) {
