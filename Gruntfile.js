@@ -4,69 +4,69 @@ module.exports = function(grunt) {
   grunt.initConfig({
     replace: {
       world: {
-        src: ['public/js/datamaps.js'],
-        dest: 'public/rel/datamaps.world.js',
+        src: ['src/js/datamaps.js'],
+        dest: 'src/rel/datamaps.world.js',
         replacements: [{
           from: '\'__WORLD__\'',
-          to: '<%= grunt.file.read("public/js/data/world.topo.json") %>'
+          to: '<%= grunt.file.read("src/js/data/world.topo.json") %>'
         }]
       },
       usa: {
-        src: ['public/js/datamaps.js'],
-        dest: 'public/rel/datamaps.usa.js',
+        src: ['src/js/datamaps.js'],
+        dest: 'src/rel/datamaps.usa.js',
         replacements: [{
           from: '\'__USA__\'',
-          to: '<%= grunt.file.read("public/js/data/usa.topo.json") %>'
+          to: '<%= grunt.file.read("src/js/data/usa.topo.json") %>'
         }]
       },
       all: {
-        src: ['public/js/datamaps.js'],
-        dest: 'public/rel/datamaps.all.js',
+        src: ['src/js/datamaps.js'],
+        dest: 'src/rel/datamaps.all.js',
         replacements: [{
           from: '\'__USA__\'',
-          to: '<%= grunt.file.read("public/js/data/usa.topo.json") %>'
+          to: '<%= grunt.file.read("src/js/data/usa.topo.json") %>'
         }, {
           from: '\'__WORLD__\'',
-          to: '<%= grunt.file.read("public/js/data/world.topo.json") %>'
+          to: '<%= grunt.file.read("src/js/data/world.topo.json") %>'
         }]
       }
     },
     watch: {
       datamap: {
-        files: ['public/js/datamaps.js'],
+        files: ['src/js/datamaps.js'],
         tasks: ['replace'],
     }
   },
    uglify: {
       dist: {
         files: {
-          'public/rel/datamaps.world.min.js': ['public/rel/datamaps.world.js'],
-          'public/rel/datamaps.usa.min.js': ['public/rel/datamaps.usa.js'],
-          'public/rel/datamaps.all.min.js': ['public/rel/datamaps.all.js'],
-          'public/rel/datamaps.none.min.js': ['public/js/datamaps.js']
+          'src/rel/datamaps.world.min.js': ['src/rel/datamaps.world.js'],
+          'src/rel/datamaps.usa.min.js': ['src/rel/datamaps.usa.js'],
+          'src/rel/datamaps.all.min.js': ['src/rel/datamaps.all.js'],
+          'src/rel/datamaps.none.min.js': ['src/js/datamaps.js']
         }
       }
     },
     jasmine: {
       all: [
-        'public/tests/SpecRunner_StatesGlobal.html',
-        'public/tests/SpecRunner_StatesStripped.html',
-        'public/tests/SpecRunner_CountriesStripped.html',
-        'public/tests/SpecRunner_CountriesGlobal.html',
-        'public/tests/SpecRunner_AllStripped.html',
-        'public/tests/SpecRunner_AllGlobal.html',
-        'public/tests/SpecRunner_jQueryPlugin.html'
+        'src/tests/SpecRunner_StatesGlobal.html',
+        'src/tests/SpecRunner_StatesStripped.html',
+        'src/tests/SpecRunner_CountriesStripped.html',
+        'src/tests/SpecRunner_CountriesGlobal.html',
+        'src/tests/SpecRunner_AllStripped.html',
+        'src/tests/SpecRunner_AllGlobal.html',
+        'src/tests/SpecRunner_jQueryPlugin.html'
       ]
     },
     copy: {
       all: {
         files: [
-          { src: ['public/rel/*.js'], dest: './', flatten: true, expand: true }
+          { src: ['src/rel/*.js'], dest: './dist', flatten: true, expand: true }
         ]
       }
     },
     clean: {
-      release: ['./datamaps.*.js']
+      release: ['.dist/datamaps.*.js']
     }
   });
 
