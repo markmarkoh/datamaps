@@ -191,23 +191,25 @@
     }
 
     var html = '<dl>';
+    var label = '';
     if ( data.legendTitle ) {
       html = '<h2>' + data.legendTitle + '</h2>' + html;
     }
     for ( var fillKey in this.options.fills ) {
 
       if ( fillKey === 'defaultFill') {
-        if ( data.defaultFillName ) {
-          html += '<dt>' + data.defaultFillName + ': </dt>';
-        }
-        else {
+        if (! data.defaultFillName ) {
           continue;
         }
+        label = data.defaultFillName;
+      } else {
+        if (data.labels && data.labels[fillKey]) {
+          label = data.labels[fillKey];
+        } else {
+          label= fillKey + ': ';
+        }
       }
-      else {
-        html += '<dt>' + fillKey + ': </dt>';
-      }
-
+      html += '<dt>' + label + '</dt>';
       html += '<dd style="background-color:' +  this.options.fills[fillKey] + '">&nbsp;</dd>';
     }
     html += '</dl>';
