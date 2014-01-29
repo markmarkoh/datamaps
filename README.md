@@ -154,6 +154,16 @@ You'll need to know the 2 letter state code ('NY' for New York) or the 3 letter 
 
 This will draw a world map and fill in IRL (Ireland) with the corresponding `fills.LOW` and USA with `fills.MEDIUM`.
 
+#### Updating a choropleth after initial drawing
+```javascript
+map.updateChoropleth({
+   USA: {fillKey: 'LOW'},
+   CAN: '#0fa0fa'
+});
+```
+
+You can specify either a literal color (as a string), or an object with a fillKey property. 
+
 You can also add a map legend with the `legend` plugin (used above)
 
 #### Custom popup on hover
@@ -290,6 +300,29 @@ The second parameter is the `options` param, where you can overide any of the de
 You can continue to call `bubbles` on the same map instance and the map will auto update itself. Any bubble previously drawn that's **not included** in subsequent calls will be removed from the UI.
 
 `map.bubbles([])` will erase all bubbles.
+
+
+#### Zooming
+
+You can override the default projection by setting your own `setProjection(element)` function.
+[Example here](http://datamaps.github.io#zoom)
+
+```javascript
+var map = new Datamap({
+  scope: 'world',
+  element: document.getElementById('container1'),
+  setProjection: function(element) {
+    var projection = d3.geo.equirectangular()
+      .center([19, -3])
+      .rotate([4.4, 0])
+      .scale(400)
+      .translate([element.offsetWidth / 2, element.offsetHeight / 2]);
+    var path = d3.geo.path()
+      .projection(projection);
+    
+    return {path: path, projection: projection};
+  },
+```
 
 #### Using with jQuery
 If jQuery is present on the page when the Datamaps library loads, it'll automatically create a jQuery plugin called `datamaps` that can be used like:
