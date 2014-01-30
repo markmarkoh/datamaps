@@ -93,7 +93,7 @@
 
     var subunits = this.svg.select('g.datamaps-subunits');
     if ( subunits.empty() ) {
-      subunits = this.addLayer('datamaps-subunits');
+      subunits = this.addLayer('datamaps-subunits', null, true);
     }
 
     var geoData = topojson.feature( data, data.objects[ this.options.scope ] ).features;
@@ -509,10 +509,15 @@
   };
 
   //add <g> layer to root SVG
-  Datamap.prototype.addLayer = function( className, id ) {
-    d3.select()
-    return this.svg.append('g')
-      .attr('id', id || '')
+  Datamap.prototype.addLayer = function( className, id, first ) {
+    var layer;
+    if ( first ) {
+      layer = this.svg.insert('g', ':first-child')
+    }
+    else {
+      layer = this.svg.append('g')
+    }
+    return layer.attr('id', id || '')
       .attr('class', className || '');
   };
 
