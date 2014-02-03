@@ -7,7 +7,7 @@
     "Dave Long (dave@davejlong.com)"
   ],
   "description": "Interactive maps for data visualizations. Bundled into a single Javascript file.",
-  "main": "public/rel/datamaps.all.js",
+  "main": "dist/datamaps.all.js",
   "keywords": [
     "USA",
     "World",
