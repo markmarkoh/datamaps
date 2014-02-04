@@ -1,5 +1,9 @@
 (function() {
   var svg;
+
+  //save off default references
+  var d3 = window.d3, topojson = window.topojson;
+  
   var defaultOptions = {
     scope: 'world',
     setProjection: setProjection,
@@ -597,7 +601,7 @@
 
   // expose library
   if ( typeof define === "function" && define.amd ) {
-    define( "datamaps", [], function () { return Datamap; } );
+    define( "datamaps", function(require) { d3 = require('d3'); topojson = require('topojson'); return Datamap; } );
   }
   else {
     window.Datamap = window.Datamaps = Datamap;
