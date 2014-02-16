@@ -35,7 +35,8 @@
         highlightFillColor: '#FC8D59',
         highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
         highlightBorderWidth: 2,
-        highlightFillOpacity: 0.85
+        highlightFillOpacity: 0.85,
+        exitDelay: 100
     },
     arcConfig: {
       strokeColor: '#DD1C77',
@@ -401,6 +402,7 @@
 
     bubbles.exit()
       .transition()
+        .delay(options.exitDelay)
         .attr("r", 0)
         .remove();
 
