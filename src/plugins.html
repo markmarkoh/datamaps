@@ -21,11 +21,11 @@
             element: document.getElementById('container1'),
             projection: 'mercator',
             geographyConfig: {
-              popupOnHover: false,
+              popupOnHover: true,
               highlightBorderColor: '#bada55',
               popupTemplate: function(geography, data) {
                 if ( data )
-                  return '<div class="hoverinfo" style="max-width: 300px;"><strong>' + geography.properties.name + '</strong> <br />' +  data.desc + ' </div>'
+                  return '<div class="hoverinfo" style="max-width: 300px;"><strong>' + geography.properties.name + '</strong> <br />' +  data.peaceTalks + ' </div>'
               },
               highlightBorderWidth: 1
             },
@@ -44,6 +44,10 @@
               "GBR": {
                 "fillKey": "Visited",
                 desc: "The President attended the 39th G8 summit at Lough Erne Resort in County Fermanagh, Northern Ireland."
+              },
+              "CAN": {
+                "fillKey": "neato",
+                peaceTalks: 1
               }
             }
           });
@@ -51,17 +55,17 @@
 window.setTimeout(function() {
 election.updateChoropleth({
   'USA': { color: 'blue' },
-  'CAN': { color: 'white' }
+  'CAN': { color: 'yellow', peaceTalks: 40 }
 })
 }, 1000);
 window.setTimeout(function() {
 election.updateChoropleth({
-  'USA': { color: 'green' },
-  'CAN': { fillKey: 'neato' },
+  'USA': { color: 'green', peaceTalks: 4 },
+  'CAN': { fillKey: 'neato', peaceTalks: 10 },
   'JPN': {color: 'pink'},
   'RUS': 'blue'
 })
-}, 2000);
+}, 3000);
 
 var l = {
   legendTitle: "Where Have We Been",
