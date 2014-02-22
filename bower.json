@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "homepage": "https://github.com/markmarkoh/datamaps",
   "authors": [
-    "Mark DiMarco<markmarkoh@gmail.com>",
+    "Mark DiMarco<markmarkoh@gmail.com>"
+  ],
+  "contributor": [
     "Dave Long (dave@davejlong.com)"
   ],
   "description": "Interactive maps for data visualizations. Bundled into a single Javascript file.",
