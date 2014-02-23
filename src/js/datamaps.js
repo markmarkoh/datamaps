@@ -342,10 +342,12 @@
         .append('svg:circle')
         .attr('class', 'datamaps-bubble')
         .attr('cx', function ( datum ) {
-          return self.latLngToXY(datum.latitude, datum.longitude)[0];
+          var latLng = self.latLngToXY(datum.latitude, datum.longitude);
+          if ( latLng ) return latLng[0];
         })
         .attr('cy', function ( datum ) {
-          return self.latLngToXY(datum.latitude, datum.longitude)[1];
+          var latLng = self.latLngToXY(datum.latitude, datum.longitude);
+          if ( latLng ) return latLng[1];
         })
         .attr('r', 0) //for animation purposes
         .attr('data-info', function(d) {

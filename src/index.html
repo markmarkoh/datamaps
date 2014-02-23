@@ -9,9 +9,9 @@
         <div id="container2" style="width: 500px; height: 300px; position: relative;"></div>
         <div id="container3" style="width: 500px; height: 300px; position: relative;"></div>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
-        <script src="/public/js/components/d3/d3.min.js"></script>
-        <script src="/public/js/components/topojson/topojson.js"></script>
-        <script src="/public/rel/datamaps.all.js"></script>
+        <script src="js/components/d3/d3.min.js"></script>
+        <script src="js/components/topojson/topojson.js"></script>
+        <script src="rel/datamaps.all.js"></script>
         <script>
 
         $('#container3').datamaps({
@@ -148,26 +148,26 @@ window.setTimeout(function() {
 
         var world = new Datamap({
             element: document.getElementById('container2'),
-            scope: 'world',
-            setProjection: function(element, options) {
-                var projection, path; 
-                var width = element.offsetWidth,
-                    height = element.offsetHeight;
+            scope: 'usa',
+            // setProjection: function(element, options) {
+            //     var projection, path; 
+            //     var width = element.offsetWidth,
+            //         height = element.offsetHeight;
 
-                var projection = d3.geo.orthographic()
-                    .scale(width / 4)
-                    .rotate([50,0,0])
-                    .translate([width / 2, height / 2])
-                    .clipAngle(90)
-                    .precision(.1);
+            //     var projection = d3.geo.orthographic()
+            //         .scale(width / 4)
+            //         .rotate([50,0,0])
+            //         .translate([width / 2, height / 2])
+            //         .clipAngle(90)
+            //         .precision(.1);
 
 
-                path = d3.geo.path()
-                  .projection( projection );
+            //     path = d3.geo.path()
+            //       .projection( projection );
 
-                return {path: path, projection: projection};
+            //     return {path: path, projection: projection};
 
-            },
+            // },
             projection: 'mercator',
             fills: {
                 defaultFill: '#ABDDA4',
@@ -189,6 +189,17 @@ window.setTimeout(function() {
                     fillKey: 'DEM',
                     latitude: 30.99128,
                     longitude: -97.13858
+                  },{
+                    name: 'Canopus',
+                    radius: 10,
+                    yeild: 2600,
+                    country: 'France',
+                    significance: 'First "staged" thermonuclear test by France',
+                    fillKey: 'REP',
+                    date: '1968-08-24',
+                    latitude: 30.29128,
+                    longitude: 497.73858
+
                   }, {
                     name: 'Canopus',
                     radius: 10,
