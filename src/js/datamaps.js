@@ -35,7 +35,8 @@
         highlightFillColor: '#FC8D59',
         highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
         highlightBorderWidth: 2,
-        highlightFillOpacity: 0.85
+        highlightFillOpacity: 0.85,
+        exitDelay: 100
     },
     arcConfig: {
       strokeColor: '#DD1C77',
@@ -403,6 +404,7 @@
 
     bubbles.exit()
       .transition()
+        .delay(options.exitDelay)
         .attr("r", 0)
         .remove();
 
@@ -528,14 +530,23 @@
     for ( var subunit in data ) {
       if ( data.hasOwnProperty(subunit) ) {
         var color;
-        if ( typeof data[subunit] === "string" ) {
-          color = data[subunit];
+        var subunitData = data[subunit]
+        if ( ! subunit ) {
+          continue;
         }
-        else if ( typeof data[subunit].color === "string" ) {
-          color = data[subunit].color;
+        else if ( typeof subunitData === "string" ) {
+          color = subunitData;
+        }
+        else if ( typeof subunitData.color === "string" ) {
+          color = subunitData.color;
         }
         else {
-          color = this.options.fills[ data[subunit].fillKey ];
+          color = this.options.fills[ subunitData.fillKey ];
+        }
+        //if it's an object, overriding the previous data
+        if ( subunitData === Object(subunitData) ) {
+          this.options.data[subunit] = defaults(subunitData, this.options.data[subunit] || {});
+          var geo = this.svg.select('.' + subunit).attr('data-info', JSON.stringify(this.options.data[subunit]));
         }
         svg
           .selectAll('.' + subunit)
