@@ -35,7 +35,8 @@
         highlightFillColor: '#FC8D59',
         highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
         highlightBorderWidth: 2,
-        highlightFillOpacity: 0.85
+        highlightFillOpacity: 0.85,
+        exitDelay: 100
     },
     arcConfig: {
       strokeColor: '#DD1C77',
@@ -48,6 +49,7 @@
   function addContainer( element ) {
     this.svg = d3.select( element ).append('svg')
       .attr('width', element.offsetWidth)
+      .attr('class', 'datamap')
       .attr('height', element.offsetHeight);
 
     return this.svg;
@@ -80,7 +82,7 @@
   function addStyleBlock() {
     if ( d3.select('.datamaps-style-block').empty() ) {
       d3.select('head').attr('class', 'datamaps-style-block').append('style')
-      .html('path {stroke: #FFFFFF; stroke-width: 1px;} .datamaps-legend dt, .datamaps-legend dd { float: left; margin: 0 3px 0 0;} .datamaps-legend dd {width: 20px; margin-right: 6px; border-radius: 3px;} .datamaps-legend {padding-bottom: 20px; z-index: 1001; position: absolute; left: 4px; font-size: 12px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;} .datamaps-hoverover {display: none; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; } .hoverinfo {padding: 4px; border-radius: 1px; background-color: #FFF; box-shadow: 1px 1px 5px #CCC; font-size: 12px; border: 1px solid #CCC; } .hoverinfo hr {border:1px dotted #CCC; }');
+      .html('.datamap path {stroke: #FFFFFF; stroke-width: 1px;} .datamaps-legend dt, .datamaps-legend dd { float: left; margin: 0 3px 0 0;} .datamaps-legend dd {width: 20px; margin-right: 6px; border-radius: 3px;} .datamaps-legend {padding-bottom: 20px; z-index: 1001; position: absolute; left: 4px; font-size: 12px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;} .datamaps-hoverover {display: none; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; } .hoverinfo {padding: 4px; border-radius: 1px; background-color: #FFF; box-shadow: 1px 1px 5px #CCC; font-size: 12px; border: 1px solid #CCC; } .hoverinfo hr {border:1px dotted #CCC; }');
     }
   }
 
@@ -92,7 +94,7 @@
 
     var subunits = this.svg.select('g.datamaps-subunits');
     if ( subunits.empty() ) {
-      subunits = this.addLayer('datamaps-subunits');
+      subunits = this.addLayer('datamaps-subunits', null, true);
     }
 
     var geoData = topojson.feature( data, data.objects[ this.options.scope ] ).features;
@@ -153,8 +155,8 @@
               .attr('data-previousAttributes', JSON.stringify(previousAttributes));
 
             //as per discussion on https://github.com/markmarkoh/datamaps/issues/19
-            if ( ! /MSIE/.test(navigator.userAgent) ) {
-             moveToFront.call(this);
+            if ( ! /MSIE/.test(navigator.userAgent) && !/Trident/.test(navigator.userAgent)) {
+              moveToFront.call(this);
             }
           }
 
@@ -190,23 +192,25 @@
     }
 
     var html = '<dl>';
+    var label = '';
     if ( data.legendTitle ) {
       html = '<h2>' + data.legendTitle + '</h2>' + html;
     }
     for ( var fillKey in this.options.fills ) {
 
       if ( fillKey === 'defaultFill') {
-        if ( data.defaultFillName ) {
-          html += '<dt>' + data.defaultFillName + ': </dt>';
-        }
-        else {
+        if (! data.defaultFillName ) {
           continue;
         }
+        label = data.defaultFillName;
+      } else {
+        if (data.labels && data.labels[fillKey]) {
+          label = data.labels[fillKey];
+        } else {
+          label= fillKey + ': ';
+        }
       }
-      else {
-        html += '<dt>' + fillKey + ': </dt>';
-      }
-
+      html += '<dt>' + label + '</dt>';
       html += '<dd style="background-color:' +  this.options.fills[fillKey] + '">&nbsp;</dd>';
     }
     html += '</dl>';
@@ -338,10 +342,12 @@
         .append('svg:circle')
         .attr('class', 'datamaps-bubble')
         .attr('cx', function ( datum ) {
-          return self.latLngToXY(datum.latitude, datum.longitude)[0];
+          var latLng = self.latLngToXY(datum.latitude, datum.longitude);
+          if ( latLng ) return latLng[0];
         })
         .attr('cy', function ( datum ) {
-          return self.latLngToXY(datum.latitude, datum.longitude)[1];
+          var latLng = self.latLngToXY(datum.latitude, datum.longitude);
+          if ( latLng ) return latLng[1];
         })
         .attr('r', 0) //for animation purposes
         .attr('data-info', function(d) {
@@ -398,6 +404,7 @@
 
     bubbles.exit()
       .transition()
+        .delay(options.exitDelay)
         .attr("r", 0)
         .remove();
 
@@ -506,11 +513,47 @@
   };
 
   //add <g> layer to root SVG
-  Datamap.prototype.addLayer = function( className, id ) {
-    d3.select()
-    return this.svg.append('g')
-      .attr('id', id || '')
+  Datamap.prototype.addLayer = function( className, id, first ) {
+    var layer;
+    if ( first ) {
+      layer = this.svg.insert('g', ':first-child')
+    }
+    else {
+      layer = this.svg.append('g')
+    }
+    return layer.attr('id', id || '')
       .attr('class', className || '');
+  };
+
+  Datamap.prototype.updateChoropleth = function(data) {
+    var svg = this.svg;
+    for ( var subunit in data ) {
+      if ( data.hasOwnProperty(subunit) ) {
+        var color;
+        var subunitData = data[subunit]
+        if ( ! subunit ) {
+          continue;
+        }
+        else if ( typeof subunitData === "string" ) {
+          color = subunitData;
+        }
+        else if ( typeof subunitData.color === "string" ) {
+          color = subunitData.color;
+        }
+        else {
+          color = this.options.fills[ subunitData.fillKey ];
+        }
+        //if it's an object, overriding the previous data
+        if ( subunitData === Object(subunitData) ) {
+          this.options.data[subunit] = defaults(subunitData, this.options.data[subunit] || {});
+          var geo = this.svg.select('.' + subunit).attr('data-info', JSON.stringify(this.options.data[subunit]));
+        }
+        svg
+          .selectAll('.' + subunit)
+          .transition()
+            .style('fill', color);
+      }
+    }
   };
 
   Datamap.prototype.updatePopup = function (element, d, options) {
