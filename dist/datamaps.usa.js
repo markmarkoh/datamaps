@@ -472,7 +472,7 @@
     if ( options.geographyConfig.dataUrl ) {
       d3.json( options.geographyConfig.dataUrl, function(error, results) {
         if ( error ) throw new Error(error);
-
+        self.customTopo = results;
         draw( results );
       });
     }
