@@ -1,7 +1,7 @@
 {
   "name": "datamaps",
   "description": "datamaps with d3.js",
-  "version": "0.3.0",
+  "version": "0.2.2",
   "author": "Mark DiMarco<markmarkoh@gmail.com>",
   "scripts": {
     "test": "grunt jasmine"
