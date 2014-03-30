@@ -346,12 +346,24 @@
         .append('svg:circle')
         .attr('class', 'datamaps-bubble')
         .attr('cx', function ( datum ) {
-          var latLng = self.latLngToXY(datum.latitude, datum.longitude);
+          var latLng;
+          if ( datumHasCoords(datum) ) {
+            latLng = self.latLngToXY(datum.latitude, datum.longitude);
+          }
+          else if ( datum.centered ) {
+            latLng = self.path.centroid(svg.select('path.' + datum.centered).data()[0]);
+          }
           if ( latLng ) return latLng[0];
         })
         .attr('cy', function ( datum ) {
-          var latLng = self.latLngToXY(datum.latitude, datum.longitude);
-          if ( latLng ) return latLng[1];
+          var latLng;
+          if ( datumHasCoords(datum) ) {
+            latLng = self.latLngToXY(datum.latitude, datum.longitude);
+          }
+          else if ( datum.centered ) {
+            latLng = self.path.centroid(svg.select('path.' + datum.centered).data()[0]);
+          }
+          if ( latLng ) return latLng[1];;
         })
         .attr('r', 0) //for animation purposes
         .attr('data-info', function(d) {
@@ -411,6 +423,10 @@
         .delay(options.exitDelay)
         .attr("r", 0)
         .remove();
+
+    function datumHasCoords (datum) {
+      return typeof datum !== 'undefined' && typeof datum.latitude !== 'undefined' && typeof datum.longitude !== 'undefined';
+    }
 
   }
 
