@@ -329,6 +329,13 @@
       });
   }
 
+  function handleVoronoi (layer, data, options) {
+    var self = this
+        svg = this.svg;
+
+    var vornoiCoords = data.map(function(datum) { return [datum.latitude, datum.longitude]});
+    console.log(vornoiCoords);
+  }
 
   function handleBubbles (layer, data, options ) {
     var self = this,
@@ -467,6 +474,7 @@
     this.addPlugin('legend', addLegend);
     this.addPlugin('arc', handleArcs);
     this.addPlugin('labels', handleLabels);
+    this.addPlugin('voronoi', handleVoronoi);
 
     //append style block with basic hoverover styles
     if ( ! this.options.disableDefaultStyles ) {

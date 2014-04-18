@@ -33,9 +33,12 @@ module.exports = function(grunt) {
     },
     watch: {
       datamap: {
-        files: ['src/js/datamaps.js'],
+        files: ['src/js/datamaps.js', 'src/examples/**.html'],
         tasks: ['replace'],
-    }
+        options: {
+          livereload: true,
+        }
+      }
   },
    uglify: {
       dist: {
