@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .active { fill: blue !important;}
+          /*.datamaps-key dt, .datamaps-key dd {float: none !important;}
+          .datamaps-key {right: -50px; top: 0;}*/
+        </style>
+      </head>
+      <body>
+
+        <div id="container1" style="border:1px dotted blue; width: 700px; height: 475px; position: relative;"></div>
+        <script src="/src/js/components/d3/d3.min.js"></script>
+        <script src="/src/js/components/topojson/topojson.js"></script>
+        <script src="/src/rel/datamaps.usa.js"></script>
+        <script>
+
+          var election = new Datamap({
+            scope: 'usa',
+            element: document.getElementById('container1'),
+            geographyConfig: {
+              popupOnHover: false,
+              highlightOnHover: false,
+              borderColor: '#444',
+              borderWidth: 0.5
+            },
+            fills: {
+              'Visited': '#306596',
+              'neato': '#0fa0fa',
+              'Trouble': '#bada55',
+              defaultFill: '#dddddd'
+            }
+          });
+
+          election.voronoi([
+              {
+                  latitude: 40.639722,
+                  longitude: -73.778889
+              },
+              {
+                  latitude: 37.618889,
+                  longitude: -122.375
+              },
+              {
+                  latitude: 30.194444,
+                  longitude: -97.67
+              },
+              {
+                  latitude: 25.793333,
+                  longitude: -80.290556
+              },
+              {
+                  latitude: 39.861667,
+                  longitude: -104.673056
+              },
+              {
+                  latitude: 35.877778,
+                  longitude: -78.7875
+              }
+          ]);
+
+</script>
+<script src="//localhost:35729/livereload.js"></script>
+</body>
+</html>
