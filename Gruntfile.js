@@ -8,7 +8,7 @@ module.exports = function(grunt) {
         dest: 'src/rel/datamaps.world.js',
         replacements: [{
           from: '\'__WORLD__\'',
-          to: '<%= grunt.file.read("src/js/data/world.topo.json") %>'
+          to: '<%= grunt.file.read("tmp/world.topo.json") %>'
         }]
       },
       usa: {
@@ -16,7 +16,7 @@ module.exports = function(grunt) {
         dest: 'src/rel/datamaps.usa.js',
         replacements: [{
           from: '\'__USA__\'',
-          to: '<%= grunt.file.read("src/js/data/usa.topo.json") %>'
+          to: '<%= grunt.file.read("tmp/usa.topo.json") %>'
         }]
       },
       all: {
@@ -24,10 +24,10 @@ module.exports = function(grunt) {
         dest: 'src/rel/datamaps.all.js',
         replacements: [{
           from: '\'__USA__\'',
-          to: '<%= grunt.file.read("src/js/data/usa.topo.json") %>'
+          to: '<%= grunt.file.read("tmp/usa.topo.json") %>'
         }, {
           from: '\'__WORLD__\'',
-          to: '<%= grunt.file.read("src/js/data/world.topo.json") %>'
+          to: '<%= grunt.file.read("tmp/world.topo.json") %>'
         }]
       }
     },
@@ -35,6 +35,18 @@ module.exports = function(grunt) {
       datamap: {
         files: ['src/js/datamaps.js'],
         tasks: ['replace'],
+    }
+  },
+  topojson: {
+    world: {
+      files: {
+        'tmp/world.topo.json': ['src/js/data/world.json']
+      }
+    },
+    usa: {
+      files: {
+        'tmp/usa.topo.json': ['src/js/data/usa.json']
+      }
     }
   },
    uglify: {
@@ -77,8 +89,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
 
+  grunt.loadNpmTasks('grunt-topojson');
+
 
   grunt.registerTask('dev', ['replace']);
-  grunt.registerTask('build', ['replace', 'uglify:dist', 'copy']);
+  grunt.registerTask('build', ['topojson', 'replace', 'uglify:dist', 'copy']);
 
 };
