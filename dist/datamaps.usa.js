@@ -8,6 +8,7 @@
     scope: 'world',
     setProjection: setProjection,
     projection: 'equirectangular',
+    dataType: 'json',
     done: function() {},
     fills: {
       defaultFill: '#ABDDA4'
@@ -503,6 +504,21 @@
     return this;
 
       function draw (data) {
+        // if fetching remote data, draw the map first then call `updateChoropleth`
+        if ( self.options.dataUrl ) {
+          //allow for csv or json data types
+          d3[self.options.dataType](self.options.dataUrl, function(data) {
+            //in the case of csv, transform data to object
+            if ( self.options.dataType === 'csv' && (data && data.slice) ) {
+              var tmpData = {};
+              for(var i = 0; i < data.length; i++) {
+                tmpData[data[i].id] = data[i];
+              } 
+              data = tmpData;
+            }
+            Datamaps.prototype.updateChoropleth.call(self, data);
+          });
+        }
         drawSubunits.call(self, data);
         handleGeographyConfig.call(self);
 
