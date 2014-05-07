@@ -63,6 +63,7 @@
   // setProjection takes the svg element and options
   function setProjection( element, options ) {
     var projection, path;
+    var svg = this.svg;
     if ( options && typeof options.scope === 'undefined') {
       options.scope = 'world';
     }
@@ -78,6 +79,23 @@
         .translate([element.offsetWidth / 2, element.offsetHeight / (options.projection === "mercator" ? 1.45 : 1.8)]);
     }
 
+    if ( options.projection === 'orthographic' ) {
+
+      svg.append("defs").append("path")
+        .datum({type: "Sphere"})
+        .attr("id", "sphere")
+        .attr("d", path);
+
+      svg.append("use")
+          .attr("class", "stroke")
+          .attr("xlink:href", "#sphere");
+
+      svg.append("use")
+          .attr("class", "fill")
+          .attr("xlink:href", "#sphere");
+      projection.scale(250).clipAngle(90).rotate([97, 0])
+    }
+
     path = d3.geo.path()
       .projection( projection );
 
@@ -87,7 +105,7 @@
   function addStyleBlock() {
     if ( d3.select('.datamaps-style-block').empty() ) {
       d3.select('head').attr('class', 'datamaps-style-block').append('style')
-      .html('.datamap path {stroke: #FFFFFF; stroke-width: 1px;} .datamaps-legend dt, .datamaps-legend dd { float: left; margin: 0 3px 0 0;} .datamaps-legend dd {width: 20px; margin-right: 6px; border-radius: 3px;} .datamaps-legend {padding-bottom: 20px; z-index: 1001; position: absolute; left: 4px; font-size: 12px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;} .datamaps-hoverover {display: none; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; } .hoverinfo {padding: 4px; border-radius: 1px; background-color: #FFF; box-shadow: 1px 1px 5px #CCC; font-size: 12px; border: 1px solid #CCC; } .hoverinfo hr {border:1px dotted #CCC; }');
+      .html('.datamap path.datamaps-graticule { fill: none; stroke: #777; stroke-width: 0.5px; stroke-opacity: .5;} .datamap path {stroke: #FFFFFF; stroke-width: 1px;} .datamaps-legend dt, .datamaps-legend dd { float: left; margin: 0 3px 0 0;} .datamaps-legend dd {width: 20px; margin-right: 6px; border-radius: 3px;} .datamaps-legend {padding-bottom: 20px; z-index: 1001; position: absolute; left: 4px; font-size: 12px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;} .datamaps-hoverover {display: none; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; } .hoverinfo {padding: 4px; border-radius: 1px; background-color: #FFF; box-shadow: 1px 1px 5px #CCC; font-size: 12px; border: 1px solid #CCC; } .hoverinfo hr {border:1px dotted #CCC; }');
     }
   }
 
@@ -286,6 +304,14 @@
       .remove();
   }
 
+  function addGraticule ( layer, options ) {
+      var graticule = d3.geo.graticule();
+      this.svg.insert("path", '.datamaps-subunits')
+        .datum(graticule)
+        .attr("class", "datamaps-graticule")
+        .attr("d", this.path); 
+  }
+
   function handleLabels ( layer, options ) {
     var self = this;
     options = options || {};
@@ -468,6 +494,7 @@
     this.addPlugin('legend', addLegend);
     this.addPlugin('arc', handleArcs);
     this.addPlugin('labels', handleLabels);
+    this.addPlugin('graticule', addGraticule);
 
     //append style block with basic hoverover styles
     if ( ! this.options.disableDefaultStyles ) {
