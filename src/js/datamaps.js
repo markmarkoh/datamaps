@@ -644,6 +644,11 @@
     }
   };
 
+  // http://jsperf.com/alternative-isfunction-implementations/4
+  Datamap.prototype.isFunction = function(value){
+    return value && typeof(value) == 'function';
+  };
+
   // expose library
   if ( typeof define === "function" && define.amd ) {
     define( "datamaps", function(require) { d3 = require('d3'); topojson = require('topojson'); return Datamap; } );
