@@ -143,26 +143,10 @@
       svg.selectAll('.datamaps-subunit')
         .on('mouseover', function(d) {
           var $this = d3.select(this);
+          var data = JSON.parse($this.attr('data-info'));
 
-          if ( options.highlightOnHover ) {
-            var previousAttributes = {
-              'fill':  $this.style('fill'),
-              'stroke': $this.style('stroke'),
-              'stroke-width': $this.style('stroke-width'),
-              'fill-opacity': $this.style('fill-opacity')
-            };
-
-            $this
-              .style('fill', options.highlightFillColor)
-              .style('stroke', options.highlightBorderColor)
-              .style('stroke-width', options.highlightBorderWidth)
-              .style('fill-opacity', options.highlightFillOpacity)
-              .attr('data-previousAttributes', JSON.stringify(previousAttributes));
-
-            //as per discussion on https://github.com/markmarkoh/datamaps/issues/19
-            if ( ! /MSIE/.test(navigator.userAgent) ) {
-             moveToFront.call(this);
-            }
+          if ( getOptionValue(options.highlightOnHover, d, data) ) {
+            self.updateHighlights($this, d, options, data);
           }
 
           if ( options.popupOnHover ) {
@@ -597,6 +581,29 @@
           .transition()
             .style('fill', color);
       }
+    }
+  };
+
+  Datamap.prototype.updateHighlights = function(element, d, options, data) {
+    var self = this;
+
+    var previousAttributes = {
+      'fill':  element.style('fill'),
+      'stroke': element.style('stroke'),
+      'stroke-width': element.style('stroke-width'),
+      'fill-opacity': element.style('fill-opacity')
+    };
+
+    element
+      .style('fill', getOptionValue(options.highlightFillColor, d, data))
+      .style('stroke', getOptionValue(options.highlightBorderColor, d, data))
+      .style('stroke-width', getOptionValue(options.highlightBorderWidth, d, data))
+      .style('fill-opacity', getOptionValue(options.highlightFillOpacity, d, data))
+      .attr('data-previousAttributes', JSON.stringify(previousAttributes));
+
+    //as per discussion on https://github.com/markmarkoh/datamaps/issues/19
+    if ( ! /MSIE/.test(navigator.userAgent) ) {
+      moveToFront.call(element);
     }
   };
 
