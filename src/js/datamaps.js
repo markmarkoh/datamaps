@@ -189,6 +189,14 @@
     }
   }
 
+  // Check if option is a function
+  function getOptionValue(option, d, data){
+    if(isFunction(option))
+      return option(d, data);
+
+    return option;
+  }
+
   //plugin to add a simple map legend
   function addLegend(layer, data, options) {
     data = data || {};
