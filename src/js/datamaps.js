@@ -167,10 +167,6 @@
           d3.selectAll('.datamaps-hoverover').style('display', 'none');
         });
     }
-    
-    function moveToFront() {
-      this.parentNode.appendChild(this);
-    }
   }
 
   // Check if option is a function
@@ -585,8 +581,6 @@
   };
 
   Datamap.prototype.updateHighlights = function(element, d, options, data) {
-    var self = this;
-
     var previousAttributes = {
       'fill':  element.style('fill'),
       'stroke': element.style('stroke'),
@@ -603,7 +597,11 @@
 
     //as per discussion on https://github.com/markmarkoh/datamaps/issues/19
     if ( ! /MSIE/.test(navigator.userAgent) ) {
-      moveToFront.call(element);
+      moveToFront(element);
+    }
+
+    function moveToFront(element) {
+      element[0][0].parentNode.appendChild(element[0][0]);
     }
   };
 
