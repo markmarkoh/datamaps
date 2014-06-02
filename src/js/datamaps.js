@@ -370,9 +370,15 @@
         .attr('data-info', function(d) {
           return JSON.stringify(d);
         })
-        .style('stroke', options.borderColor)
-        .style('stroke-width', options.borderWidth)
-        .style('fill-opacity', options.fillOpacity)
+        .style('stroke', function ( datum ) {
+          return typeof datum.borderColor !== 'undefined' ? datum.borderColor : options.borderColor;
+        })
+        .style('stroke-width', function ( datum ) {
+          return typeof datum.borderWidth !== 'undefined' ? datum.borderWidth : options.borderWidth;
+        })
+        .style('fill-opacity', function ( datum ) {
+          return typeof datum.fillOpacity !== 'undefined' ? datum.fillOpacity : options.fillOpacity;
+        })
         .style('fill', function ( datum ) {
           var fillColor = fillData[ datum.fillKey ];
           return fillColor || fillData.defaultFill;

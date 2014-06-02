@@ -293,6 +293,12 @@ The first parameter to `bubbles` should be an array of objects, each with **at l
  
 Optionally, pass in `fillKey` to color code the bubble, and pass in any other data you want to render in a popup template which can be overridden in the options parameter.
 
+For further customization, you can set these properties on each bubble to override the options parameter (or default options):
+
+  - `borderColor`
+  - `borderWidth`
+  - `fillOpacity`
+
 The second parameter is the `options` param, where you can overide any of the default options (documented below)
 
 
