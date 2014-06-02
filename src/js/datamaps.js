@@ -371,13 +371,13 @@
           return JSON.stringify(d);
         })
         .style('stroke', function ( datum ) {
-          return datum.borderColor || options.borderColor;
+          return typeof datum.borderColor !== 'undefined' ? datum.borderColor : options.borderColor;
         })
         .style('stroke-width', function ( datum ) {
-          return datum.borderWidth || options.borderWidth;
+          return typeof datum.borderWidth !== 'undefined' ? datum.borderWidth : options.borderWidth;
         })
         .style('fill-opacity', function ( datum ) {
-          return datum.fillOpacity || options.fillOpacity;
+          return typeof datum.fillOpacity !== 'undefined' ? datum.fillOpacity : options.fillOpacity;
         })
         .style('fill', function ( datum ) {
           var fillColor = fillData[ datum.fillKey ];
