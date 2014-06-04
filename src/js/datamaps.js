@@ -160,7 +160,7 @@
               .attr('data-previousAttributes', JSON.stringify(previousAttributes));
 
             //as per discussion on https://github.com/markmarkoh/datamaps/issues/19
-            if ( ! /MSIE/.test(navigator.userAgent) ) {
+            if ( ! /((MSIE)|(Trident))/.test ) {
              moveToFront.call(this);
             }
           }
