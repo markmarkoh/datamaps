@@ -323,6 +323,30 @@ You can continue to call `bubbles` on the same map instance and the map will aut
 `map.bubbles([])` will erase all bubbles.
 
 
+#### Labels
+
+For USA maps you can add 2 letter (*i.e., NY, TX*) labels to each state. To add labels, after created the map:
+
+```javascript
+map.labels();
+```
+
+The following options are allowed:
+
+  - `labelColor` //font color, default: #000
+  - `lineWidth` //line width for New England states, default: 1
+  - `fontSize` //font size, default: 10
+  - `fontFamily` //font family, default: 'Verdana'
+
+An example for using the options: 
+
+```javascript
+map.labels({labelColor: 'blue', fontSize: 12});
+```
+
+
+
+
 #### Zooming
 
 You can override the default projection by setting your own `setProjection(element)` function.
