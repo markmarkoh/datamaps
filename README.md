@@ -44,6 +44,21 @@ Example:
 
 This should render a new world map with a standard projection.
 
+#### via Bower
+
+1. `bower install datamaps`
+2. Refer to file in `dist` directory, like:
+
+```html
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script src="bower_components/dist/datamaps.world.min.js"></script>
+<div id="container" style="position: relative; width: 500px; height: 300px;"></div>
+<script>
+    var map = new Datamap({element: document.getElementById('container')});
+</script>
+```
+
 #### USA Only Map
 A map of the USA with an Albers based projection will be default if you only include `datamaps.usa.min.js`, but in case you include `datamaps.all.min.js`:
 ```html
