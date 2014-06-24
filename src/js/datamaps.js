@@ -509,18 +509,12 @@
 
     if(options.zoom){
       function mousewheel( datum ) {
-        var scale = getSVGTransform(self.svg.select('g.datamaps-subunits').node()).scale;
-        var change;
-
-        if(d3.event.type == 'mousewheel') change = d3.event.wheelDelta;
-        else change = -d3.event.detail;
-
+        var change = (d3.event.type == 'mousewheel') ? d3.event.wheelDelta : -d3.event.detail;
         if (change > 0){
-          scale *= (1 + options.zoomIncrement);
+          setSVGScale(self.svg, 1 + options.zoomIncrement);
         }else{
-          scale *= (1 - options.zoomIncrement);
+          setSVGScale(self.svg, 1 - options.zoomIncrement);
         }
-        setSVGScale(svg, scale);
         d3.event.stopPropagation();
       };
       svg.on('mousewheel', mousewheel);
@@ -545,34 +539,33 @@
   }
   function setSVGScale(svg, scale){
     var currentScale = getSVGTransform(svg.select('g').node());
+    //need to re-center
+    var container = svg.node().parentElement;
+    var c = 0.5 * (scale - 1) / scale / currentScale.scale;
+    var x = currentScale.x - container.clientWidth * c;
+    var y = currentScale.y - container.clientHeight * c;
 
     svg.selectAll('g').each(function(){
       var g = this;
-      var current = getSVGTransform(g);
-      if(scale == current.scale) return;
       var b = g.transform.baseVal;
       var count = b.numberOfItems;
-      var t = null;
+      var t = null, s = null;
       for(var i=0;i<count;i++){
         var bi = b.getItem(i);
-        if (bi.type == SVGTransform.SVG_TRANSFORM_SCALE){
-          t = bi;
-          break;
-        }
+        if (bi.type == SVGTransform.SVG_TRANSFORM_SCALE) s = bi;
+        if (bi.type == SVGTransform.SVG_TRANSFORM_TRANSLATE) t = bi;
       }
+      if(!s){
+        s = g.parentElement.createSVGTransform();
+        b.appendItem(s);
+      }
+      s.setScale(currentScale.scale * scale, currentScale.scale * scale);
       if(!t){
         t = g.parentElement.createSVGTransform();
         b.appendItem(t);
       }
-      t.setScale(scale, scale);
+      t.setTranslate(x, y);
     });
-
-    //need to re-center
-    var size = svg.node().parentElement;
-    var cx = size.clientWidth * (scale / currentScale.scale - 1) / scale / 2;
-    var cy = size.clientHeight * (scale / currentScale.scale - 1) / scale / 2;
-
-    setSVGTranslation(svg, currentScale.x - cx, currentScale.y - cy, false);
   }
   function setSVGTranslation(svg, x, y, bounded){
     if(Math.abs(x)==0 && Math.abs(y)==0) return;
