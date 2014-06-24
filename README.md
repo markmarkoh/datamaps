@@ -44,6 +44,21 @@ Example:
 
 This should render a new world map with a standard projection.
 
+#### via Bower
+
+1. `bower install datamaps`
+2. Refer to file in `dist` directory, like:
+
+```html
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script src="bower_components/dist/datamaps.world.min.js"></script>
+<div id="container" style="position: relative; width: 500px; height: 300px;"></div>
+<script>
+    var map = new Datamap({element: document.getElementById('container')});
+</script>
+```
+
 #### USA Only Map
 A map of the USA with an Albers based projection will be default if you only include `datamaps.usa.min.js`, but in case you include `datamaps.all.min.js`:
 ```html
@@ -306,6 +321,30 @@ The second parameter is the `options` param, where you can overide any of the de
 You can continue to call `bubbles` on the same map instance and the map will auto update itself. Any bubble previously drawn that's **not included** in subsequent calls will be removed from the UI.
 
 `map.bubbles([])` will erase all bubbles.
+
+
+#### Labels
+
+For USA maps you can add 2 letter (*i.e., NY, TX*) labels to each state. To add labels, after created the map:
+
+```javascript
+map.labels();
+```
+
+The following options are allowed:
+
+  - `labelColor` //font color, default: #000
+  - `lineWidth` //line width for New England states, default: 1
+  - `fontSize` //font size, default: 10
+  - `fontFamily` //font family, default: 'Verdana'
+
+An example for using the options: 
+
+```javascript
+map.labels({labelColor: 'blue', fontSize: 12});
+```
+
+
 
 
 #### Zooming
