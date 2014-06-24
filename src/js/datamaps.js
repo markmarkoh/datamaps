@@ -459,7 +459,7 @@
       function mousedown(){
         if(d3.event.which == 1){
           position = d3.mouse(this);
-          var transform = getSVGTransform(self.svg.select('g.datamaps-subunits').node());
+          var transform = getSVGTransform(self.svg);
           if(cleanExit) oldCursor = svg.node().style.cursor;
           cleanExit = false;
           svg.style('cursor','move');
@@ -522,8 +522,8 @@
     }
   }
 
-  function getSVGTransform(g){
-    var b = g.transform.baseVal;
+  function getSVGTransform(svg){
+    var b = svg.select('g.datamaps-subunits').node().transform.baseVal;
     var count = b.numberOfItems;
     var sx = 1, x = 0, y = 0;
     for(var i=0;i<count;i++){
@@ -538,7 +538,7 @@
     return { scale: sx, x: x, y: y};
   }
   function setSVGScale(svg, scale){
-    var currentScale = getSVGTransform(svg.select('g').node());
+    var currentScale = getSVGTransform(svg);
     //need to re-center
     var container = svg.node().parentElement;
     var c = 0.5 * (scale - 1) / scale / currentScale.scale;
@@ -570,7 +570,7 @@
   function setSVGTranslation(svg, x, y, bounded){
     if(Math.abs(x)==0 && Math.abs(y)==0) return;
 
-    var current = getSVGTransform(svg.select('g.datamaps-subunits').node());
+    var current = getSVGTransform(svg);
 
     //limit to edges
     if(bounded){
@@ -592,13 +592,16 @@
         var g = this;
         var b = g.transform.baseVal;
         var count = b.numberOfItems;
-        var t = null;
+        var t = null, s = null;
         for(var i=0;i<count;i++){
           var bi = b.getItem(i);
-          if (bi.type == SVGTransform.SVG_TRANSFORM_TRANSLATE){
-            t = bi;
-            break;
-          }
+          if (bi.type == SVGTransform.SVG_TRANSFORM_SCALE) s = bi;
+          if (bi.type == SVGTransform.SVG_TRANSFORM_TRANSLATE) t = bi;
+        }
+        if(!s){
+          s = g.parentElement.createSVGTransform();
+          b.appendItem(s);
+          s.setScale(1,1);
         }
         if(!t){
           t = g.parentElement.createSVGTransform();
@@ -776,7 +779,7 @@
     element.on('mousemove', null);
     element.on('mousemove', function() {
       var position = d3.mouse(this);
-      var transform = getSVGTransform(self.svg.select('g.datamaps-subunits').node());
+      var transform = getSVGTransform(self.svg);
       d3.select(self.svg[0][0].parentNode).select('.datamaps-hoverover')
         .style('top', ((position[1] + transform.y) * transform.scale + 30) + "px")
         .html(function() {
