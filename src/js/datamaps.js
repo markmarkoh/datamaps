@@ -48,6 +48,12 @@
       strokeWidth: 1,
       arcSharpness: 1,
       animationSpeed: 600
+    },
+    pointerConfig: {
+      pan: true,
+      panBounds: true,
+      zoom: true,
+      zoomIncrement: 0.1
     }
   };
 
@@ -183,7 +189,7 @@
             }
           }
           $this.on('mousemove', null);
-          d3.selectAll('.datamaps-hoverover').style('display', 'none');
+          d3.select(self.options.element).selectAll('.datamaps-hoverover').style('display', 'none');
         });
     }
     
@@ -440,6 +446,176 @@
 
   }
 
+  function handlePointer (layer, data, options) {
+
+    var self = this,
+     svg = this.svg,
+     position = null;
+
+    var cleanExit = true;
+
+    if(options.pan){
+      var oldCursor;
+      function mousedown(){
+        if(d3.event.which == 1){
+          position = d3.mouse(this);
+          var transform = getSVGTransform(self.svg.select('g.datamaps-subunits').node());
+          if(cleanExit) oldCursor = svg.node().style.cursor;
+          cleanExit = false;
+          svg.style('cursor','move');
+
+          function pointermove(){
+            var newPosition = d3.mouse(this);
+            //scale to keep movements proportional to mouse movements
+            var x = (newPosition[0] - (position[0]||0)) / transform.scale;
+            var y = (newPosition[1] - (position[1]||0)) / transform.scale;
+            setSVGTranslation(svg, transform.x + x, transform.y + y, options.panBounds);
+          }
+          svg.on('mousemove', pointermove);
+          svg.on('touchmove', pointermove);
+          svg.on('pointermove', pointermove);
+
+          //disable built in image dragging for firefox
+          svg.on('dragstart', function(e){ d3.event.preventDefault(); })
+
+          function pointerup() {
+            svg.style('cursor',oldCursor);
+            oldCursor = null;
+            cleanExit = true;
+            svg.on('mousemove', null);
+            svg.on('touchmove', null);
+            svg.on('pointermove', null);
+          }
+          svg.on('mouseup', pointerup);
+          svg.on('touchend', pointerup);
+          svg.on('pointerup', pointerup);
+        }
+      }
+      svg.on('mousedown', mousedown);
+      svg.on('touchstart', mousedown);
+      svg.on('pointerdown', mousedown);
+
+      function pointerout(){
+        svg.style('cursor',oldCursor);
+        oldCursor = null;
+        cleanExit = true;
+        svg.on('mousemove', null);
+        svg.on('touchmove', null);
+        svg.on('pointermove', null);
+      }
+      svg.on('mouseout', pointerout);
+      svg.on('pointerout', pointerout);
+    }
+
+    if(options.zoom){
+      function mousewheel( datum ) {
+        var scale = getSVGTransform(self.svg.select('g.datamaps-subunits').node()).scale;
+        var change;
+
+        if(d3.event.type == 'mousewheel') change = d3.event.wheelDelta;
+        else change = -d3.event.detail;
+
+        if (change > 0){
+          scale *= (1 + options.zoomIncrement);
+        }else{
+          scale *= (1 - options.zoomIncrement);
+        }
+        setSVGScale(svg, scale);
+        d3.event.stopPropagation();
+      };
+      svg.on('mousewheel', mousewheel);
+      svg.on('DOMMouseScroll', mousewheel);
+    }
+  }
+
+  function getSVGTransform(g){
+    var b = g.transform.baseVal;
+    var count = b.numberOfItems;
+    var sx = 1, x = 0, y = 0;
+    for(var i=0;i<count;i++){
+      var t = b.getItem(i);
+      if (t.type == SVGTransform.SVG_TRANSFORM_SCALE){
+        sx = t.matrix.a;
+      }else if(t.type == SVGTransform.SVG_TRANSFORM_TRANSLATE){
+        x = t.matrix.e;
+        y = t.matrix.f;
+      }
+    }
+    return { scale: sx, x: x, y: y};
+  }
+  function setSVGScale(svg, scale){
+    var currentScale = getSVGTransform(svg.select('g').node());
+
+    svg.selectAll('g').each(function(){
+      var g = this;
+      var current = getSVGTransform(g);
+      if(scale == current.scale) return;
+      var b = g.transform.baseVal;
+      var count = b.numberOfItems;
+      var t = null;
+      for(var i=0;i<count;i++){
+        var bi = b.getItem(i);
+        if (bi.type == SVGTransform.SVG_TRANSFORM_SCALE){
+          t = bi;
+          break;
+        }
+      }
+      if(!t){
+        t = g.parentElement.createSVGTransform();
+        b.appendItem(t);
+      }
+      t.setScale(scale, scale);
+    });
+
+    //need to re-center
+    var size = svg.node().parentElement;
+    var cx = size.clientWidth * (scale / currentScale.scale - 1) / scale / 2;
+    var cy = size.clientHeight * (scale / currentScale.scale - 1) / scale / 2;
+
+    setSVGTranslation(svg, currentScale.x - cx, currentScale.y - cy, false);
+  }
+  function setSVGTranslation(svg, x, y, bounded){
+    if(Math.abs(x)==0 && Math.abs(y)==0) return;
+
+    var current = getSVGTransform(svg.select('g.datamaps-subunits').node());
+
+    //limit to edges
+    if(bounded){
+      var container = svg.node().parentElement;
+      var w = container.clientWidth;
+      var h = container.clientHeight;
+      var size = svg.node().getBBox();
+      var diffX = current.x - x;
+      var diffY = current.y - y;
+
+      if(size.x >= diffX && diffX <= 0) x = current.x;
+      if(size.y >= diffY && diffY <= 0) y = current.y;
+      if(w - size.x - size.width + diffX >= 0 && diffX >= 0) x = current.x;
+      if(h - size.y - size.height + diffY >= 0 && diffY >= 0) y = current.y;
+    }
+
+    if(x!=current.x || y!=current.y){
+      svg.selectAll('g').each(function() {
+        var g = this;
+        var b = g.transform.baseVal;
+        var count = b.numberOfItems;
+        var t = null;
+        for(var i=0;i<count;i++){
+          var bi = b.getItem(i);
+          if (bi.type == SVGTransform.SVG_TRANSFORM_TRANSLATE){
+            t = bi;
+            break;
+          }
+        }
+        if(!t){
+          t = g.parentElement.createSVGTransform();
+          b.appendItem(t);
+        }
+        t.setTranslate(x, y);
+      });
+    }
+  }
+
   //stolen from underscore.js
   function defaults(obj) {
     Array.prototype.slice.call(arguments, 1).forEach(function(source) {
@@ -477,6 +653,7 @@
     this.addPlugin('legend', addLegend);
     this.addPlugin('arc', handleArcs);
     this.addPlugin('labels', handleLabels);
+    this.addPlugin('pointer', handlePointer);
 
     //append style block with basic hoverover styles
     if ( ! this.options.disableDefaultStyles ) {
@@ -606,14 +783,15 @@
     element.on('mousemove', null);
     element.on('mousemove', function() {
       var position = d3.mouse(this);
+      var transform = getSVGTransform(self.svg.select('g.datamaps-subunits').node());
       d3.select(self.svg[0][0].parentNode).select('.datamaps-hoverover')
-        .style('top', ( (position[1] + 30)) + "px")
+        .style('top', ((position[1] + transform.y) * transform.scale + 30) + "px")
         .html(function() {
           var data = JSON.parse(element.attr('data-info'));
           //if ( !data ) return '';
           return options.popupTemplate(d, data);
         })
-        .style('left', ( position[0]) + "px");
+        .style('left', ((position[0] + transform.x) * transform.scale) + "px");
     });
 
     d3.select(self.svg[0][0].parentNode).select('.datamaps-hoverover').style('display', 'block');
