@@ -28,7 +28,7 @@ Downloads:
 
 1. Include D3.js and Topojson on your page
 2. Include Datamaps.js on your page
-3. Add a container, set the height and width
+3. Add a container, set the height and width and position to relative
 4. Create a `new Datamaps(options)`, passing in at least an `element` option
 
 Example:
