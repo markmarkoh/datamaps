@@ -507,7 +507,7 @@
       });
     }
     else {
-      draw( this[options.scope + 'Topo'] || JSON.parse(options.geographyConfig.dataJson));
+      draw( this[options.scope + 'Topo'] || options.geographyConfig.dataJson);
     }
 
     return this;
