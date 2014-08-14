@@ -3,7 +3,7 @@
 
   //save off default references
   var d3 = window.d3, topojson = window.topojson;
-  
+
   var defaultOptions = {
     scope: 'world',
     setProjection: setProjection,
@@ -25,7 +25,8 @@
         highlightOnHover: true,
         highlightFillColor: '#FC8D59',
         highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
-        highlightBorderWidth: 2
+        highlightBorderWidth: 2,
+        zoomOnClick: true
     },
     bubblesConfig: {
         borderWidth: 2,
@@ -136,6 +137,44 @@
       .style('stroke', geoConfig.borderColor);
   }
 
+  function handleZoomConfig () {
+    var svg = this.svg;
+    var self = this;
+    var options = this.options.geographyConfig;
+    var width = self.options.element.clientWidth,
+        height = self.options.element.clientHeight,
+        centered;
+
+    if ( options.zoomOnClick ) {
+      svg.selectAll('.datamaps-subunit')
+        .on('click', clicked);
+    }
+    function clicked(d) {
+      var x, y, k;
+
+      if (d && centered !== d) {
+        var centroid = self.path.centroid(d);
+        x = centroid[0];
+        y = centroid[1];
+        k = 4;
+        centered = d;
+      } else {
+        x = width / 2;
+        y = height / 2;
+        k = 1;
+        centered = null;
+      }
+
+      svg.selectAll("path")
+          .classed("active", centered && function(d) { return d === centered; });
+
+      svg.transition()
+          .duration(750)
+          .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")")
+          .style("stroke-width", 1.5 / k + "px");
+    }
+  }
+
   function handleGeographyConfig () {
     var hoverover;
     var svg = this.svg;
@@ -186,7 +225,7 @@
           d3.selectAll('.datamaps-hoverover').style('display', 'none');
         });
     }
-    
+
     function moveToFront() {
       this.parentNode.appendChild(this);
     }
@@ -522,7 +561,7 @@
               var tmpData = {};
               for(var i = 0; i < data.length; i++) {
                 tmpData[data[i].id] = data[i];
-              } 
+              }
               data = tmpData;
             }
             Datamaps.prototype.updateChoropleth.call(self, data);
@@ -530,6 +569,7 @@
         }
         drawSubunits.call(self, data);
         handleGeographyConfig.call(self);
+        handleZoomConfig.call(self);
 
         if ( self.options.geographyConfig.popupOnHover || self.options.bubblesConfig.popupOnHover) {
           hoverover = d3.select( self.options.element ).append('div')
