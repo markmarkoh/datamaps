@@ -461,14 +461,26 @@
     centered = d;
 
     var width  = self.options.element.clientWidth,
-        height = self.options.element.clientHeight;
+        height = self.options.element.clientHeight,
+        bounds;
 
-    var bounds  = self.path.bounds(d),
-        dx      =  bounds[1][0] - bounds[0][0],
+    if ( d.radius ) { //Circle
+      var cx = d3.select(d3.event.originalTarget).attr("cx");
+      var cy = d3.select(d3.event.originalTarget).attr("cy");
+      bounds = [
+                [ Number(cx) - d.radius, Number(cy) - d.radius ],
+                [ Number(cx) + d.radius, Number(cy) + d.radius ]
+               ];
+    } else {
+      bounds  = self.path.bounds(d)
+    }
+    console.log("bounds:", bounds)
+
+    var dx      =  bounds[1][0] - bounds[0][0],
         dy      =  bounds[1][1] - bounds[0][1],
         x       = (bounds[0][0] + bounds[1][0]) / 2,
         y       = (bounds[0][1] + bounds[1][1]) / 2,
-        scale   = self.options.zoomFactor || .9 / Math.max(dx / width, dy / height),
+        scale   = (self.options.zoomFactor || .9) / Math.max(dx / width, dy / height),
         translate = [width / 2 - scale * x, height / 2 - scale * y];
 
     self.svg.selectAll("path")
@@ -478,10 +490,6 @@
       .duration(750)
       .style("stroke-width", 1.5 / scale + "px")
       .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
-    /*self.svg.transition()
-        .duration(750)
-        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")")
-        .style("stroke-width", 1.5 / k + "px");*/
   }
 
   function resetZoom() {
