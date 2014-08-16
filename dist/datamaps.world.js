@@ -465,8 +465,8 @@
         bounds;
 
     if ( d.radius ) { //Circle
-      var cx = d3.select(d3.event.originalTarget).attr("cx");
-      var cy = d3.select(d3.event.originalTarget).attr("cy");
+      var cx = d3.select(d3.event.target).attr("cx");
+      var cy = d3.select(d3.event.target).attr("cy");
       bounds = [
                 [ Number(cx) - d.radius, Number(cy) - d.radius ],
                 [ Number(cx) + d.radius, Number(cy) + d.radius ]
