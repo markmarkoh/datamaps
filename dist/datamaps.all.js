@@ -26,7 +26,8 @@
         highlightFillColor: '#FC8D59',
         highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
         highlightBorderWidth: 2,
-        zoomOnClick: true
+        zoomOnClick: true,
+        zoomFactor: 0.9
     },
     bubblesConfig: {
         borderWidth: 2,
@@ -453,11 +454,12 @@
 
   function clicked(d) {
     var self = this;
+
     if ( centered === d ) return resetZoom.call(self);
-    self.svg.selectAll("path")
-      .classed("active", false);
+
+    self.svg.selectAll("path").classed("active", false);
     centered = d;
-    //var x, y, k;
+
     var width  = self.options.element.clientWidth,
         height = self.options.element.clientHeight;
 
@@ -466,13 +468,13 @@
         dy      =  bounds[1][1] - bounds[0][1],
         x       = (bounds[0][0] + bounds[1][0]) / 2,
         y       = (bounds[0][1] + bounds[1][1]) / 2,
-        scale   = .9 / Math.max(dx / width, dy / height),
+        scale   = self.options.zoomFactor || .9 / Math.max(dx / width, dy / height),
         translate = [width / 2 - scale * x, height / 2 - scale * y];
 
     self.svg.selectAll("path")
       .classed("active", centered && function( d ) { return d === centered; });
 
-    self.svg.transition()
+    self.svg.selectAll("g").transition()
       .duration(750)
       .style("stroke-width", 1.5 / scale + "px")
       .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
@@ -488,7 +490,7 @@
       .classed("active", false);
     centered = d3.select(null);
 
-    this.svg.transition()
+    this.svg.selectAll("g").transition()
       .duration(750)
       .style("stroke-width", "1.5px")
       .attr("transform", "");
