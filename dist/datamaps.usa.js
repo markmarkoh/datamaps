@@ -474,7 +474,6 @@
     } else {
       bounds  = self.path.bounds(d)
     }
-    console.log("bounds:", bounds)
 
     var dx      =  bounds[1][0] - bounds[0][0],
         dy      =  bounds[1][1] - bounds[0][1],
