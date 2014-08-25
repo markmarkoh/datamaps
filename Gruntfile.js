@@ -47,6 +47,22 @@ module.exports = function(grunt) {
         }
       }
     },
+    topojson: {
+      world: {
+        options: {
+          idProperty: 'adm0_a3_us',
+          copyProperties: ['name']
+        },
+        files: {
+          'tmp/world.topo.json': ['src/js/data/hires/world.json']
+        }
+      },
+      usa: {
+        files: {
+          'tmp/usa.topo.json': ['src/js/data/usa.json']
+        }
+      }
+    },
     jasmine: {
       all: [
         'src/tests/SpecRunner_StatesGlobal.html',
@@ -76,6 +92,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-text-replace');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-topojson');
 
 
   grunt.registerTask('dev', ['replace']);
