@@ -13,6 +13,8 @@
     fills: {
       defaultFill: '#ABDDA4'
     },
+    pluginLayers: {},
+    pluginOptions: {},
     redrawOnResize: false,
     geographyConfig: {
         dataUrl: null,
@@ -563,23 +565,15 @@
   };
 
   Datamap.prototype.redraw = function() {
-    var self = this;
-
     // Clear SVG
-    d3.select(this.options.element).select('svg').remove();
-    return;
+    d3.select(this.options.element).html('')
 
     // Call drawing (but not data!) functions again
     addContainer.call(this, this.options.element, this.options.height, this.options.width );
     this.draw();
 
     //Add plugins
-    var copyPlugins = this.calledPlugins.slice(0);
-    this.calledPlugins = [];
-    copyPlugins.forEach(function(plugin) {
-      self[plugin.name].apply(self, plugin.args);
-    });
-
+    this.reinitiatePlugins();  
   };
 
   /**************************************
@@ -596,6 +590,21 @@
   Datamap.prototype.latLngToXY = function(lat, lng) {
      return this.projection([lng, lat]);
   };
+
+  Datamap.prototype.reinitiatePlugins = function() {
+    var copyPlugins = this.calledPlugins.slice(0);
+    this.calledPlugins = [];
+    for(var i = 0; i < copyPlugins.length; i++) {
+      var plugin = copyPlugins[i];
+      this.options.pluginLayers[plugin.name] = this.options.pluginLayers[plugin.name].html('');
+    }
+    
+    for(var i = 0; i < copyPlugins.length; i++) {
+      var plugin = copyPlugins[i];
+//      this.options.pluginLayers[plugin.name] = this.addLayer(plugin.name);
+      this[plugin.name].apply(this, plugin.args);
+    }
+  }
 
   //add <g> layer to root SVG
   Datamap.prototype.addLayer = function( className, id, first ) {
@@ -669,7 +678,7 @@
         }
 
         //Record plugin call for redraw
-        this.calledPlugins.push({name: name, args: arguments});
+        this.calledPlugins.push({name: name, args: Array.prototype.slice.call(arguments, 0)});
 
         if ( typeof options === 'function' ) {
           callback = options;
@@ -679,14 +688,14 @@
         options = defaults(options || {}, defaultOptions[name + 'Config']);
 
         //add a single layer, reuse the old layer
-        if ( !createNewLayer && this.options[name + 'Layer'] ) {
-          layer = this.options[name + 'Layer'];
-          options = options || this.options[name + 'Options'];
+        if ( !createNewLayer && this.options.pluginLayers.name ) {
+          layer = this.options.pluginLayers[name];
+          options = options || this.options.pluginOptions[name]
         }
         else {
           layer = this.addLayer(name);
-          this.options[name + 'Layer'] = layer;
-          this.options[name + 'Options'] = options;
+          this.options.pluginLayers[name] = layer;
+          this.options.pluginOptions[name] = options;
         }
         pluginFn.apply(this, [layer, data, options]);
         if ( callback ) {
