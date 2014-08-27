@@ -27,6 +27,9 @@
         highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
         highlightBorderWidth: 2
     },
+    projectionConfig: {
+      rotation: [97, 0]
+    },
     bubblesConfig: {
         borderWidth: 2,
         borderColor: '#FFFFFF',
@@ -66,6 +69,8 @@
     var width = options.width || element.offsetWidth;
     var height = options.height || element.offsetHeight;
     var projection, path;
+    var svg = this.svg;
+    
     if ( options && typeof options.scope === 'undefined') {
       options.scope = 'world';
     }
@@ -81,6 +86,23 @@
         .translate([width / 2, height / (options.projection === "mercator" ? 1.45 : 1.8)]);
     }
 
+    if ( options.projection === 'orthographic' ) {
+
+      svg.append("defs").append("path")
+        .datum({type: "Sphere"})
+        .attr("id", "sphere")
+        .attr("d", path);
+
+      svg.append("use")
+          .attr("class", "stroke")
+          .attr("xlink:href", "#sphere");
+
+      svg.append("use")
+          .attr("class", "fill")
+          .attr("xlink:href", "#sphere");
+      projection.scale(250).clipAngle(90).rotate(options.projectionConfig.rotation)
+    }
+
     path = d3.geo.path()
       .projection( projection );
 
@@ -90,7 +112,7 @@
   function addStyleBlock() {
     if ( d3.select('.datamaps-style-block').empty() ) {
       d3.select('head').append('style').attr('class', 'datamaps-style-block')
-      .html('.datamap .labels {pointer-events: none;} .datamap path {stroke: #FFFFFF; stroke-width: 1px;} .datamaps-legend dt, .datamaps-legend dd { float: left; margin: 0 3px 0 0;} .datamaps-legend dd {width: 20px; margin-right: 6px; border-radius: 3px;} .datamaps-legend {padding-bottom: 20px; z-index: 1001; position: absolute; left: 4px; font-size: 12px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;} .datamaps-hoverover {display: none; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; } .hoverinfo {padding: 4px; border-radius: 1px; background-color: #FFF; box-shadow: 1px 1px 5px #CCC; font-size: 12px; border: 1px solid #CCC; } .hoverinfo hr {border:1px dotted #CCC; }');
+      .html('.datamap path.datamaps-graticule { fill: none; stroke: #777; stroke-width: 0.5px; stroke-opacity: .5; pointer-events: none; } .datamap .labels {pointer-events: none;} .datamap path {stroke: #FFFFFF; stroke-width: 1px;} .datamaps-legend dt, .datamaps-legend dd { float: left; margin: 0 3px 0 0;} .datamaps-legend dd {width: 20px; margin-right: 6px; border-radius: 3px;} .datamaps-legend {padding-bottom: 20px; z-index: 1001; position: absolute; left: 4px; font-size: 12px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;} .datamaps-hoverover {display: none; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; } .hoverinfo {padding: 4px; border-radius: 1px; background-color: #FFF; box-shadow: 1px 1px 5px #CCC; font-size: 12px; border: 1px solid #CCC; } .hoverinfo hr {border:1px dotted #CCC; }');
     }
   }
 
@@ -226,6 +248,14 @@
     var hoverover = d3.select( this.options.element ).append('div')
       .attr('class', 'datamaps-legend')
       .html(html);
+  }
+
+    function addGraticule ( layer, options ) {
+      var graticule = d3.geo.graticule();
+      this.svg.insert("path", '.datamaps-subunits')
+        .datum(graticule)
+        .attr("class", "datamaps-graticule")
+        .attr("d", this.path); 
   }
 
   function handleArcs (layer, data, options) {
@@ -464,6 +494,7 @@
     //set options for global use
     this.options = defaults(options, defaultOptions);
     this.options.geographyConfig = defaults(options.geographyConfig, defaultOptions.geographyConfig);
+    this.options.projectionConfig = defaults(options.projectionConfig, defaultOptions.projectionConfig);
     this.options.bubblesConfig = defaults(options.bubblesConfig, defaultOptions.bubblesConfig);
     this.options.arcConfig = defaults(options.arcConfig, defaultOptions.arcConfig);
 
@@ -477,6 +508,7 @@
     this.addPlugin('legend', addLegend);
     this.addPlugin('arc', handleArcs);
     this.addPlugin('labels', handleLabels);
+    this.addPlugin('graticule', addGraticule);
 
     //append style block with basic hoverover styles
     if ( ! this.options.disableDefaultStyles ) {
