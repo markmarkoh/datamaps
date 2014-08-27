@@ -10,7 +10,7 @@ Out of the box in includes support for choropleths and bubble maps (see [demos](
 
 ##### For feature requests, open an issue!
 
-##### [Contribution Guideliness](#contributing)
+##### [Contribution Guideliness](#contributing-guidelines)
 
 #### Demos at http://datamaps.github.io
 
