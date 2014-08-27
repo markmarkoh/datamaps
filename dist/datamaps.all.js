@@ -13,6 +13,7 @@
     fills: {
       defaultFill: '#ABDDA4'
     },
+    redrawOnResize: false,
     geographyConfig: {
         dataUrl: null,
         hideAntarctica: true,
@@ -483,6 +484,22 @@
       addStyleBlock();
     }
 
+    // Attach to onresize if redraw selected
+    if(this.options.redrawOnResize) {
+      var self = this;
+
+      if(window.onresize !== null) {
+        var existingOnResize = window.onresize;
+        
+        window.onresize = function() {
+          self.redraw();
+          existingOnResize();
+        };
+      } else {
+        window.onresize = function() { self.redraw(); };
+      }
+    }
+
     return this.draw();
   }
 
@@ -542,6 +559,16 @@
         self.options.done(self);
       }
   };
+
+  Datamap.prototype.redraw = function() {
+    // Clear children
+    d3.select(this.options.element).select('svg').remove();
+    
+    // Call drawing (but not data!) functions again
+    addContainer.call(this, this.options.element, this.options.height, this.options.width );
+    this.draw();
+  };
+
   /**************************************
                 TopoJSON
   ***************************************/
