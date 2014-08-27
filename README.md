@@ -10,6 +10,8 @@ Out of the box in includes support for choropleths and bubble maps (see [demos](
 
 ##### For feature requests, open an issue!
 
+##### [Contribution Guideliness](#contributing)
+
 #### Demos at http://datamaps.github.io
 
 ---
@@ -436,7 +438,7 @@ All events are bubbled up to the root `svg` element and to listen to events, use
 ```
 ---
 
-Examples:
+#Contributing Guidelines
 
-  - [Datamap of ongoing military conflicts](http://bl.ocks.org/4127667)
-  - [US Election map](http://bl.ocks.org/4127517)
+* Do not run the `grunt build` task or submit any built files in your PR. 
+* Have an example in `src/examples` if adding a new feature. Copy an existing feature `.html` file to start.
