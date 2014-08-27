@@ -479,6 +479,8 @@
     this.addPlugin('arc', handleArcs);
     this.addPlugin('labels', handleLabels);
 
+    this.calledPlugins = [];
+
     //append style block with basic hoverover styles
     if ( ! this.options.disableDefaultStyles ) {
       addStyleBlock();
@@ -561,12 +563,23 @@
   };
 
   Datamap.prototype.redraw = function() {
-    // Clear children
+    var self = this;
+
+    // Clear SVG
     d3.select(this.options.element).select('svg').remove();
-    
+    return;
+
     // Call drawing (but not data!) functions again
     addContainer.call(this, this.options.element, this.options.height, this.options.width );
     this.draw();
+
+    //Add plugins
+    var copyPlugins = this.calledPlugins.slice(0);
+    this.calledPlugins = [];
+    copyPlugins.forEach(function(plugin) {
+      self[plugin.name].apply(self, plugin.args);
+    });
+
   };
 
   /**************************************
@@ -12115,6 +12128,9 @@
         if ( typeof createNewLayer === "undefined" ) {
           createNewLayer = false;
         }
+
+        //Record plugin call for redraw
+        this.calledPlugins.push({name: name, args: arguments});
 
         if ( typeof options === 'function' ) {
           callback = options;
