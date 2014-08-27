@@ -562,10 +562,8 @@
 
   Datamap.prototype.redraw = function() {
     // Clear children
-    while(this.options.element.firstChild) {
-      this.options.element.removeChild(this.options.element.firstChild);
-    }
-
+    d3.select(this.options.element).select('svg').remove();
+    
     // Call drawing (but not data!) functions again
     addContainer.call(this, this.options.element, this.options.height, this.options.width );
     this.draw();
