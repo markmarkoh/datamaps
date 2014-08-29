@@ -2,8 +2,8 @@
   var svg;
 
   //save off default references
-  var d3 = window.d3, topojson = window.topojson, centered;
-
+  var d3 = window.d3, topojson = window.topojson;
+  
   var defaultOptions = {
     scope: 'world',
     setProjection: setProjection,
@@ -42,10 +42,6 @@
         highlightBorderWidth: 2,
         highlightFillOpacity: 0.85,
         exitDelay: 100
-    },
-    zoomConfig: {
-        zoomOnClick: true,
-        zoomFactor: 0.8
     },
     arcConfig: {
       strokeColor: '#DD1C77',
@@ -190,11 +186,7 @@
           d3.selectAll('.datamaps-hoverover').style('display', 'none');
         });
     }
-    if ( this.options.zoomConfig.zoomOnClick ) {
-      svg.selectAll('.datamaps-subunit')
-        .on('click', function(d) { clicked.call(self, d) });
-    }
-
+    
     function moveToFront() {
       this.parentNode.appendChild(this);
     }
@@ -436,11 +428,6 @@
             return datum.radius;
           });
 
-    if ( self.options.zoomConfig.zoomOnClick ) {
-      bubbles
-        .on('click', function (d) { clicked.call(self, d) });
-    }
-
     bubbles.exit()
       .transition()
         .delay(options.exitDelay)
@@ -451,57 +438,6 @@
       return typeof datum !== 'undefined' && typeof datum.latitude !== 'undefined' && typeof datum.longitude !== 'undefined';
     }
 
-  }
-
-  function clicked(d) {
-    var self = this,
-        zoomFactor  = self.options.zoomConfig.zoomFactor,
-        width   = self.options.element.clientWidth,
-        height  = self.options.element.clientHeight,
-        bounds;
-
-    if ( centered === d || !zoomFactor) return resetZoom.call(self);
-
-    self.svg.selectAll("path").classed("active", false);
-    centered = d;
-
-    if ( d.radius ) { //Circle
-        var cx = d3.select(d3.event.target).attr("cx");
-        var cy = d3.select(d3.event.target).attr("cy");
-        bounds = [
-            [ Number(cx) - d.radius, Number(cy) - d.radius ],
-            [ Number(cx) + d.radius, Number(cy) + d.radius ]
-        ];
-    } else {
-      bounds  = self.path.bounds(d)
-    }
-
-    var dx      =  bounds[1][0] - bounds[0][0],
-        dy      =  bounds[1][1] - bounds[0][1],
-        x       = (bounds[0][0] + bounds[1][0]) / 2,
-        y       = (bounds[0][1] + bounds[1][1]) / 2,
-        scale   = zoomFactor / Math.max(dx / width, dy / height),
-        translate = [width / 2 - scale * x, height / 2 - scale * y];
-
-    self.svg.selectAll("path")
-      .classed("active", centered && function( d ) { return d === centered; });
-
-    self.svg.selectAll("g").transition()
-      .duration(750)
-      .style("stroke-width", 1.5 / scale + "px")
-      .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
-  }
-
-  function resetZoom() {
-
-    this.svg.selectAll("path")
-      .classed("active", false);
-    centered = d3.select(null);
-
-    this.svg.selectAll("g").transition()
-      .duration(750)
-      .style("stroke-width", "1.5px")
-      .attr("transform", "");
   }
 
   //stolen from underscore.js
@@ -586,7 +522,7 @@
               var tmpData = {};
               for(var i = 0; i < data.length; i++) {
                 tmpData[data[i].id] = data[i];
-              }
+              } 
               data = tmpData;
             }
             Datamaps.prototype.updateChoropleth.call(self, data);
@@ -669,7 +605,7 @@
     var self = this;
     element.on('mousemove', null);
     element.on('mousemove', function() {
-      var position = d3.mouse(self.options.element);
+      var position = d3.mouse(this);
       d3.select(self.svg[0][0].parentNode).select('.datamaps-hoverover')
         .style('top', ( (position[1] + 30)) + "px")
         .html(function() {
