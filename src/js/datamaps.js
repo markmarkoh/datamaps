@@ -192,7 +192,7 @@
     }
     if ( this.options.zoomConfig.zoomOnClick ) {
       svg.selectAll('.datamaps-subunit')
-        .on('click', function(d) { clicked.call(self, d) });
+        .on('click', function(d) { clickZoom.call(self, d) });
     }
 
     function moveToFront() {
@@ -438,7 +438,7 @@
 
     if ( self.options.zoomConfig.zoomOnClick ) {
       bubbles
-        .on('click', function (d) { clicked.call(self, d) });
+        .on('click', function (d) { clickZoom.call(self, d) });
     }
 
     bubbles.exit()
@@ -453,14 +453,15 @@
 
   }
 
-  function clicked(d) {
+  function clickZoom(d) {
     var self = this,
         zoomFactor  = self.options.zoomConfig.zoomFactor,
         width   = self.options.element.clientWidth,
         height  = self.options.element.clientHeight,
         bounds;
-
-    if ( centered === d || !zoomFactor) return resetZoom.call(self);
+    if (centered === d
+    || isNaN(zoomFactor)
+    || zoomFactor <= 0) return resetZoom.call(self);
 
     self.svg.selectAll("path").classed("active", false);
     centered = d;
@@ -606,6 +607,35 @@
         self.options.done(self);
       }
   };
+
+  Datamap.prototype.toggleZoom = function(bool) {
+    var self = this,
+        zoomOnClick = this.options.zoomConfig.zoomOnClick,
+        svg = d3.select( this.options.element ).select('svg');
+
+    var toggleEvents = function (setTo) {
+      if (setTo === undefined) { setTo = !zoomOnClick }
+
+      if (setTo === false) { //Disable
+        svg.selectAll('.datamaps-bubble, .datamaps-subunit')
+          .on('click', null);
+      } else { //Enable
+        svg.selectAll('.datamaps-bubble, .datamaps-subunit')
+          .on('click', function(d) { clickZoom.call(self, d) });
+      }
+    }
+
+    if (bool !== undefined && typeof bool == 'boolean') {
+      toggleEvents(bool);
+      this.options.zoomConfig.zoomOnClick = bool;
+    } else if (bool == undefined) {
+      toggleEvents();
+      this.options.zoomConfig.zoomOnClick = !zoomOnClick;
+    } else {
+      throw "Datamaps Error - toggleZoom() must call with a boolean";
+    }
+
+  }
   /**************************************
                 TopoJSON
   ***************************************/
