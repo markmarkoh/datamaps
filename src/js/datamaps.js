@@ -668,8 +668,8 @@
   Datamap.prototype.updatePopup = function (element, d, options) {
     var self = this;
     element.on('mousemove', null);
-    element.on('mousemove', function() { //Todo account for zoom
-      var position = d3.mouse(this);
+    element.on('mousemove', function() {
+      var position = d3.mouse(self.options.element);
       d3.select(self.svg[0][0].parentNode).select('.datamaps-hoverover')
         .style('top', ( (position[1] + 30)) + "px")
         .html(function() {

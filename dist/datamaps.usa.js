@@ -25,9 +25,7 @@
         highlightOnHover: true,
         highlightFillColor: '#FC8D59',
         highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
-        highlightBorderWidth: 2,
-        zoomOnClick: true,
-        zoomFactor: 0.9
+        highlightBorderWidth: 2
     },
     bubblesConfig: {
         borderWidth: 2,
@@ -44,6 +42,10 @@
         highlightBorderWidth: 2,
         highlightFillOpacity: 0.85,
         exitDelay: 100
+    },
+    zoomConfig: {
+        zoomOnClick: true,
+        zoomFactor: 0.8
     },
     arcConfig: {
       strokeColor: '#DD1C77',
@@ -188,8 +190,7 @@
           d3.selectAll('.datamaps-hoverover').style('display', 'none');
         });
     }
-
-    if ( options.zoomOnClick ) {
+    if ( this.options.zoomConfig.zoomOnClick ) {
       svg.selectAll('.datamaps-subunit')
         .on('click', function(d) { clicked.call(self, d) });
     }
@@ -435,7 +436,7 @@
             return datum.radius;
           });
 
-    if ( self.options.geographyConfig.zoomOnClick ) {
+    if ( self.options.zoomConfig.zoomOnClick ) {
       bubbles
         .on('click', function (d) { clicked.call(self, d) });
     }
@@ -453,24 +454,24 @@
   }
 
   function clicked(d) {
-    var self = this;
+    var self = this,
+        zoomFactor  = self.options.zoomConfig.zoomFactor,
+        width   = self.options.element.clientWidth,
+        height  = self.options.element.clientHeight,
+        bounds;
 
-    if ( centered === d ) return resetZoom.call(self);
+    if ( centered === d || !zoomFactor) return resetZoom.call(self);
 
     self.svg.selectAll("path").classed("active", false);
     centered = d;
 
-    var width  = self.options.element.clientWidth,
-        height = self.options.element.clientHeight,
-        bounds;
-
     if ( d.radius ) { //Circle
-      var cx = d3.select(d3.event.target).attr("cx");
-      var cy = d3.select(d3.event.target).attr("cy");
-      bounds = [
-                [ Number(cx) - d.radius, Number(cy) - d.radius ],
-                [ Number(cx) + d.radius, Number(cy) + d.radius ]
-               ];
+        var cx = d3.select(d3.event.target).attr("cx");
+        var cy = d3.select(d3.event.target).attr("cy");
+        bounds = [
+            [ Number(cx) - d.radius, Number(cy) - d.radius ],
+            [ Number(cx) + d.radius, Number(cy) + d.radius ]
+        ];
     } else {
       bounds  = self.path.bounds(d)
     }
@@ -479,7 +480,7 @@
         dy      =  bounds[1][1] - bounds[0][1],
         x       = (bounds[0][0] + bounds[1][0]) / 2,
         y       = (bounds[0][1] + bounds[1][1]) / 2,
-        scale   = (self.options.zoomFactor || .9) / Math.max(dx / width, dy / height),
+        scale   = zoomFactor / Math.max(dx / width, dy / height),
         translate = [width / 2 - scale * x, height / 2 - scale * y];
 
     self.svg.selectAll("path")
@@ -668,7 +669,7 @@
     var self = this;
     element.on('mousemove', null);
     element.on('mousemove', function() {
-      var position = d3.mouse(this);
+      var position = d3.mouse(self.options.element);
       d3.select(self.svg[0][0].parentNode).select('.datamaps-hoverover')
         .style('top', ( (position[1] + 30)) + "px")
         .html(function() {
