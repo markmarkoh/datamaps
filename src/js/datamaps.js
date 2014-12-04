@@ -531,7 +531,7 @@
           newsize = options.element.clientWidth,
           oldsize = d3.select( options.element).select('svg').attr('data-width');
 
-      d3.select( options.element).select('svg').select('g').style(prefix + 'transform', 'scale(' + (newsize / oldsize) + ')');
+      d3.select( options.element).select('svg').selectAll('g').style(prefix + 'transform', 'scale(' + (newsize / oldsize) + ')');
     }
   }
 
