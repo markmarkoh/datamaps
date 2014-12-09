@@ -6,7 +6,7 @@
   
   var defaultOptions = {
     scope: 'world',
-    responsive: true,
+    responsive: false,
     setProjection: setProjection,
     projection: 'equirectangular',
     dataType: 'json',
@@ -62,6 +62,11 @@
       .attr('class', 'datamap')
       .attr('height', height || element.offsetHeight)
       .style('overflow', 'hidden'); // IE10+ doesn't respect height/width when map is zoomed in
+
+    if (this.options.responsive) {
+      d3.select(this.options.element).style({'position': 'relative', 'padding-bottom': '60%'});
+      d3.select(this.options.element).select('svg').style({'position': 'absolute', 'width': '100%', 'height': '100%'});
+    }
 
     return this.svg;
   }
@@ -531,7 +536,7 @@
           newsize = options.element.clientWidth,
           oldsize = d3.select( options.element).select('svg').attr('data-width');
 
-      d3.select( options.element).select('svg').selectAll('g').style(prefix + 'transform', 'scale(' + (newsize / oldsize) + ')');
+      d3.select(options.element).select('svg').selectAll('g').style(prefix + 'transform', 'scale(' + (newsize / oldsize) + ')');
     }
   }
 
