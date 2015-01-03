@@ -6,6 +6,7 @@
   
   var defaultOptions = {
     scope: 'world',
+    responsive: false,
     setProjection: setProjection,
     projection: 'equirectangular',
     dataType: 'json',
@@ -57,9 +58,15 @@
   function addContainer( element, height, width ) {
     this.svg = d3.select( element ).append('svg')
       .attr('width', width || element.offsetWidth)
+      .attr('data-width', width || element.offsetWidth)
       .attr('class', 'datamap')
       .attr('height', height || element.offsetHeight)
       .style('overflow', 'hidden'); // IE10+ doesn't respect height/width when map is zoomed in
+
+    if (this.options.responsive) {
+      d3.select(this.options.element).style({'position': 'relative', 'padding-bottom': '60%'});
+      d3.select(this.options.element).select('svg').style({'position': 'absolute', 'width': '100%', 'height': '100%'});
+    }
 
     return this.svg;
   }
@@ -518,6 +525,21 @@
     return this.draw();
   }
 
+  // resize map
+  Datamap.prototype.resize = function () {
+
+    var self = this;
+    var options = self.options;
+
+    if (options.responsive) {
+      var prefix = '-webkit-transform' in document.body.style ? '-webkit-' : '-moz-transform' in document.body.style ? '-moz-' : '-ms-transform' in document.body.style ? '-ms-' : '',
+          newsize = options.element.clientWidth,
+          oldsize = d3.select( options.element).select('svg').attr('data-width');
+
+      d3.select(options.element).select('svg').selectAll('g').style(prefix + 'transform', 'scale(' + (newsize / oldsize) + ')');
+    }
+  }
+
   // actually draw the features(states & countries)
   Datamap.prototype.draw = function() {
     //save off in a closure
@@ -637,7 +659,7 @@
     var self = this;
     element.on('mousemove', null);
     element.on('mousemove', function() {
-      var position = d3.mouse(this);
+      var position = d3.mouse(self.options.element);
       d3.select(self.svg[0][0].parentNode).select('.datamaps-hoverover')
         .style('top', ( (position[1] + 30)) + "px")
         .html(function() {
