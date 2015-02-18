@@ -6,7 +6,7 @@ Datamaps
 Datamaps is intended to provide some data visualizations based on geographical data. It's SVG-based, can scale to any screen size, and includes everything inside of 1 script file.
 It heavily relies on the amazing [D3.js](https://github.com/mbostock/d3) library.
 
-Out of the box in includes support for choropleths and bubble maps (see [demos](http://datamaps.github.io)), but it's not limited to just that. Its new plugin system allows for the addition of any type of visualization over the map.
+Out of the box it includes support for choropleths and bubble maps (see [demos](http://datamaps.github.io)), but it's not limited to just that. Its new plugin system allows for the addition of any type of visualization over the map.
 
 ##### For feature requests, open an issue!
 
