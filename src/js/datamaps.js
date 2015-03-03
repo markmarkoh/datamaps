@@ -330,10 +330,24 @@
 
   function handleLabels ( layer, options ) {
     var self = this;
-    options = options || {};
-    var labelStartCoodinates = this.projection([-67.707617, 42.722131]);
+    var defaultOptions = {
+      fontFamily: "Verdana",
+      fontSize: 10,
+      hightlightOnLabelHover: true,
+      labelColor: "#000",
+      labelStartCoodinates: [-67.707617, 42.722131],
+      labelSpacing: 2,
+      lineColor: "#000",
+      lineWidth: 1,
+      popupOnLabelHover: true,
+      smallStates: ["VT", "NH", "MA", "RI", "CT", "NJ", "DE", "MD", "DC"],
+      smallStatesOnly: false
+    };
+    options = defaults(options, defaultOptions);
+    var labelStartCoodinates = this.projection(options.labelStartCoodinates);
     this.svg.selectAll(".datamaps-subunit")
       .attr("data-foo", function(d) {
+        var subunit = this;
         var center = self.path.centroid(d);
         var xOffset = 7.5, yOffset = 5;
 
@@ -347,27 +361,52 @@
         x = center[0] - xOffset;
         y = center[1] + yOffset;
 
-        var smallStateIndex = ["VT", "NH", "MA", "RI", "CT", "NJ", "DE", "MD", "DC"].indexOf(d.id);
+        var smallStateIndex = options.smallStates.indexOf(d.id);
         if ( smallStateIndex > -1) {
           var yStart = labelStartCoodinates[1];
           x = labelStartCoodinates[0];
-          y = yStart + (smallStateIndex * (2+ (options.fontSize || 12)));
+          y = yStart + (smallStateIndex * (options.labelSpacing + options.fontSize));
           layer.append("line")
             .attr("x1", x - 3)
             .attr("y1", y - 5)
             .attr("x2", center[0])
             .attr("y2", center[1])
-            .style("stroke", options.labelColor || "#000")
-            .style("stroke-width", options.lineWidth || 1)
+            .style("stroke", options.lineColor)
+            .style("stroke-width", options.lineWidth)
         }
 
-        layer.append("text")
-          .attr("x", x)
-          .attr("y", y)
-          .style("font-size", (options.fontSize || 10) + 'px')
-          .style("font-family", options.fontFamily || "Verdana")
-          .style("fill", options.labelColor || "#000")
-          .text( d.id );
+        if (!options.smallStatesOnly || (options.smallStatesOnly && smallStateIndex > -1) ) {
+          layer.append("text")
+            .attr("x", x)
+            .attr("y", y)
+            .style("font-size", options.fontSize + 'px')
+            .style("font-family", options.fontFamily)
+            .style("fill", options.labelColor)
+            .text(d.id)
+            .on("click", function(data, idx) {
+              var event = document.createEvent('Event');
+              event.initEvent("click", true, true);
+              subunit.dispatchEvent(event);
+            })
+            .on("mouseover", function(data, idx) {
+              if (options.hightlightOnLabelHover) {
+                var event = document.createEvent('Event');
+                event.initEvent("mouseover", true, true);
+                subunit.dispatchEvent(event);
+
+                if (self.options.geographyConfig.popupOnHover && (!options.popupOnLabelHover || smallStateIndex > -1)) {
+                  d3.selectAll('.datamaps-hoverover').style('display', 'none');
+                }
+              }
+            })
+            .on("mouseout", function(data, idx) {
+              if (options.hightlightOnLabelHover) {
+                var event = document.createEvent('Event');
+                event.initEvent("mouseout", true, true);
+                subunit.dispatchEvent(event);
+              }
+            });
+        }
         return "bar";
       });
   }
