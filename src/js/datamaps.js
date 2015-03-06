@@ -281,6 +281,13 @@
 
     var arcs = layer.selectAll('path.datamaps-arc').data( data, JSON.stringify );
 
+    var path = d3.geo.path()
+        .projection(self.projection);
+
+    var arc = d3.geo.greatArc()
+        .source(function(d) { return [d.origin.longitude, d.origin.latitude]; })
+        .target(function(d) { return [d.destination.longitude, d.destination.latitude]; });
+
     arcs
       .enter()
         .append('svg:path')
@@ -303,6 +310,9 @@
             var originXY = self.latLngToXY(datum.origin.latitude, datum.origin.longitude);
             var destXY = self.latLngToXY(datum.destination.latitude, datum.destination.longitude);
             var midXY = [ (originXY[0] + destXY[0]) / 2, (originXY[1] + destXY[1]) / 2];
+            if (options.greatArc) {
+              return path(arc(datum))
+            }
             return "M" + originXY[0] + ',' + originXY[1] + "S" + (midXY[0] + (50 * options.arcSharpness)) + "," + (midXY[1] - (75 * options.arcSharpness)) + "," + destXY[0] + "," + destXY[1];
         })
         .transition()
