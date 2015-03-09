@@ -333,18 +333,18 @@
     var defaultOptions = {
       fontFamily: "Verdana",
       fontSize: 10,
-      hightlightOnLabelHover: true,
+      passLabelMouseEvents: true,
       labelColor: "#000",
-      labelStartCoodinates: [-67.707617, 42.722131],
+      labelStartCoordinates: [-67.707617, 42.722131],
       labelSpacing: 2,
       lineColor: "#000",
       lineWidth: 1,
       popupOnLabelHover: true,
-      smallStates: ["VT", "NH", "MA", "RI", "CT", "NJ", "DE", "MD", "DC"],
-      smallStatesOnly: false
+      smallSubunits: ["VT", "NH", "MA", "RI", "CT", "NJ", "DE", "MD", "DC"],
+      smallSubunitsOnly: false
     };
     options = defaults(options, defaultOptions);
-    var labelStartCoodinates = this.projection(options.labelStartCoodinates);
+    var labelStartCoordinates = this.projection(options.labelStartCoordinates);
     this.svg.selectAll(".datamaps-subunit")
       .attr("data-foo", function(d) {
         var subunit = this;
@@ -361,11 +361,11 @@
         x = center[0] - xOffset;
         y = center[1] + yOffset;
 
-        var smallStateIndex = options.smallStates.indexOf(d.id);
-        if ( smallStateIndex > -1) {
-          var yStart = labelStartCoodinates[1];
-          x = labelStartCoodinates[0];
-          y = yStart + (smallStateIndex * (options.labelSpacing + options.fontSize));
+        var smallSubunitIndex = options.smallSubunits.indexOf(d.id);
+        if ( smallSubunitIndex > -1) {
+          var yStart = labelStartCoordinates[1];
+          x = labelStartCoordinates[0];
+          y = yStart + (smallSubunitIndex * (options.labelSpacing + options.fontSize));
           layer.append("line")
             .attr("x1", x - 3)
             .attr("y1", y - 5)
@@ -375,7 +375,7 @@
             .style("stroke-width", options.lineWidth)
         }
 
-        if (!options.smallStatesOnly || (options.smallStatesOnly && smallStateIndex > -1) ) {
+        if (!options.smallSubunitsOnly || (options.smallSubunitsOnly && smallSubunitIndex > -1) ) {
           layer.append("text")
             .attr("x", x)
             .attr("y", y)
@@ -389,18 +389,18 @@
               subunit.dispatchEvent(event);
             })
             .on("mouseover", function(data, idx) {
-              if (options.hightlightOnLabelHover) {
+              if (options.passLabelMouseEvents) {
                 var event = document.createEvent('Event');
                 event.initEvent("mouseover", true, true);
                 subunit.dispatchEvent(event);
 
-                if (self.options.geographyConfig.popupOnHover && (!options.popupOnLabelHover || smallStateIndex > -1)) {
+                if (self.options.geographyConfig.popupOnHover && (!options.popupOnLabelHover || smallSubunitIndex > -1)) {
                   d3.selectAll('.datamaps-hoverover').style('display', 'none');
                 }
               }
             })
             .on("mouseout", function(data, idx) {
-              if (options.hightlightOnLabelHover) {
+              if (options.passLabelMouseEvents) {
                 var event = document.createEvent('Event');
                 event.initEvent("mouseout", true, true);
                 subunit.dispatchEvent(event);
