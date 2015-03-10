@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style type="text/css">
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+                font-size: 14px;
+                background-color: #f7f7f7;
+            }
+            h2:first-child {
+                margin-top: 0;
+            }
+            .wrapper {
+                max-width: 700px;
+                margin: 0 auto;
+            }
+            .example {
+                max-width: 700px;
+                background-color: #fff;
+                padding: 20px;
+                box-shadow: 2px 2px 4px rgba(0,0,0,0.15);
+            }
+            .example + .example {
+                margin-top: 20px;
+            }
+            .map {
+                min-height: 400px;
+                position: relative;
+            }
+            code {
+                display: block;
+                white-space: pre-line;
+                background-color: #eaeaea;
+                padding: 10px;
+                border: 1px solid #ccc;
+                overflow: auto;
+                font-size: 13px;
+            }
+        </style>
+    </head>
+    <body>
+        <script src="../js/components/d3/d3.min.js"></script>
+        <script src="../js/components/topojson/topojson.js"></script>
+        <script src="../rel/datamaps.usa.js"></script>
+        <div class="wrapper">
+            <h1>Label Plugin Examples</h1>
+
+            <div class="example">
+                <h2>No options (Has click alert to show label event pass through)</h2>
+                <div class="map" id="map1"></div>
+                <code>map.labels();
+
+                    map.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
+                    &nbsp; &nbsp; alert('Clicked: ' + geography.id);
+                    });
+                </code>
+                <script>
+                    (function() {
+                        var map = new Datamap({
+                            element: document.getElementById('map1'),
+                            scope: 'usa'
+                        });
+
+                        map.labels();
+
+                        map.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
+                            alert('Clicked: ' + geography.id);
+                        });
+                    })();
+                </script>
+            </div>
+
+            <div class="example">
+                <h2>Small subunits only</h2>
+                <div class="map" id="map2"></div>
+                <code>map.labels({
+                    &nbsp; &nbsp; smallSubunitsOnly: true
+                    });
+                </code>
+                <script>
+                    (function() {
+                        var map = new Datamap({
+                            element: document.getElementById('map2'),
+                            scope: 'usa'
+                        });
+
+                        map.labels({
+                            smallSubunitsOnly: true
+                        });
+                    })();
+                </script>
+            </div>
+
+            <div class="example">
+                <h2>Small subunits only with custom list</h2>
+                <div class="map" id="map3"></div>
+                <code>map.labels({
+                    &nbsp; &nbsp; smallSubunitsOnly: true,
+                    &nbsp; &nbsp; smallSubunits: ['RI', 'CT', 'MD', 'DE']
+                    });
+                </code>
+                <script>
+                    (function() {
+                        var map = new Datamap({
+                            element: document.getElementById('map3'),
+                            scope: 'usa'
+                        });
+
+                        map.labels({
+                            smallSubunitsOnly: true,
+                            smallSubunits: ['RI', 'CT', 'MD', 'DE']
+                        });
+                    })();
+                </script>
+            </div>
+
+            <div class="example">
+                <h2>Disable passing label mouse events to original subunit (click and hover won't pass)</h2>
+                <div class="map" id="map4"></div>
+                <code>map.labels({
+                &nbsp; &nbsp; passLabelMouseEvents: false
+                });
+
+                map.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
+                &nbsp; &nbsp; alert('Clicked: ' + geography.id);
+                });
+                </code>
+                <script>
+                    (function() {
+                        var map = new Datamap({
+                            element: document.getElementById('map4'),
+                            scope: 'usa'
+                        });
+
+                        map.labels({
+                            passLabelMouseEvents: false
+                        });
+
+                        map.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
+                            alert('Clicked: ' + geography.id);
+                        });
+                    })();
+                </script>
+            </div>
+
+            <div class="example">
+                <h2>Label Style Options</h2>
+                <div class="map" id="map5"></div>
+                <code>map.labels({
+                    &nbsp; &nbsp; fontFamily: "Verdana",
+                    &nbsp; &nbsp; fontSize: 13,
+                    &nbsp; &nbsp; labelColor: '#00a',
+                    &nbsp; &nbsp; labelSpacing: 10,
+                    &nbsp; &nbsp; labelStartCoordinates: [-65.707617, 45.722131],
+                    &nbsp; &nbsp; lineColor: "#175635",
+                    &nbsp; &nbsp; lineWidth: 2
+                    });
+                </code>
+                <script>
+                    (function() {
+                        var map = new Datamap({
+                            element: document.getElementById('map5'),
+                            scope: 'usa'
+                        });
+
+                        map.labels({
+                            fontFamily: "Verdana",
+                            fontSize: 13,
+                            labelColor: '#00a',
+                            labelSpacing: 10,
+                            labelStartCoordinates: [-65.707617, 45.722131],
+                            lineColor: "#175635",
+                            lineWidth: 2
+                        });
+                    })();
+                </script>
+            </div>
+
+            <div class="example">
+                <h2>Disable popup on label hover</h2>
+                <div class="map" id="map6"></div>
+                <code>map.labels({
+                    &nbsp; &nbsp; popupOnLabelHover: false
+                    });
+
+                    map.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
+                    &nbsp; &nbsp; alert('Clicked: ' + geography.id);
+                    });
+                </code>
+                <script>
+                    (function() {
+                        var map = new Datamap({
+                            element: document.getElementById('map6'),
+                            scope: 'usa'
+                        });
+
+                        map.labels({
+                            popupOnLabelHover: false
+                        });
+
+                        map.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
+                            alert('Clicked: ' + geography.id);
+                        });
+                    })();
+                </script>
+            </div>
+        </div>
+    </body>
+</html>
+
