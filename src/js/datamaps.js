@@ -330,6 +330,7 @@
 
   function handleLabels ( layer, options ) {
     var self = this;
+    options = options || {};
     var defaultOptions = {
       fontFamily: "Verdana",
       fontSize: 10,
