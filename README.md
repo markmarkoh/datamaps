@@ -6,7 +6,7 @@ Datamaps
 Datamaps is intended to provide some data visualizations based on geographical data. It's SVG-based, can scale to any screen size, and includes everything inside of 1 script file.
 It heavily relies on the amazing [D3.js](https://github.com/mbostock/d3) library.
 
-Out of the box in includes support for choropleths and bubble maps (see [demos](http://datamaps.github.io)), but it's not limited to just that. Its new plugin system allows for the addition of any type of visualization over the map.
+Out of the box it includes support for choropleths and bubble maps (see [demos](http://datamaps.github.io)), but it's not limited to just that. Its new plugin system allows for the addition of any type of visualization over the map.
 
 ##### For feature requests, open an issue!
 
@@ -35,8 +35,8 @@ Downloads:
 
 Example:
 ```html
-<script src="http://d3js.org/d3.v3.min.js"></script>
-<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
 <script src="/datamaps.world.min.js"></script>
 <div id="container" style="position: relative; width: 500px; height: 300px;"></div>
 <script>
@@ -52,8 +52,8 @@ This should render a new world map with a standard projection.
 2. Refer to file in `dist` directory, like:
 
 ```html
-<script src="http://d3js.org/d3.v3.min.js"></script>
-<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
 <script src="bower_components/datamaps/dist/datamaps.world.min.js"></script>
 <div id="container" style="position: relative; width: 500px; height: 300px;"></div>
 <script>
