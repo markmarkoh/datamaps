@@ -24,7 +24,7 @@ Downloads:
  - [No preset topojson (6.8kb, 2.3kb gzip'd)](http://datamaps.github.io/scripts/datamaps.none.min.js)
 
 
-###Documentation
+### Documentation
 
 #### Getting Started
 
@@ -45,6 +45,20 @@ Example:
 ```
 
 This should render a new world map with a standard projection.
+
+#### via [NPM](https://www.npmjs.com/package/datamaps)
+1. `npm install datamaps`
+2. Refer to file in `dist` directory, like:
+
+```html
+<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+<script src="node_modules/datamaps/dist/datamaps.world.min.js"></script>
+<div id="container" style="position: relative; width: 500px; height: 300px;"></div>
+<script>
+    var map = new Datamap({element: document.getElementById('container')});
+</script>
+```
 
 #### via Bower
 
@@ -96,7 +110,7 @@ A map of the USA with an Albers based projection will be default if you only inc
     });
 </script>
 ```
-    
+
 #### Using custom maps
 ```html
 <script>
@@ -163,7 +177,7 @@ You'll need to know the 2 letter state code ('NY' for New York) or the 3 letter 
             }
         }
     });
-    
+
     //draw a legend for this map
     map.legend();
 </script>
