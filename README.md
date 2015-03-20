@@ -272,7 +272,7 @@ var bombMap = new Datamap({
      var bombs = [{
         name: 'Joe 4',
         radius: 25,
-        yeild: 400,
+        yield: 400,
         country: 'USSR',
         fillKey: 'RUS',
         significance: 'First fusion weapon test by the USSR (not "staged")',
@@ -282,7 +282,7 @@ var bombMap = new Datamap({
       },{
         name: 'RDS-37',
         radius: 40,
-        yeild: 1600,
+        yield: 1600,
         country: 'USSR',
         fillKey: 'RUS',
         significance: 'First "staged" thermonuclear weapon test by the USSR (deployable)',
@@ -293,7 +293,7 @@ var bombMap = new Datamap({
       },{
         name: 'Tsar Bomba',
         radius: 75,
-        yeild: 50000,
+        yield: 50000,
         country: 'USSR',
         fillKey: 'RUS',
         significance: 'Largest thermonuclear weapon ever tested—scaled down from its initial 100 Mt design by 50%',
@@ -306,7 +306,7 @@ var bombMap = new Datamap({
 bombMap.bubbles(bombs, {
     popupTemplate: function (geo, data) { 
             return ['<div class="hoverinfo">' +  data.name,
-            '<br/>Payload: ' +  data.yeild + ' kilotons',
+            '<br/>Payload: ' +  data.yield + ' kilotons',
             '<br/>Country: ' +  data.country + '',
             '<br/>Date: ' +  data.date + '',
             '</div>'].join('');
