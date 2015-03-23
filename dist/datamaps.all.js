@@ -509,7 +509,6 @@
     if ( typeof d3 === 'undefined' || typeof topojson === 'undefined' ) {
       throw new Error('Include d3.js (v3.0.3 or greater) and topojson on this page before creating a new map');
    }
-
     //set options for global use
     this.options = defaults(options, defaultOptions);
     this.options.geographyConfig = defaults(options.geographyConfig, defaultOptions.geographyConfig);
@@ -12160,7 +12159,7 @@
           options = undefined;
         }
 
-        options = defaults(options || {}, defaultOptions[name + 'Config']);
+        options = defaults(options || {}, self.options[name + 'Config']);
 
         //add a single layer, reuse the old layer
         if ( !createNewLayer && this.options[name + 'Layer'] ) {
