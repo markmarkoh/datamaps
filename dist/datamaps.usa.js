@@ -10,6 +10,7 @@
     setProjection: setProjection,
     projection: 'equirectangular',
     dataType: 'json',
+    data: {},
     done: function() {},
     fills: {
       defaultFill: '#ABDDA4'
@@ -35,6 +36,7 @@
         borderWidth: 2,
         borderColor: '#FFFFFF',
         popupOnHover: true,
+        radius: null,
         popupTemplate: function(geography, data) {
           return '<div class="hoverinfo"><strong>' + data.name + '</strong></div>';
         },
@@ -54,6 +56,32 @@
       animationSpeed: 600
     }
   };
+
+  /*
+    Getter for value. If not declared on datumValue, look up the chain into optionsValue
+  */
+  function val( datumValue, optionsValue, context ) {
+    if ( typeof context === 'undefined' ) {
+      context = optionsValue;
+      optionsValues = undefined;
+    }
+    var value = typeof datumValue !== 'undefined' ? datumValue : optionsValue;
+
+    if (typeof value === 'undefined') {
+      return  null;
+    }
+
+    if ( typeof value === 'function' ) {
+      var fnContext = [context];
+      if ( context.geography ) {
+        fnContext = [context.geography, context.data];
+      }
+      return value.apply(null, fnContext);
+    }
+    else {
+      return value;
+    }
+  }
 
   function addContainer( element, height, width ) {
     this.svg = d3.select( element ).append('svg')
@@ -155,13 +183,21 @@
         return JSON.stringify( colorCodeData[d.id]);
       })
       .style('fill', function(d) {
+        //if fillKey - use that
+        //otherwise check 'fill'
+        //otherwise check 'defaultFill'
         var fillColor;
 
-        if ( colorCodeData[d.id] ) {
-          fillColor = fillData[ colorCodeData[d.id].fillKey ];
+        var datum = colorCodeData[d.id];
+        if ( datum && datum.fillKey ) {
+          fillColor = fillData[ val(datum.fillKey, {data: colorCodeData[d.id], geography: d}) ];
+        }
+        
+        if ( typeof fillColor === 'undefined' ) {
+          fillColor = val(datum && datum.fillColor, fillData.defaultFill, {data: colorCodeData[d.id], geography: d});
         }
 
-        return fillColor || fillData.defaultFill;
+        return fillColor;
       })
       .style('stroke-width', geoConfig.borderWidth)
       .style('stroke', geoConfig.borderColor);
@@ -177,7 +213,7 @@
       svg.selectAll('.datamaps-subunit')
         .on('mouseover', function(d) {
           var $this = d3.select(this);
-
+          var datum = self.options.data[d.id] || {};
           if ( options.highlightOnHover ) {
             var previousAttributes = {
               'fill':  $this.style('fill'),
@@ -187,10 +223,10 @@
             };
 
             $this
-              .style('fill', options.highlightFillColor)
-              .style('stroke', options.highlightBorderColor)
-              .style('stroke-width', options.highlightBorderWidth)
-              .style('fill-opacity', options.highlightFillOpacity)
+              .style('fill', val(datum.highlightFillColor, options.highlightFillColor, datum))
+              .style('stroke', val(datum.highlightBorderColor, options.highlightBorderColor, datum))
+              .style('stroke-width', val(datum.highlightBorderWidth, options.highlightBorderWidth, datum))
+              .style('fill-opacity', val(datum.highlightFillOpacity, options.highlightFillOpacity, datum))
               .attr('data-previousAttributes', JSON.stringify(previousAttributes));
 
             //as per discussion on https://github.com/markmarkoh/datamaps/issues/19
@@ -275,6 +311,14 @@
       throw "Datamaps Error - arcs must be an array";
     }
 
+    // For some reason arc options were put in an `options` object instead of the parent arc
+    // I don't like this, so to match bubbles and other plugins I'm moving it
+    // This is to keep backwards compatability
+    for ( var i = 0; i < data.length; i++ ) {
+      data[i] = defaults(data[i], data[i].options);
+      delete data[i].options;
+    }
+
     if ( typeof options === "undefined" ) {
       options = defaultOptions.arcConfig;
     }
@@ -284,40 +328,36 @@
     var path = d3.geo.path()
         .projection(self.projection);
 
-    var arc = d3.geo.greatArc()
-        .source(function(d) { return [d.origin.longitude, d.origin.latitude]; })
-        .target(function(d) { return [d.destination.longitude, d.destination.latitude]; });
-
     arcs
       .enter()
         .append('svg:path')
         .attr('class', 'datamaps-arc')
         .style('stroke-linecap', 'round')
         .style('stroke', function(datum) {
-          if ( datum.options && datum.options.strokeColor) {
-            return datum.options.strokeColor;
-          }
-          return  options.strokeColor
+          return val(datum.strokeColor, options.strokeColor, datum);
         })
         .style('fill', 'none')
         .style('stroke-width', function(datum) {
-          if ( datum.options && datum.options.strokeWidth) {
-            return datum.options.strokeWidth;
-          }
-          return options.strokeWidth;
+            return val(datum.strokeWidth, options.strokeWidth, datum);
         })
         .attr('d', function(datum) {
-            var originXY = self.latLngToXY(datum.origin.latitude, datum.origin.longitude);
-            var destXY = self.latLngToXY(datum.destination.latitude, datum.destination.longitude);
+            var originXY = self.latLngToXY(val(datum.origin.latitude, datum), val(datum.origin.longitude, datum))
+            var destXY = self.latLngToXY(val(datum.destination.latitude, datum), val(datum.destination.longitude, datum));
             var midXY = [ (originXY[0] + destXY[0]) / 2, (originXY[1] + destXY[1]) / 2];
             if (options.greatArc) {
-              return path(arc(datum))
+                  // TODO: Move this to inside `if` clause when setting attr `d`
+              var greatArc = d3.geo.greatArc()
+                  .source(function(d) { return [val(d.origin.longitude, d), val(d.origin.latitude, d)]; })
+                  .target(function(d) { return [val(d.destination.longitude, d), val(d.destination.latitude, d)]; });
+
+              return path(greatArc(datum))
             }
-            return "M" + originXY[0] + ',' + originXY[1] + "S" + (midXY[0] + (50 * options.arcSharpness)) + "," + (midXY[1] - (75 * options.arcSharpness)) + "," + destXY[0] + "," + destXY[1];
+            var sharpness = val(datum.arcSharpness, options.arcSharpness, datum);
+            return "M" + originXY[0] + ',' + originXY[1] + "S" + (midXY[0] + (50 * sharpness)) + "," + (midXY[1] - (75 * sharpness)) + "," + destXY[0] + "," + destXY[1];
         })
         .transition()
           .delay(100)
-          .style('fill', function() {
+          .style('fill', function(datum) {
             /*
               Thank you Jake Archibald, this is awesome.
               Source: http://jakearchibald.com/2013/animated-line-drawing-svg/
@@ -327,7 +367,7 @@
             this.style.strokeDasharray = length + ' ' + length;
             this.style.strokeDashoffset = length;
             this.getBoundingClientRect();
-            this.style.transition = this.style.WebkitTransition = 'stroke-dashoffset ' + options.animationSpeed + 'ms ease-out';
+            this.style.transition = this.style.WebkitTransition = 'stroke-dashoffset ' + val(datum.animationSpeed, options.animationSpeed, datum) + 'ms ease-out';
             this.style.strokeDashoffset = '0';
             return 'none';
           })
@@ -423,16 +463,16 @@
           return JSON.stringify(d);
         })
         .style('stroke', function ( datum ) {
-          return typeof datum.borderColor !== 'undefined' ? datum.borderColor : options.borderColor;
+          return val(datum.borderColor, options.borderColor, datum);
         })
         .style('stroke-width', function ( datum ) {
-          return typeof datum.borderWidth !== 'undefined' ? datum.borderWidth : options.borderWidth;
+          return val(datum.borderWidth, options.borderWidth, datum);
         })
         .style('fill-opacity', function ( datum ) {
-          return typeof datum.fillOpacity !== 'undefined' ? datum.fillOpacity : options.fillOpacity;
+          return val(datum.fillOpacity, options.fillOpacity, datum);
         })
         .style('fill', function ( datum ) {
-          var fillColor = fillData[ datum.fillKey ];
+          var fillColor = fillData[ val(datum.fillKey, options.fillKey, datum) ];
           return fillColor || fillData.defaultFill;
         })
         .on('mouseover', function ( datum ) {
@@ -448,10 +488,10 @@
             };
 
             $this
-              .style('fill', options.highlightFillColor)
-              .style('stroke', options.highlightBorderColor)
-              .style('stroke-width', options.highlightBorderWidth)
-              .style('fill-opacity', options.highlightFillOpacity)
+              .style('fill', val(datum.highlightFillColor, options.highlightFillColor, datum))
+              .style('stroke', val(datum.highlightBorderColor, options.highlightBorderColor, datum))
+              .style('stroke-width', val(datum.highlightBorderWidth, options.highlightBorderWidth, datum))
+              .style('fill-opacity', val(datum.highlightFillOpacity, options.highlightFillOpacity, datum))
               .attr('data-previousAttributes', JSON.stringify(previousAttributes));
           }
 
@@ -474,7 +514,7 @@
         })
         .transition().duration(400)
           .attr('r', function ( datum ) {
-            return datum.radius;
+            return val(datum.radius, options.radius, datum);
           });
 
     bubbles.exit()

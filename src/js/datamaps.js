@@ -192,7 +192,8 @@
         if ( datum && datum.fillKey ) {
           fillColor = fillData[ val(datum.fillKey, {data: colorCodeData[d.id], geography: d}) ];
         }
-        else {
+        
+        if ( typeof fillColor === 'undefined' ) {
           fillColor = val(datum && datum.fillColor, fillData.defaultFill, {data: colorCodeData[d.id], geography: d});
         }
 
