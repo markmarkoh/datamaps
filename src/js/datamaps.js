@@ -10,6 +10,7 @@
     setProjection: setProjection,
     projection: 'equirectangular',
     dataType: 'json',
+    data: {},
     done: function() {},
     fills: {
       defaultFill: '#ABDDA4'
@@ -35,7 +36,7 @@
         borderWidth: 2,
         borderColor: '#FFFFFF',
         popupOnHover: true,
-        radius: 80,
+        radius: null,
         popupTemplate: function(geography, data) {
           return '<div class="hoverinfo"><strong>' + data.name + '</strong></div>';
         },
@@ -60,16 +61,24 @@
     Getter for value. If not declared on datumValue, look up the chain into optionsValue
   */
   function val( datumValue, optionsValue, context ) {
-
+    if ( typeof context === 'undefined' ) {
+      context = optionsValue;
+      optionsValues = undefined;
+    }
     var value = typeof datumValue !== 'undefined' ? datumValue : optionsValue;
 
+    if (typeof value === 'undefined') {
+      return  null;
+    }
+
     if ( typeof value === 'function' ) {
-      console.log(value, context);
-      console.log( 'GetValueFn', value.apply(null, [context]) );
-      return value.apply(null, [context]);
+      var fnContext = [context];
+      if ( context.geography ) {
+        fnContext = [context.geography, context.data];
+      }
+      return value.apply(null, fnContext);
     }
     else {
-      console.log( 'GetValueLiteral', value);
       return value;
     }
   }
@@ -174,13 +183,20 @@
         return JSON.stringify( colorCodeData[d.id]);
       })
       .style('fill', function(d) {
+        //if fillKey - use that
+        //otherwise check 'fill'
+        //otherwise check 'defaultFill'
         var fillColor;
 
-        if ( colorCodeData[d.id] ) {
-          fillColor = fillData[ colorCodeData[d.id].fillKey ];
+        var datum = colorCodeData[d.id];
+        if ( datum && datum.fillKey ) {
+          fillColor = fillData[ val(datum.fillKey, {data: colorCodeData[d.id], geography: d}) ];
+        }
+        else {
+          fillColor = val(datum && datum.fillColor, fillData.defaultFill, {data: colorCodeData[d.id], geography: d});
         }
 
-        return fillColor || fillData.defaultFill;
+        return fillColor;
       })
       .style('stroke-width', geoConfig.borderWidth)
       .style('stroke', geoConfig.borderColor);
@@ -196,7 +212,7 @@
       svg.selectAll('.datamaps-subunit')
         .on('mouseover', function(d) {
           var $this = d3.select(this);
-
+          var datum = self.options.data[d.id] || {};
           if ( options.highlightOnHover ) {
             var previousAttributes = {
               'fill':  $this.style('fill'),
@@ -206,10 +222,10 @@
             };
 
             $this
-              .style('fill', options.highlightFillColor)
-              .style('stroke', options.highlightBorderColor)
-              .style('stroke-width', options.highlightBorderWidth)
-              .style('fill-opacity', options.highlightFillOpacity)
+              .style('fill', val(datum.highlightFillColor, options.highlightFillColor, datum))
+              .style('stroke', val(datum.highlightBorderColor, options.highlightBorderColor, datum))
+              .style('stroke-width', val(datum.highlightBorderWidth, options.highlightBorderWidth, datum))
+              .style('fill-opacity', val(datum.highlightFillOpacity, options.highlightFillOpacity, datum))
               .attr('data-previousAttributes', JSON.stringify(previousAttributes));
 
             //as per discussion on https://github.com/markmarkoh/datamaps/issues/19
@@ -311,11 +327,6 @@
     var path = d3.geo.path()
         .projection(self.projection);
 
-    // TODO: Move this to inside `if` clause when setting attr `d`
-    var arc = d3.geo.greatArc()
-        .source(function(d) { return [d.origin.longitude, d.origin.latitude]; })
-        .target(function(d) { return [d.destination.longitude, d.destination.latitude]; });
-
     arcs
       .enter()
         .append('svg:path')
@@ -329,11 +340,16 @@
             return val(datum.strokeWidth, options.strokeWidth, datum);
         })
         .attr('d', function(datum) {
-            var originXY = self.latLngToXY(datum.origin.latitude, datum.origin.longitude);
-            var destXY = self.latLngToXY(datum.destination.latitude, datum.destination.longitude);
+            var originXY = self.latLngToXY(val(datum.origin.latitude, datum), val(datum.origin.longitude, datum))
+            var destXY = self.latLngToXY(val(datum.destination.latitude, datum), val(datum.destination.longitude, datum));
             var midXY = [ (originXY[0] + destXY[0]) / 2, (originXY[1] + destXY[1]) / 2];
             if (options.greatArc) {
-              return path(arc(datum))
+                  // TODO: Move this to inside `if` clause when setting attr `d`
+              var greatArc = d3.geo.greatArc()
+                  .source(function(d) { return [val(d.origin.longitude, d), val(d.origin.latitude, d)]; })
+                  .target(function(d) { return [val(d.destination.longitude, d), val(d.destination.latitude, d)]; });
+
+              return path(greatArc(datum))
             }
             var sharpness = val(datum.arcSharpness, options.arcSharpness, datum);
             return "M" + originXY[0] + ',' + originXY[1] + "S" + (midXY[0] + (50 * sharpness)) + "," + (midXY[1] - (75 * sharpness)) + "," + destXY[0] + "," + destXY[1];

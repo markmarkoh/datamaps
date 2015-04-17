@@ -21,9 +21,33 @@
             element: document.getElementById('container1'),
             geographyConfig: {
               popupOnHover: false,
-              highlightOnHover: false,
+              highlightOnHover: true,
               borderColor: '#444',
               borderWidth: 0.5
+            },
+            data: {
+              TX: {
+                fillKey: 'neato',
+                highlightFillColor: '#bada55'
+              },
+              MT: {
+                fillKey: 'Trouble',
+                highlightFillColor: function(d) {
+                  return '#fada55';
+                }
+              },
+              NM: {
+                fillColor: '#fa0fa0'
+              },
+              OK: {
+                fillColor: function(d) {
+                  console.log('fillOk', d);
+                  return '#ffaa00';
+                }
+              },
+              NJ: {
+                wockah: 'flocka'
+              }
             },
             bubblesConfig: {
               popupTemplate: function(geography, data) {
@@ -31,11 +55,9 @@
               },
               fillOpacity: 0.2,
               borderWidth: function(data) {
-                console.log(arguments);
                 return 4;
               },
               radius: function(data) {
-                console.log(arguments);
                 if ( data.centered && data.centered[0] === 'N' ) return 90;
                 else return 10;
               },
@@ -45,14 +67,17 @@
               'Visited': '#306596',
               'neato': '#0fa0fa',
               'Trouble': '#bada55',
-              defaultFill: '#dddddd'
+              defaultFill: function(geography, data) {
+                console.log('defaultFill', geography.id, data);
+                return '#DDDDDD';
+              }
             }
           });
 
           election.bubbles([
             {centered: 'NY', fillKey: 'Trouble', highlightFillColor: '#aaafff'},
             {centered: 'KY', fillKey: 'neato', highlightFillColor: function(value) { return '#fa0fa0'; }},
-            {centered: 'TX', fillKey: 'neato', radius: function(value) { return 100; }},
+            {centered: 'TX', fillKey: 'neato', radius: function(value) { return 20; }},
             {centered: 'CA', fillKey: 'Trouble', radius: 46},
             {centered: 'WA', fillKey: 'neato', popupTemplate: function(geo, data) { return '<div class="hoverinfo">Wahhhh</div>'; }},
             {centered: 'MA', fillKey: 'Trouble', radius: 10},
@@ -91,7 +116,7 @@
 
       election.arc([{
         origin: {
-          latitude: 30,
+          latitude: function(datum) { return 30 },
           longitude: -97
         },
         destination: {
