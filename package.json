@@ -1,12 +1,16 @@
 {
   "name": "datamaps",
+  "main": "dist/datamaps.all.js",
   "description": "datamaps with d3.js",
   "version": "0.4.0",
   "author": "Mark DiMarco<markmarkoh@gmail.com>",
   "scripts": {
     "test": "grunt jasmine"
   },
-  "dependencies": {},
+  "dependencies": {
+    "d3": "^3.5.5",
+    "topojson": "^1.6.19"
+  },
   "devDependencies": {
     "grunt-replace": "~0.4.4",
     "grunt": "~0.4.1",
