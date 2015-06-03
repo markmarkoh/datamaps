@@ -759,7 +759,12 @@
   };
 
   // expose library
-  if ( typeof define === "function" && define.amd ) {
+  if (typeof exports === 'object') {
+    d3 = require('d3');
+    topojson = require('topojson');
+    module.exports = Datamap;
+  }
+  else if ( typeof define === "function" && define.amd ) {
     define( "datamaps", function(require) { d3 = require('d3'); topojson = require('topojson'); return Datamap; } );
   }
   else {
