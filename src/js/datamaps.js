@@ -3,10 +3,11 @@
 
   //save off default references
   var d3 = window.d3, topojson = window.topojson;
-  
+
   var defaultOptions = {
     scope: 'world',
     responsive: false,
+    aspectRatio: 0.5625,
     setProjection: setProjection,
     projection: 'equirectangular',
     dataType: 'json',
@@ -92,10 +93,10 @@
       .style('overflow', 'hidden'); // IE10+ doesn't respect height/width when map is zoomed in
 
     if (this.options.responsive) {
-      d3.select(this.options.element).style({'position': 'relative', 'padding-bottom': '60%'});
+      d3.select(this.options.element).style({'position': 'relative', 'padding-bottom': (this.options.aspectRatio*100) + '%'});
       d3.select(this.options.element).select('svg').style({'position': 'absolute', 'width': '100%', 'height': '100%'});
       d3.select(this.options.element).select('svg').select('g').selectAll('path').style('vector-effect', 'non-scaling-stroke');
-    
+
     }
 
     return this.svg;
@@ -107,7 +108,7 @@
     var height = options.height || element.offsetHeight;
     var projection, path;
     var svg = this.svg;
-    
+
     if ( options && typeof options.scope === 'undefined') {
       options.scope = 'world';
     }
@@ -192,7 +193,7 @@
         if ( datum && datum.fillKey ) {
           fillColor = fillData[ val(datum.fillKey, {data: colorCodeData[d.id], geography: d}) ];
         }
-        
+
         if ( typeof fillColor === 'undefined' ) {
           fillColor = val(datum && datum.fillColor, fillData.defaultFill, {data: colorCodeData[d.id], geography: d});
         }
@@ -253,7 +254,7 @@
           d3.selectAll('.datamaps-hoverover').style('display', 'none');
         });
     }
-    
+
     function moveToFront() {
       this.parentNode.appendChild(this);
     }
@@ -300,7 +301,7 @@
       this.svg.insert("path", '.datamaps-subunits')
         .datum(graticule)
         .attr("class", "datamaps-graticule")
-        .attr("d", this.path); 
+        .attr("d", this.path);
   }
 
   function handleArcs (layer, data, options) {
@@ -627,7 +628,7 @@
               var tmpData = {};
               for(var i = 0; i < data.length; i++) {
                 tmpData[data[i].id] = data[i];
-              } 
+              }
               data = tmpData;
             }
             Datamaps.prototype.updateChoropleth.call(self, data);
