@@ -7,6 +7,7 @@
   var defaultOptions = {
     scope: 'world',
     responsive: false,
+    aspectRatio: 0.5625,
     setProjection: setProjection,
     projection: 'equirectangular',
     dataType: 'json',
@@ -92,7 +93,7 @@
       .style('overflow', 'hidden'); // IE10+ doesn't respect height/width when map is zoomed in
 
     if (this.options.responsive) {
-      d3.select(this.options.element).style({'position': 'relative', 'padding-bottom': '60%'});
+      d3.select(this.options.element).style({'position': 'relative', 'padding-bottom': (this.options.aspectRatio*100) + '%'});
       d3.select(this.options.element).select('svg').style({'position': 'absolute', 'width': '100%', 'height': '100%'});
       d3.select(this.options.element).select('svg').select('g').selectAll('path').style('vector-effect', 'non-scaling-stroke');
     

@@ -414,6 +414,8 @@ Set `responsive` to `true` and then listen for `resize` events on `window`, and 
 
 Avoid setting the height and width of the `container` with hard pixel values, instead use percent values. (use `50%` instead of `500px`.
 
+If the aspect ratio of your custom map is not the default `16:9` (`0.5625`), you should use the `aspectRatio` option to set it appropriately (eg. `0.3` for a `3:1` aspect ratio).
+
 ```html
 <div id="container"></div>
 <script>
