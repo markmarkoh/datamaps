@@ -716,8 +716,11 @@
         .style('top', ( (position[1] + 30)) + "px")
         .html(function() {
           var data = JSON.parse(element.attr('data-info'));
-          //if ( !data ) return '';
-          return options.popupTemplate(d, data);
+          try {
+            return options.popupTemplate(d, data);
+          } catch (e) {
+            return "";
+          }
         })
         .style('left', ( position[0]) + "px");
     });
