@@ -67,6 +67,11 @@ module.exports = function(grunt) {
     },
     clean: {
       release: ['.dist/datamaps.*.js']
+    },
+    sync: {
+      options: {
+        include: ['name', 'version', 'main', 'dependencies']
+      }
     }
   });
 
@@ -76,9 +81,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-text-replace');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-sync-pkg');
 
 
   grunt.registerTask('dev', ['replace']);
-  grunt.registerTask('build', ['replace', 'uglify:dist', 'copy']);
+  grunt.registerTask('build', ['replace', 'uglify:dist', 'copy', 'sync']);
 
 };
