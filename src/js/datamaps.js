@@ -19,6 +19,7 @@
     geographyConfig: {
         dataUrl: null,
         hideAntarctica: true,
+        contiguousUnitedStates : false,
         borderWidth: 1,
         borderColor: '#FDFDFD',
         popupTemplate: function(geography, data) {
@@ -169,6 +170,12 @@
     if ( geoConfig.hideAntarctica ) {
       geoData = geoData.filter(function(feature) {
         return feature.id !== "ATA";
+      });
+    }
+
+    if ( geoConfig.contiguousUnitedStates ) {
+      geoData = geoData.filter(function(feature) {
+        return feature.id !== "HI" && feature.id !== 'AK';
       });
     }
 
