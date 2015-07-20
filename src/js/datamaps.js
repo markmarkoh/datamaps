@@ -19,7 +19,7 @@
     geographyConfig: {
         dataUrl: null,
         hideAntarctica: true,
-        contiguousUnitedStates : false,
+        hideHawaiiAndAlaska : false,
         borderWidth: 1,
         borderColor: '#FDFDFD',
         popupTemplate: function(geography, data) {
@@ -173,7 +173,7 @@
       });
     }
 
-    if ( geoConfig.contiguousUnitedStates ) {
+    if ( geoConfig.hideHawaiiAndAlaska ) {
       geoData = geoData.filter(function(feature) {
         return feature.id !== "HI" && feature.id !== 'AK';
       });
