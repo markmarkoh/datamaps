@@ -12,13 +12,14 @@
     "topojson": "^1.6.19"
   },
   "devDependencies": {
-    "grunt-replace": "~0.4.4",
     "grunt": "~0.4.1",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-copy": "~0.4.1",
     "grunt-contrib-jasmine": "~0.5.2",
-    "grunt-text-replace": "~0.3.6",
     "grunt-contrib-uglify": "~0.2.2",
     "grunt-contrib-watch": "~0.4.4",
-    "grunt-contrib-copy": "~0.4.1",
-    "grunt-contrib-clean": "~0.5.0"
+    "grunt-replace": "~0.4.4",
+    "grunt-sync-pkg": "^0.1.2",
+    "grunt-text-replace": "~0.3.6"
   }
 }
