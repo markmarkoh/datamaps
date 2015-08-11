@@ -464,7 +464,7 @@
           else if ( datum.centered ) {
             latLng = self.path.centroid(svg.select('path.' + datum.centered).data()[0]);
           }
-          if ( latLng ) return latLng[1];;
+          if ( latLng ) return latLng[1];
         })
         .attr('r', 0) //for animation purposes
         .attr('data-info', function(d) {
