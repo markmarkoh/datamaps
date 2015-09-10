@@ -16,6 +16,7 @@
     fills: {
       defaultFill: '#ABDDA4'
     },
+    filters: {},
     geographyConfig: {
         dataUrl: null,
         hideAntarctica: true,
@@ -434,6 +435,7 @@
   function handleBubbles (layer, data, options ) {
     var self = this,
         fillData = this.options.fills,
+        filterData = this.options.filters,
         svg = this.svg;
 
     if ( !data || (data && !data.slice) ) {
@@ -473,6 +475,13 @@
         .attr('data-info', function(d) {
           return JSON.stringify(d);
         })
+        .attr('filter', function (datum) {
+          var filterKey = filterData[ val(datum.filterKey, options.filterKey, datum) ];
+          
+          if (filterKey) {
+            return filterKey;
+          }
+        })
         .style('stroke', function ( datum ) {
           return val(datum.borderColor, options.borderColor, datum);
         })
@@ -485,7 +494,7 @@
         .style('fill', function ( datum ) {
           var fillColor = fillData[ val(datum.fillKey, options.fillKey, datum) ];
           return fillColor || fillData.defaultFill;
-        })
+        })        
         .on('mouseover', function ( datum ) {
           var $this = d3.select(this);
 
