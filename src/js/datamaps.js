@@ -542,7 +542,7 @@
     }
 
     function getBubbleKey (options) {
-      if (options.updateBubbles) {
+      if (options.update) {
         return function(d) { 
           return JSON.stringify({
             latitude: d.latitude,
