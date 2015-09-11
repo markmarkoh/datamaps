@@ -474,15 +474,19 @@ If the aspect ratio of your custom map is not the default `16:9` (`0.5625`), you
         borderWidth: 2,
         borderColor: '#FFFFFF',
         popupOnHover: true,
+        radius: null,
         popupTemplate: function(geography, data) {
-          return '&lt;div class="hoverinfo"&gt;&lt;strong&gt;' + data.name + '&lt;/strong&gt;&lt;/div&gt;';
+          return '<div class="hoverinfo"><strong>' + data.name + '</strong></div>';
         },
         fillOpacity: 0.75,
+        animate: true,
         highlightOnHover: true,
         highlightFillColor: '#FC8D59',
         highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
         highlightBorderWidth: 2,
-        highlightFillOpacity: 0.85
+        highlightFillOpacity: 0.85,
+        exitDelay: 100,
+        keyFn: JSON.stringify
     },
     arcConfig: {
       strokeColor: '#DD1C77',
