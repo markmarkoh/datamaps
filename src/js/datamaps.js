@@ -50,7 +50,7 @@
         highlightBorderWidth: 2,
         highlightFillOpacity: 0.85,
         exitDelay: 100,
-        update: false
+        keyFn: JSON.stringify
     },
     arcConfig: {
       strokeColor: '#DD1C77',
@@ -441,7 +441,7 @@
       throw "Datamaps Error - bubbles must be an array";
     }
 
-    var bubbles = layer.selectAll('circle.datamaps-bubble').data( data, getBubbleKey(options) );
+    var bubbles = layer.selectAll('circle.datamaps-bubble').data( data, options.keyFn );
 
     bubbles
       .enter()
@@ -540,20 +540,6 @@
     function datumHasCoords (datum) {
       return typeof datum !== 'undefined' && typeof datum.latitude !== 'undefined' && typeof datum.longitude !== 'undefined';
     }
-
-    function getBubbleKey (options) {
-      if (options.update) {
-        return function(d) { 
-          return JSON.stringify({
-            latitude: d.latitude,
-            longitude: d.longitude
-          });
-        }
-      } else {
-        return JSON.stringify;
-      }
-    }
-
   }
 
   //stolen from underscore.js
