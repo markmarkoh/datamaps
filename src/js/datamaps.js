@@ -50,7 +50,8 @@
         highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
         highlightBorderWidth: 2,
         highlightFillOpacity: 0.85,
-        exitDelay: 100
+        exitDelay: 100,
+        key: JSON.stringify
     },
     arcConfig: {
       strokeColor: '#DD1C77',
@@ -442,7 +443,7 @@
       throw "Datamaps Error - bubbles must be an array";
     }
 
-    var bubbles = layer.selectAll('circle.datamaps-bubble').data( data, JSON.stringify );
+    var bubbles = layer.selectAll('circle.datamaps-bubble').data( data, options.key );
 
     bubbles
       .enter()
@@ -532,10 +533,12 @@
 
           d3.selectAll('.datamaps-hoverover').style('display', 'none');
         })
-        .transition().duration(400)
-          .attr('r', function ( datum ) {
-            return val(datum.radius, options.radius, datum);
-          });
+
+    bubbles.transition()
+      .duration(400)
+      .attr('r', function ( datum ) {
+        return val(datum.radius, options.radius, datum);
+      });
 
     bubbles.exit()
       .transition()
@@ -546,7 +549,6 @@
     function datumHasCoords (datum) {
       return typeof datum !== 'undefined' && typeof datum.latitude !== 'undefined' && typeof datum.longitude !== 'undefined';
     }
-
   }
 
   //stolen from underscore.js
