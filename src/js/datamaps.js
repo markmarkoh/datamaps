@@ -50,7 +50,7 @@
         highlightBorderWidth: 2,
         highlightFillOpacity: 0.85,
         exitDelay: 100,
-        keyFn: JSON.stringify
+        key: JSON.stringify
     },
     arcConfig: {
       strokeColor: '#DD1C77',
@@ -441,7 +441,7 @@
       throw "Datamaps Error - bubbles must be an array";
     }
 
-    var bubbles = layer.selectAll('circle.datamaps-bubble').data( data, options.keyFn );
+    var bubbles = layer.selectAll('circle.datamaps-bubble').data( data, options.key );
 
     bubbles
       .enter()

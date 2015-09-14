@@ -486,7 +486,7 @@ If the aspect ratio of your custom map is not the default `16:9` (`0.5625`), you
         highlightBorderWidth: 2,
         highlightFillOpacity: 0.85,
         exitDelay: 100,
-        keyFn: JSON.stringify
+        key: JSON.stringify
     },
     arcConfig: {
       strokeColor: '#DD1C77',
