@@ -4,6 +4,11 @@
   "description": "datamaps with d3.js",
   "version": "0.4.0",
   "author": "Mark DiMarco<markmarkoh@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/markmarkoh/datamaps.git"
+  },
   "scripts": {
     "test": "grunt jasmine"
   },
