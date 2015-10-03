@@ -605,11 +605,10 @@
     var options = self.options;
 
     if (options.responsive) {
-      var prefix = '-webkit-transform' in document.body.style ? '-webkit-' : '-moz-transform' in document.body.style ? '-moz-' : '-ms-transform' in document.body.style ? '-ms-' : '',
-          newsize = options.element.clientWidth,
+      var newsize = options.element.clientWidth,
           oldsize = d3.select( options.element).select('svg').attr('data-width');
 
-      d3.select(options.element).select('svg').selectAll('g').style(prefix + 'transform', 'scale(' + (newsize / oldsize) + ')');
+      d3.select(options.element).select('svg').selectAll('g').attr('transform', 'scale(' + (newsize / oldsize) + ')');
     }
   }
 
