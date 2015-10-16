@@ -1043,7 +1043,12 @@
     module.exports = Datamap;
   }
   else if ( typeof define === "function" && define.amd ) {
-    define( "datamaps", function(require) { d3 = require('d3'); topojson = require('topojson'); return Datamap; } );
+    define( "datamaps", ["require", "d3", "topojson"], function(require) {
+      d3 = require('d3');
+      topojson = require('topojson');
+
+      return Datamap;
+    });
   }
   else {
     window.Datamap = window.Datamaps = Datamap;
