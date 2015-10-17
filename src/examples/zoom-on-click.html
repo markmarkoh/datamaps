@@ -10,26 +10,38 @@
       <body>
 
         <div id="container1" style="border:1px dotted blue; width: 700px; height: 475px; position: relative;"></div>
+        Zoom enabled? <input id="enabled" type="checkbox" checked>
+        Zoom factor: <input id="factor" type="text" value="0.9">
         <script src="../js/components/d3/d3.min.js"></script>
         <script src="../js/components/topojson/topojson.js"></script>
         <!-- <script src="/src/js/json2.js"></script> -->
         <script src="../rel/datamaps.usa.js"></script>
         <script>
+          var zoomFactor = 0.9,
+              enabled = true;
+
+          document.getElementById('factor').addEventListener('change', function (e) {
+            zoomFactor = Number(e.target.value);
+            election.options.zoomConfig.zoomFactor = zoomFactor;
+          })
+
+          document.getElementById('enabled').addEventListener('change', function (e) {
+            enabled = !enabled;
+            election.toggleZoom(enabled);
+          })
 
           var election = new Datamap({
             scope: 'usa',
             element: document.getElementById('container1'),
             geographyConfig: {
               popupOnHover: false,
-              highlightOnHover: false,
+              highlightOnHover: true,
               borderColor: '#444',
               borderWidth: 0.5
             },
-            bubblesConfig: {
-              popupTemplate: function(geography, data) {
-                return '<div class="hoverinfo">Some From New: data about ' + data.centered + '</div>'
-              },
-              fillOpacity: 0.2
+            zoomConfig: {
+              zoomOnClick: true,
+              zoomFactor: zoomFactor
             },
             fills: {
               'Visited': '#306596',
@@ -78,11 +90,10 @@
             {centered: 'MO', fillKey: 'neato', radius: 2},
             {centered: 'WI', fillKey: 'Visited', radius: 10},
           ], {
-            // popupTemplate: function(geography, data) {
-            //   return '<div class="hoverinfo">Some data about ' + data.centered + '</div>'
-            // }
-          });
-
+            popupTemplate: function(geography, data) {
+              return '<div class="hoverinfo">Some data about ' + data.centered + '</div>'
+            }
+          })
 </script>
 </body>
 </html>
