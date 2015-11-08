@@ -3,7 +3,7 @@
 
   //save off default references
   var d3 = window.d3, topojson = window.topojson;
-  
+
   var defaultOptions = {
     scope: 'world',
     responsive: false,
@@ -99,7 +99,7 @@
       d3.select(this.options.element).style({'position': 'relative', 'padding-bottom': (this.options.aspectRatio*100) + '%'});
       d3.select(this.options.element).select('svg').style({'position': 'absolute', 'width': '100%', 'height': '100%'});
       d3.select(this.options.element).select('svg').select('g').selectAll('path').style('vector-effect', 'non-scaling-stroke');
-    
+
     }
 
     return this.svg;
@@ -111,7 +111,7 @@
     var height = options.height || element.offsetHeight;
     var projection, path;
     var svg = this.svg;
-    
+
     if ( options && typeof options.scope === 'undefined') {
       options.scope = 'world';
     }
@@ -202,7 +202,7 @@
         if ( datum && datum.fillKey ) {
           fillColor = fillData[ val(datum.fillKey, {data: colorCodeData[d.id], geography: d}) ];
         }
-        
+
         if ( typeof fillColor === 'undefined' ) {
           fillColor = val(datum && datum.fillColor, fillData.defaultFill, {data: colorCodeData[d.id], geography: d});
         }
@@ -263,7 +263,7 @@
           d3.selectAll('.datamaps-hoverover').style('display', 'none');
         });
     }
-    
+
     function moveToFront() {
       this.parentNode.appendChild(this);
     }
@@ -310,7 +310,7 @@
       this.svg.insert("path", '.datamaps-subunits')
         .datum(graticule)
         .attr("class", "datamaps-graticule")
-        .attr("d", this.path); 
+        .attr("d", this.path);
   }
 
   function handleArcs (layer, data, options) {
@@ -471,14 +471,14 @@
         })
         .attr('r', function(datum) {
           // if animation enabled start with radius 0, otherwise use full size.
-          return options.animate ? 0 : val(datum.radius, options.radius, datum); 
+          return options.animate ? 0 : val(datum.radius, options.radius, datum);
         })
         .attr('data-info', function(d) {
           return JSON.stringify(d);
         })
         .attr('filter', function (datum) {
           var filterKey = filterData[ val(datum.filterKey, options.filterKey, datum) ];
-          
+
           if (filterKey) {
             return filterKey;
           }
@@ -495,7 +495,7 @@
         .style('fill', function ( datum ) {
           var fillColor = fillData[ val(datum.fillKey, options.fillKey, datum) ];
           return fillColor || fillData.defaultFill;
-        })        
+        })
         .on('mouseover', function ( datum ) {
           var $this = d3.select(this);
 
@@ -648,7 +648,7 @@
               var tmpData = {};
               for(var i = 0; i < data.length; i++) {
                 tmpData[data[i].id] = data[i];
-              } 
+              }
               data = tmpData;
             }
             Datamaps.prototype.updateChoropleth.call(self, data);
@@ -964,6 +964,9 @@
         }
         else if ( typeof subunitData.color === "string" ) {
           color = subunitData.color;
+        }
+        else if ( typeof subunitData.fillColor === "string" ) {
+          color = subunitData.fillColor;
         }
         else {
           color = this.options.fills[ subunitData.fillKey ];
