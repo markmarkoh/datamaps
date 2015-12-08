@@ -22,6 +22,7 @@
         hideAntarctica: true,
         hideHawaiiAndAlaska : false,
         borderWidth: 1,
+        borderOpacity: 1,
         borderColor: '#FDFDFD',
         popupTemplate: function(geography, data) {
           return '<div class="hoverinfo"><strong>' + geography.properties.name + '</strong></div>';
@@ -30,13 +31,15 @@
         highlightOnHover: true,
         highlightFillColor: '#FC8D59',
         highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
-        highlightBorderWidth: 2
+        highlightBorderWidth: 2,
+        highlightBorderOpacity: 1
     },
     projectionConfig: {
       rotation: [97, 0]
     },
     bubblesConfig: {
         borderWidth: 2,
+        borderOpacity: 1,
         borderColor: '#FFFFFF',
         popupOnHover: true,
         radius: null,
@@ -49,6 +52,7 @@
         highlightFillColor: '#FC8D59',
         highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
         highlightBorderWidth: 2,
+        highlightBorderOpacity: 1,
         highlightFillOpacity: 0.85,
         exitDelay: 100,
         key: JSON.stringify
@@ -210,6 +214,7 @@
         return fillColor;
       })
       .style('stroke-width', geoConfig.borderWidth)
+      .style('stroke-opacity', geoConfig.borderOpacity)
       .style('stroke', geoConfig.borderColor);
   }
 
@@ -236,6 +241,7 @@
               .style('fill', val(datum.highlightFillColor, options.highlightFillColor, datum))
               .style('stroke', val(datum.highlightBorderColor, options.highlightBorderColor, datum))
               .style('stroke-width', val(datum.highlightBorderWidth, options.highlightBorderWidth, datum))
+              .style('stroke-opacity', val(datum.highlightBorderOpacity, options.highlightBorderOpacity, datum))
               .style('fill-opacity', val(datum.highlightFillOpacity, options.highlightFillOpacity, datum))
               .attr('data-previousAttributes', JSON.stringify(previousAttributes));
 
@@ -489,6 +495,9 @@
         .style('stroke-width', function ( datum ) {
           return val(datum.borderWidth, options.borderWidth, datum);
         })
+        .style('stroke-opacity', function ( datum ) {
+          return val(datum.borderOpacity, options.borderOpacity, datum);
+        })
         .style('fill-opacity', function ( datum ) {
           return val(datum.fillOpacity, options.fillOpacity, datum);
         })
@@ -512,6 +521,7 @@
               .style('fill', val(datum.highlightFillColor, options.highlightFillColor, datum))
               .style('stroke', val(datum.highlightBorderColor, options.highlightBorderColor, datum))
               .style('stroke-width', val(datum.highlightBorderWidth, options.highlightBorderWidth, datum))
+              .style('stroke-opacity', val(datum.highlightBorderOpacity, options.highlightBorderOpacity, datum))
               .style('fill-opacity', val(datum.highlightFillOpacity, options.highlightFillOpacity, datum))
               .attr('data-previousAttributes', JSON.stringify(previousAttributes));
           }
