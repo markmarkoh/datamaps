@@ -551,6 +551,11 @@
       .duration(400)
       .attr('r', function ( datum ) {
         return val(datum.radius, options.radius, datum);
+      })
+    .transition()
+      .duration(0)
+      .attr('data-info', function(d) {
+        return JSON.stringify(d);
       });
 
     bubbles.exit()
