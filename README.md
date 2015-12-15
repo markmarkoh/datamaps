@@ -18,10 +18,10 @@ Out of the box it includes support for choropleths and bubble maps (see [demos](
 
 Downloads:
 
- - [World map (94kb, 36.7kb gzip'd)](http://datamaps.github.io/scripts/datamaps.world.min.js)
- - [USA only (35kb, 13.9kb gzip'd)](http://datamaps.github.io/scripts/datamaps.usa.min.js)
- - [USA & World (131kb, 47.1kb gzip'd)](http://datamaps.github.io/scripts/datamaps.all.min.js)
- - [No preset topojson (6.8kb, 2.3kb gzip'd)](http://datamaps.github.io/scripts/datamaps.none.min.js)
+ - [World map (94kb, 36.7kb gzip'd)](http://datamaps.github.io/scripts/0.4.2/datamaps.world.min.js)
+ - [USA only (35kb, 13.9kb gzip'd)](http://datamaps.github.io/scripts/0.4.2/datamaps.usa.min.js)
+ - [USA & World (131kb, 47.1kb gzip'd)](http://datamaps.github.io/scripts/0.4.2/datamaps.all.min.js)
+ - [No preset topojson (6.8kb, 2.3kb gzip'd)](http://datamaps.github.io/scripts/0.4.2/datamaps.none.min.js)
 
 
 ### Documentation
@@ -129,7 +129,7 @@ A map of the USA with an Albers based projection will be default if you only inc
 }
             path = d3.geo.path()
                 .projection( projection );
-            
+
             return {path: path, projection: projection};
         }
     });
@@ -194,7 +194,7 @@ map.updateChoropleth({
 });
 ```
 
-You can specify either a literal color (as a string), or an object with a fillKey property. 
+You can specify either a literal color (as a string), or an object with a fillKey property.
 
 You can also add a map legend with the `legend` plugin (used above)
 
@@ -239,7 +239,7 @@ Expanding on the previous example of using `data`, any property passed into `dat
     });
 </script>
 ```
-    
+
 `geographyConfig.popupTemplate` just needs to return an HTML string, so feel free to use [Handlebars](https://github.com/wycats/handlebars.js/) or [Underscore](http://underscorejs.org/#template) templates (instead of the terrible Array.join method above).
 
 
@@ -296,7 +296,7 @@ var bombMap = new Datamap({
         date: '1955-11-22',
         latitude: 50.07,
         longitude: 78.43
-     
+
       },{
         name: 'Tsar Bomba',
         radius: 75,
@@ -311,7 +311,7 @@ var bombMap = new Datamap({
     ];
 //draw bubbles for bombs
 bombMap.bubbles(bombs, {
-    popupTemplate: function (geo, data) { 
+    popupTemplate: function (geo, data) {
             return ['<div class="hoverinfo">' +  data.name,
             '<br/>Payload: ' +  data.yield + ' kilotons',
             '<br/>Country: ' +  data.country + '',
@@ -328,7 +328,7 @@ The first parameter to `bubbles` should be an array of objects, each with **at l
   - `latitude`
   - `longitude`
   - `radius`
- 
+
 Optionally, pass in `fillKey` to color code the bubble, and pass in any other data you want to render in a popup template which can be overridden in the options parameter.
 
 For further customization, you can set these properties on each bubble to override the options parameter (or default options):
@@ -362,7 +362,7 @@ The following options are allowed:
   - `fontSize` //font size, default: 10
   - `fontFamily` //font family, default: 'Verdana'
 
-An example for using the options: 
+An example for using the options:
 
 ```javascript
 map.labels({labelColor: 'blue', fontSize: 12});
@@ -388,7 +388,7 @@ var map = new Datamap({
       .translate([element.offsetWidth / 2, element.offsetHeight / 2]);
     var path = d3.geo.path()
       .projection(projection);
-    
+
     return {path: path, projection: projection};
   },
 ```
@@ -415,7 +415,7 @@ All events are bubbled up to the root `svg` element and to listen to events, use
         }
     });
 </script>
-```  
+```
 
 #### Responsive Maps
 Set `responsive` to `true` and then listen for `resize` events on `window`, and call `Datamaps.prototype.resize`.
@@ -431,16 +431,16 @@ If the aspect ratio of your custom map is not the default `16:9` (`0.5625`), you
         element: document.getElementById('container'),
         responsive: true
     });
-    
+
     window.addEventListener('resize', function() {
         map.resize();
     });
-    
+
     //alternatively with d3
     d3.select(window).on('resize', function() {
         map.resize();
     });
-    
+
     //alternatively with jQuery
     $(window).on('resize', function() {
        map.resize();
@@ -512,5 +512,5 @@ If the aspect ratio of your custom map is not the default `16:9` (`0.5625`), you
 
 #Contributing Guidelines
 
-* Do not run the `grunt build` task or submit any built files in your PR. 
+* Do not run the `grunt build` task or submit any built files in your PR.
 * Have an example in `src/examples` if adding a new feature. Copy an existing feature `.html` file to start.
