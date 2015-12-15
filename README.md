@@ -357,15 +357,29 @@ map.labels();
 
 The following options are allowed:
 
-  - `labelColor` //font color, default: #000
-  - `lineWidth` //line width for New England states, default: 1
-  - `fontSize` //font size, default: 10
   - `fontFamily` //font family, default: 'Verdana'
+  - `fontSize` //font size, default: 10
+  - `passLabelMouseEvents` //Passes mouseover and mouseout events to subunit shapes if labels are present, default: true
+  - `labelColor` //font color, default: #000
+  - `labelStartCoordinates` //[x,y] location on the projection to start the smallSubunits label rendering, default: [-67.707617, 42.722131]
+  - `labelSpacing` //number of pixels inbetween each of the smallSubunits labels, default: 2
+  - `lineColor` //color of the line from the smallSubunits label to the smallSubunits center, default: #000
+  - `lineWidth` //line width for the smallSubunits' pointers, default: 1
+  - `popupOnLabelHover` //allows you to show/hide the geographyConfig.popupOnHover when hovering over a subunit's label not in small subunit list, default: true
+  - `smallSubunits` //defines list of subunits to render in a list instead of the center of the subunit.  Label order is defined by order of the list, default: ["VT", "NH", "MA", "RI", "CT", "NJ", "DE", "MD", "DC"]
+  - `smallSubunitsOnly` //whether to only show only the labels defined in the smallSubunits list, default: false
 
 An example for using the options:
 
 ```javascript
+//blue labels that are 12 pixels
 map.labels({labelColor: 'blue', fontSize: 12});
+
+//only show small US states excluding Washington D.C. that activate the normal highlight on hover
+map.labels({
+  smallSubunits: ["VT", "NH", "MA", "RI", "CT", "NJ", "DE", "MD"],
+  smallSubunitsOnly: true
+});
 ```
 
 

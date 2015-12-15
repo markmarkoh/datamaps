@@ -157,7 +157,7 @@
   function addStyleBlock() {
     if ( d3.select('.datamaps-style-block').empty() ) {
       d3.select('head').append('style').attr('class', 'datamaps-style-block')
-      .html('.datamap path.datamaps-graticule { fill: none; stroke: #777; stroke-width: 0.5px; stroke-opacity: .5; pointer-events: none; } .datamap .labels {pointer-events: none;} .datamap path {stroke: #FFFFFF; stroke-width: 1px;} .datamaps-legend dt, .datamaps-legend dd { float: left; margin: 0 3px 0 0;} .datamaps-legend dd {width: 20px; margin-right: 6px; border-radius: 3px;} .datamaps-legend {padding-bottom: 20px; z-index: 1001; position: absolute; left: 4px; font-size: 12px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;} .datamaps-hoverover {display: none; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; } .hoverinfo {padding: 4px; border-radius: 1px; background-color: #FFF; box-shadow: 1px 1px 5px #CCC; font-size: 12px; border: 1px solid #CCC; } .hoverinfo hr {border:1px dotted #CCC; }');
+      .html('.datamap path.datamaps-graticule { fill: none; stroke: #777; stroke-width: 0.5px; stroke-opacity: .5; pointer-events: none; } .datamap path {stroke: #FFFFFF; stroke-width: 1px;} .datamaps-legend dt, .datamaps-legend dd { float: left; margin: 0 3px 0 0;} .datamaps-legend dd {width: 20px; margin-right: 6px; border-radius: 3px;} .datamaps-legend {padding-bottom: 20px; z-index: 1001; position: absolute; left: 4px; font-size: 12px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;} .datamaps-hoverover {display: none; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; } .hoverinfo {padding: 4px; border-radius: 1px; background-color: #FFF; box-shadow: 1px 1px 5px #CCC; font-size: 12px; border: 1px solid #CCC; } .hoverinfo hr {border:1px dotted #CCC; }');
     }
   }
 
@@ -400,9 +400,24 @@
   function handleLabels ( layer, options ) {
     var self = this;
     options = options || {};
-    var labelStartCoodinates = this.projection([-67.707617, 42.722131]);
+    var defaultOptions = {
+      fontFamily: "Verdana",
+      fontSize: 10,
+      passLabelMouseEvents: true,
+      labelColor: "#000",
+      labelStartCoordinates: [-67.707617, 42.722131],
+      labelSpacing: 2,
+      lineColor: "#000",
+      lineWidth: 1,
+      popupOnLabelHover: true,
+      smallSubunits: ["VT", "NH", "MA", "RI", "CT", "NJ", "DE", "MD", "DC"],
+      smallSubunitsOnly: false
+    };
+    options = defaults(options, defaultOptions);
+    var labelStartCoordinates = this.projection(options.labelStartCoordinates);
     this.svg.selectAll(".datamaps-subunit")
       .attr("data-foo", function(d) {
+        var subunit = this;
         var center = self.path.centroid(d);
         var xOffset = 7.5, yOffset = 5;
 
@@ -416,27 +431,53 @@
         x = center[0] - xOffset;
         y = center[1] + yOffset;
 
-        var smallStateIndex = ["VT", "NH", "MA", "RI", "CT", "NJ", "DE", "MD", "DC"].indexOf(d.id);
-        if ( smallStateIndex > -1) {
-          var yStart = labelStartCoodinates[1];
-          x = labelStartCoodinates[0];
-          y = yStart + (smallStateIndex * (2+ (options.fontSize || 12)));
+        var smallSubunitIndex = options.smallSubunits.indexOf(d.id);
+        if ( smallSubunitIndex > -1) {
+          var yStart = labelStartCoordinates[1];
+          x = labelStartCoordinates[0];
+          y = yStart + (smallSubunitIndex * (options.labelSpacing + options.fontSize));
           layer.append("line")
             .attr("x1", x - 3)
             .attr("y1", y - 5)
             .attr("x2", center[0])
             .attr("y2", center[1])
-            .style("stroke", options.labelColor || "#000")
-            .style("stroke-width", options.lineWidth || 1)
+            .style("stroke", options.lineColor)
+            .style("stroke-width", options.lineWidth)
         }
 
-        layer.append("text")
-          .attr("x", x)
-          .attr("y", y)
-          .style("font-size", (options.fontSize || 10) + 'px')
-          .style("font-family", options.fontFamily || "Verdana")
-          .style("fill", options.labelColor || "#000")
-          .text( d.id );
+        if (!options.smallSubunitsOnly || (options.smallSubunitsOnly && smallSubunitIndex > -1) ) {
+          layer.append("text")
+            .attr("x", x)
+            .attr("y", y)
+            .style("font-size", options.fontSize + 'px')
+            .style("font-family", options.fontFamily)
+            .style("fill", options.labelColor)
+            .style("pointer-events", options.passLabelMouseEvents ? "" : "none")
+            .text(d.id)
+            .on("click", function(data, idx) {
+              var event = document.createEvent('Event');
+              event.initEvent("click", true, true);
+              subunit.dispatchEvent(event);
+            })
+            .on("mouseover", function(data, idx) {
+              if (options.passLabelMouseEvents) {
+                var event = document.createEvent('Event');
+                event.initEvent("mouseover", true, true);
+                subunit.dispatchEvent(event);
+
+                if (self.options.geographyConfig.popupOnHover && (!options.popupOnLabelHover || smallSubunitIndex > -1)) {
+                  d3.selectAll('.datamaps-hoverover').style('display', 'none');
+                }
+              }
+            })
+            .on("mouseout", function(data, idx) {
+              if (options.passLabelMouseEvents) {
+                var event = document.createEvent('Event');
+                event.initEvent("mouseout", true, true);
+                subunit.dispatchEvent(event);
+              }
+            });
+        }
         return "bar";
       });
   }
