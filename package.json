@@ -2,7 +2,7 @@
   "name": "datamaps",
   "main": "dist/datamaps.all.js",
   "description": "datamaps with d3.js",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "author": "Mark DiMarco<markmarkoh@gmail.com>",
   "license": "MIT",
   "repository": {
