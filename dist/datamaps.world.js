@@ -3,10 +3,11 @@
 
   //save off default references
   var d3 = window.d3, topojson = window.topojson;
-  
+
   var defaultOptions = {
     scope: 'world',
     responsive: false,
+    aspectRatio: 0.5625,
     setProjection: setProjection,
     projection: 'equirectangular',
     dataType: 'json',
@@ -15,9 +16,11 @@
     fills: {
       defaultFill: '#ABDDA4'
     },
+    filters: {},
     geographyConfig: {
         dataUrl: null,
         hideAntarctica: true,
+        hideHawaiiAndAlaska : false,
         borderWidth: 1,
         borderColor: '#FDFDFD',
         popupTemplate: function(geography, data) {
@@ -47,7 +50,8 @@
         highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
         highlightBorderWidth: 2,
         highlightFillOpacity: 0.85,
-        exitDelay: 100
+        exitDelay: 100,
+        key: JSON.stringify
     },
     arcConfig: {
       strokeColor: '#DD1C77',
@@ -92,10 +96,10 @@
       .style('overflow', 'hidden'); // IE10+ doesn't respect height/width when map is zoomed in
 
     if (this.options.responsive) {
-      d3.select(this.options.element).style({'position': 'relative', 'padding-bottom': '60%'});
+      d3.select(this.options.element).style({'position': 'relative', 'padding-bottom': (this.options.aspectRatio*100) + '%'});
       d3.select(this.options.element).select('svg').style({'position': 'absolute', 'width': '100%', 'height': '100%'});
       d3.select(this.options.element).select('svg').select('g').selectAll('path').style('vector-effect', 'non-scaling-stroke');
-    
+
     }
 
     return this.svg;
@@ -107,7 +111,7 @@
     var height = options.height || element.offsetHeight;
     var projection, path;
     var svg = this.svg;
-    
+
     if ( options && typeof options.scope === 'undefined') {
       options.scope = 'world';
     }
@@ -171,6 +175,12 @@
       });
     }
 
+    if ( geoConfig.hideHawaiiAndAlaska ) {
+      geoData = geoData.filter(function(feature) {
+        return feature.id !== "HI" && feature.id !== 'AK';
+      });
+    }
+
     var geo = subunits.selectAll('path.datamaps-subunit').data( geoData );
 
     geo.enter()
@@ -192,7 +202,7 @@
         if ( datum && datum.fillKey ) {
           fillColor = fillData[ val(datum.fillKey, {data: colorCodeData[d.id], geography: d}) ];
         }
-        
+
         if ( typeof fillColor === 'undefined' ) {
           fillColor = val(datum && datum.fillColor, fillData.defaultFill, {data: colorCodeData[d.id], geography: d});
         }
@@ -230,7 +240,7 @@
               .attr('data-previousAttributes', JSON.stringify(previousAttributes));
 
             //as per discussion on https://github.com/markmarkoh/datamaps/issues/19
-            if ( ! /((MSIE)|(Trident))/.test ) {
+            if ( ! /((MSIE)|(Trident))/.test(navigator.userAgent) ) {
              moveToFront.call(this);
             }
           }
@@ -253,7 +263,7 @@
           d3.selectAll('.datamaps-hoverover').style('display', 'none');
         });
     }
-    
+
     function moveToFront() {
       this.parentNode.appendChild(this);
     }
@@ -300,7 +310,7 @@
       this.svg.insert("path", '.datamaps-subunits')
         .datum(graticule)
         .attr("class", "datamaps-graticule")
-        .attr("d", this.path); 
+        .attr("d", this.path);
   }
 
   function handleArcs (layer, data, options) {
@@ -426,13 +436,14 @@
   function handleBubbles (layer, data, options ) {
     var self = this,
         fillData = this.options.fills,
+        filterData = this.options.filters,
         svg = this.svg;
 
     if ( !data || (data && !data.slice) ) {
       throw "Datamaps Error - bubbles must be an array";
     }
 
-    var bubbles = layer.selectAll('circle.datamaps-bubble').data( data, JSON.stringify );
+    var bubbles = layer.selectAll('circle.datamaps-bubble').data( data, options.key );
 
     bubbles
       .enter()
@@ -456,11 +467,21 @@
           else if ( datum.centered ) {
             latLng = self.path.centroid(svg.select('path.' + datum.centered).data()[0]);
           }
-          if ( latLng ) return latLng[1];;
+          if ( latLng ) return latLng[1];
         })
-        .attr('r', 0) //for animation purposes
+        .attr('r', function(datum) {
+          // if animation enabled start with radius 0, otherwise use full size.
+          return options.animate ? 0 : val(datum.radius, options.radius, datum);
+        })
         .attr('data-info', function(d) {
           return JSON.stringify(d);
+        })
+        .attr('filter', function (datum) {
+          var filterKey = filterData[ val(datum.filterKey, options.filterKey, datum) ];
+
+          if (filterKey) {
+            return filterKey;
+          }
         })
         .style('stroke', function ( datum ) {
           return val(datum.borderColor, options.borderColor, datum);
@@ -512,10 +533,12 @@
 
           d3.selectAll('.datamaps-hoverover').style('display', 'none');
         })
-        .transition().duration(400)
-          .attr('r', function ( datum ) {
-            return val(datum.radius, options.radius, datum);
-          });
+
+    bubbles.transition()
+      .duration(400)
+      .attr('r', function ( datum ) {
+        return val(datum.radius, options.radius, datum);
+      });
 
     bubbles.exit()
       .transition()
@@ -526,7 +549,6 @@
     function datumHasCoords (datum) {
       return typeof datum !== 'undefined' && typeof datum.latitude !== 'undefined' && typeof datum.longitude !== 'undefined';
     }
-
   }
 
   //stolen from underscore.js
@@ -583,11 +605,10 @@
     var options = self.options;
 
     if (options.responsive) {
-      var prefix = '-webkit-transform' in document.body.style ? '-webkit-' : '-moz-transform' in document.body.style ? '-moz-' : '-ms-transform' in document.body.style ? '-ms-' : '',
-          newsize = options.element.clientWidth,
+      var newsize = options.element.clientWidth,
           oldsize = d3.select( options.element).select('svg').attr('data-width');
 
-      d3.select(options.element).select('svg').selectAll('g').style(prefix + 'transform', 'scale(' + (newsize / oldsize) + ')');
+      d3.select(options.element).select('svg').selectAll('g').attr('transform', 'scale(' + (newsize / oldsize) + ')');
     }
   }
 
@@ -627,7 +648,7 @@
               var tmpData = {};
               for(var i = 0; i < data.length; i++) {
                 tmpData[data[i].id] = data[i];
-              } 
+              }
               data = tmpData;
             }
             Datamaps.prototype.updateChoropleth.call(self, data);
@@ -12112,7 +12133,261 @@
     }
 }
 ;
+  Datamap.prototype.abwTopo = '__ABW__';
+  Datamap.prototype.afgTopo = '__AFG__';
+  Datamap.prototype.agoTopo = '__AGO__';
+  Datamap.prototype.aiaTopo = '__AIA__';
+  Datamap.prototype.albTopo = '__ALB__';
+  Datamap.prototype.aldTopo = '__ALD__';
+  Datamap.prototype.andTopo = '__AND__';
+  Datamap.prototype.areTopo = '__ARE__';
+  Datamap.prototype.argTopo = '__ARG__';
+  Datamap.prototype.armTopo = '__ARM__';
+  Datamap.prototype.asmTopo = '__ASM__';
+  Datamap.prototype.ataTopo = '__ATA__';
+  Datamap.prototype.atcTopo = '__ATC__';
+  Datamap.prototype.atfTopo = '__ATF__';
+  Datamap.prototype.atgTopo = '__ATG__';
+  Datamap.prototype.ausTopo = '__AUS__';
+  Datamap.prototype.autTopo = '__AUT__';
+  Datamap.prototype.azeTopo = '__AZE__';
+  Datamap.prototype.bdiTopo = '__BDI__';
+  Datamap.prototype.belTopo = '__BEL__';
+  Datamap.prototype.benTopo = '__BEN__';
+  Datamap.prototype.bfaTopo = '__BFA__';
+  Datamap.prototype.bgdTopo = '__BGD__';
+  Datamap.prototype.bgrTopo = '__BGR__';
+  Datamap.prototype.bhrTopo = '__BHR__';
+  Datamap.prototype.bhsTopo = '__BHS__';
+  Datamap.prototype.bihTopo = '__BIH__';
+  Datamap.prototype.bjnTopo = '__BJN__';
+  Datamap.prototype.blmTopo = '__BLM__';
+  Datamap.prototype.blrTopo = '__BLR__';
+  Datamap.prototype.blzTopo = '__BLZ__';
+  Datamap.prototype.bmuTopo = '__BMU__';
+  Datamap.prototype.bolTopo = '__BOL__';
+  Datamap.prototype.braTopo = '__BRA__';
+  Datamap.prototype.brbTopo = '__BRB__';
+  Datamap.prototype.brnTopo = '__BRN__';
+  Datamap.prototype.btnTopo = '__BTN__';
+  Datamap.prototype.norTopo = '__NOR__';
+  Datamap.prototype.bwaTopo = '__BWA__';
+  Datamap.prototype.cafTopo = '__CAF__';
+  Datamap.prototype.canTopo = '__CAN__';
+  Datamap.prototype.cheTopo = '__CHE__';
+  Datamap.prototype.chlTopo = '__CHL__';
+  Datamap.prototype.chnTopo = '__CHN__';
+  Datamap.prototype.civTopo = '__CIV__';
+  Datamap.prototype.clpTopo = '__CLP__';
+  Datamap.prototype.cmrTopo = '__CMR__';
+  Datamap.prototype.codTopo = '__COD__';
+  Datamap.prototype.cogTopo = '__COG__';
+  Datamap.prototype.cokTopo = '__COK__';
+  Datamap.prototype.colTopo = '__COL__';
+  Datamap.prototype.comTopo = '__COM__';
+  Datamap.prototype.cpvTopo = '__CPV__';
+  Datamap.prototype.criTopo = '__CRI__';
+  Datamap.prototype.csiTopo = '__CSI__';
+  Datamap.prototype.cubTopo = '__CUB__';
+  Datamap.prototype.cuwTopo = '__CUW__';
+  Datamap.prototype.cymTopo = '__CYM__';
+  Datamap.prototype.cynTopo = '__CYN__';
+  Datamap.prototype.cypTopo = '__CYP__';
+  Datamap.prototype.czeTopo = '__CZE__';
+  Datamap.prototype.deuTopo = '__DEU__';
+  Datamap.prototype.djiTopo = '__DJI__';
+  Datamap.prototype.dmaTopo = '__DMA__';
+  Datamap.prototype.dnkTopo = '__DNK__';
+  Datamap.prototype.domTopo = '__DOM__';
+  Datamap.prototype.dzaTopo = '__DZA__';
+  Datamap.prototype.ecuTopo = '__ECU__';
+  Datamap.prototype.egyTopo = '__EGY__';
+  Datamap.prototype.eriTopo = '__ERI__';
+  Datamap.prototype.esbTopo = '__ESB__';
+  Datamap.prototype.espTopo = '__ESP__';
+  Datamap.prototype.estTopo = '__EST__';
+  Datamap.prototype.ethTopo = '__ETH__';
+  Datamap.prototype.finTopo = '__FIN__';
+  Datamap.prototype.fjiTopo = '__FJI__';
+  Datamap.prototype.flkTopo = '__FLK__';
+  Datamap.prototype.fraTopo = '__FRA__';
+  Datamap.prototype.froTopo = '__FRO__';
+  Datamap.prototype.fsmTopo = '__FSM__';
+  Datamap.prototype.gabTopo = '__GAB__';
+  Datamap.prototype.psxTopo = '__PSX__';
+  Datamap.prototype.gbrTopo = '__GBR__';
+  Datamap.prototype.geoTopo = '__GEO__';
+  Datamap.prototype.ggyTopo = '__GGY__';
+  Datamap.prototype.ghaTopo = '__GHA__';
+  Datamap.prototype.gibTopo = '__GIB__';
+  Datamap.prototype.ginTopo = '__GIN__';
+  Datamap.prototype.gmbTopo = '__GMB__';
+  Datamap.prototype.gnbTopo = '__GNB__';
+  Datamap.prototype.gnqTopo = '__GNQ__';
+  Datamap.prototype.grcTopo = '__GRC__';
+  Datamap.prototype.grdTopo = '__GRD__';
+  Datamap.prototype.grlTopo = '__GRL__';
+  Datamap.prototype.gtmTopo = '__GTM__';
+  Datamap.prototype.gumTopo = '__GUM__';
+  Datamap.prototype.guyTopo = '__GUY__';
+  Datamap.prototype.hkgTopo = '__HKG__';
+  Datamap.prototype.hmdTopo = '__HMD__';
+  Datamap.prototype.hndTopo = '__HND__';
+  Datamap.prototype.hrvTopo = '__HRV__';
+  Datamap.prototype.htiTopo = '__HTI__';
+  Datamap.prototype.hunTopo = '__HUN__';
+  Datamap.prototype.idnTopo = '__IDN__';
+  Datamap.prototype.imnTopo = '__IMN__';
+  Datamap.prototype.indTopo = '__IND__';
+  Datamap.prototype.ioaTopo = '__IOA__';
+  Datamap.prototype.iotTopo = '__IOT__';
+  Datamap.prototype.irlTopo = '__IRL__';
+  Datamap.prototype.irnTopo = '__IRN__';
+  Datamap.prototype.irqTopo = '__IRQ__';
+  Datamap.prototype.islTopo = '__ISL__';
+  Datamap.prototype.isrTopo = '__ISR__';
+  Datamap.prototype.itaTopo = '__ITA__';
+  Datamap.prototype.jamTopo = '__JAM__';
+  Datamap.prototype.jeyTopo = '__JEY__';
+  Datamap.prototype.jorTopo = '__JOR__';
+  Datamap.prototype.jpnTopo = '__JPN__';
+  Datamap.prototype.kabTopo = '__KAB__';
+  Datamap.prototype.kasTopo = '__KAS__';
+  Datamap.prototype.kazTopo = '__KAZ__';
+  Datamap.prototype.kenTopo = '__KEN__';
+  Datamap.prototype.kgzTopo = '__KGZ__';
+  Datamap.prototype.khmTopo = '__KHM__';
+  Datamap.prototype.kirTopo = '__KIR__';
+  Datamap.prototype.knaTopo = '__KNA__';
+  Datamap.prototype.korTopo = '__KOR__';
+  Datamap.prototype.kosTopo = '__KOS__';
+  Datamap.prototype.kwtTopo = '__KWT__';
+  Datamap.prototype.laoTopo = '__LAO__';
+  Datamap.prototype.lbnTopo = '__LBN__';
+  Datamap.prototype.lbrTopo = '__LBR__';
+  Datamap.prototype.lbyTopo = '__LBY__';
+  Datamap.prototype.lcaTopo = '__LCA__';
+  Datamap.prototype.lieTopo = '__LIE__';
+  Datamap.prototype.lkaTopo = '__LKA__';
+  Datamap.prototype.lsoTopo = '__LSO__';
+  Datamap.prototype.ltuTopo = '__LTU__';
+  Datamap.prototype.luxTopo = '__LUX__';
+  Datamap.prototype.lvaTopo = '__LVA__';
+  Datamap.prototype.macTopo = '__MAC__';
+  Datamap.prototype.mafTopo = '__MAF__';
+  Datamap.prototype.marTopo = '__MAR__';
+  Datamap.prototype.mcoTopo = '__MCO__';
+  Datamap.prototype.mdaTopo = '__MDA__';
+  Datamap.prototype.mdgTopo = '__MDG__';
+  Datamap.prototype.mdvTopo = '__MDV__';
+  Datamap.prototype.mexTopo = '__MEX__';
+  Datamap.prototype.mhlTopo = '__MHL__';
+  Datamap.prototype.mkdTopo = '__MKD__';
+  Datamap.prototype.mliTopo = '__MLI__';
+  Datamap.prototype.mltTopo = '__MLT__';
+  Datamap.prototype.mmrTopo = '__MMR__';
+  Datamap.prototype.mneTopo = '__MNE__';
+  Datamap.prototype.mngTopo = '__MNG__';
+  Datamap.prototype.mnpTopo = '__MNP__';
+  Datamap.prototype.mozTopo = '__MOZ__';
+  Datamap.prototype.mrtTopo = '__MRT__';
+  Datamap.prototype.msrTopo = '__MSR__';
+  Datamap.prototype.musTopo = '__MUS__';
+  Datamap.prototype.mwiTopo = '__MWI__';
+  Datamap.prototype.mysTopo = '__MYS__';
+  Datamap.prototype.namTopo = '__NAM__';
+  Datamap.prototype.nclTopo = '__NCL__';
+  Datamap.prototype.nerTopo = '__NER__';
+  Datamap.prototype.nfkTopo = '__NFK__';
+  Datamap.prototype.ngaTopo = '__NGA__';
+  Datamap.prototype.nicTopo = '__NIC__';
+  Datamap.prototype.niuTopo = '__NIU__';
+  Datamap.prototype.nldTopo = '__NLD__';
+  Datamap.prototype.nplTopo = '__NPL__';
+  Datamap.prototype.nruTopo = '__NRU__';
+  Datamap.prototype.nulTopo = '__NUL__';
+  Datamap.prototype.nzlTopo = '__NZL__';
+  Datamap.prototype.omnTopo = '__OMN__';
+  Datamap.prototype.pakTopo = '__PAK__';
+  Datamap.prototype.panTopo = '__PAN__';
+  Datamap.prototype.pcnTopo = '__PCN__';
+  Datamap.prototype.perTopo = '__PER__';
+  Datamap.prototype.pgaTopo = '__PGA__';
+  Datamap.prototype.phlTopo = '__PHL__';
+  Datamap.prototype.plwTopo = '__PLW__';
+  Datamap.prototype.pngTopo = '__PNG__';
+  Datamap.prototype.polTopo = '__POL__';
+  Datamap.prototype.priTopo = '__PRI__';
+  Datamap.prototype.prkTopo = '__PRK__';
+  Datamap.prototype.prtTopo = '__PRT__';
+  Datamap.prototype.pryTopo = '__PRY__';
+  Datamap.prototype.pyfTopo = '__PYF__';
+  Datamap.prototype.qatTopo = '__QAT__';
+  Datamap.prototype.rouTopo = '__ROU__';
+  Datamap.prototype.rusTopo = '__RUS__';
+  Datamap.prototype.rwaTopo = '__RWA__';
+  Datamap.prototype.sahTopo = '__SAH__';
+  Datamap.prototype.sauTopo = '__SAU__';
+  Datamap.prototype.scrTopo = '__SCR__';
+  Datamap.prototype.sdnTopo = '__SDN__';
+  Datamap.prototype.sdsTopo = '__SDS__';
+  Datamap.prototype.senTopo = '__SEN__';
+  Datamap.prototype.serTopo = '__SER__';
+  Datamap.prototype.sgpTopo = '__SGP__';
+  Datamap.prototype.sgsTopo = '__SGS__';
+  Datamap.prototype.shnTopo = '__SHN__';
+  Datamap.prototype.slbTopo = '__SLB__';
+  Datamap.prototype.sleTopo = '__SLE__';
+  Datamap.prototype.slvTopo = '__SLV__';
+  Datamap.prototype.smrTopo = '__SMR__';
+  Datamap.prototype.solTopo = '__SOL__';
+  Datamap.prototype.somTopo = '__SOM__';
+  Datamap.prototype.spmTopo = '__SPM__';
+  Datamap.prototype.srbTopo = '__SRB__';
+  Datamap.prototype.stpTopo = '__STP__';
+  Datamap.prototype.surTopo = '__SUR__';
+  Datamap.prototype.svkTopo = '__SVK__';
+  Datamap.prototype.svnTopo = '__SVN__';
+  Datamap.prototype.sweTopo = '__SWE__';
+  Datamap.prototype.swzTopo = '__SWZ__';
+  Datamap.prototype.sxmTopo = '__SXM__';
+  Datamap.prototype.sycTopo = '__SYC__';
+  Datamap.prototype.syrTopo = '__SYR__';
+  Datamap.prototype.tcaTopo = '__TCA__';
+  Datamap.prototype.tcdTopo = '__TCD__';
+  Datamap.prototype.tgoTopo = '__TGO__';
+  Datamap.prototype.thaTopo = '__THA__';
+  Datamap.prototype.tjkTopo = '__TJK__';
+  Datamap.prototype.tkmTopo = '__TKM__';
+  Datamap.prototype.tlsTopo = '__TLS__';
+  Datamap.prototype.tonTopo = '__TON__';
+  Datamap.prototype.ttoTopo = '__TTO__';
+  Datamap.prototype.tunTopo = '__TUN__';
+  Datamap.prototype.turTopo = '__TUR__';
+  Datamap.prototype.tuvTopo = '__TUV__';
+  Datamap.prototype.twnTopo = '__TWN__';
+  Datamap.prototype.tzaTopo = '__TZA__';
+  Datamap.prototype.ugaTopo = '__UGA__';
+  Datamap.prototype.ukrTopo = '__UKR__';
+  Datamap.prototype.umiTopo = '__UMI__';
+  Datamap.prototype.uryTopo = '__URY__';
   Datamap.prototype.usaTopo = '__USA__';
+  Datamap.prototype.usgTopo = '__USG__';
+  Datamap.prototype.uzbTopo = '__UZB__';
+  Datamap.prototype.vatTopo = '__VAT__';
+  Datamap.prototype.vctTopo = '__VCT__';
+  Datamap.prototype.venTopo = '__VEN__';
+  Datamap.prototype.vgbTopo = '__VGB__';
+  Datamap.prototype.virTopo = '__VIR__';
+  Datamap.prototype.vnmTopo = '__VNM__';
+  Datamap.prototype.vutTopo = '__VUT__';
+  Datamap.prototype.wlfTopo = '__WLF__';
+  Datamap.prototype.wsbTopo = '__WSB__';
+  Datamap.prototype.wsmTopo = '__WSM__';
+  Datamap.prototype.yemTopo = '__YEM__';
+  Datamap.prototype.zafTopo = '__ZAF__';
+  Datamap.prototype.zmbTopo = '__ZMB__';
+  Datamap.prototype.zweTopo = '__ZWE__';
 
   /**************************************
                 Utilities
@@ -12151,6 +12426,9 @@
         else if ( typeof subunitData.color === "string" ) {
           color = subunitData.color;
         }
+        else if ( typeof subunitData.fillColor === "string" ) {
+          color = subunitData.fillColor;
+        }
         else {
           color = this.options.fills[ subunitData.fillKey ];
         }
@@ -12176,8 +12454,11 @@
         .style('top', ( (position[1] + 30)) + "px")
         .html(function() {
           var data = JSON.parse(element.attr('data-info'));
-          //if ( !data ) return '';
-          return options.popupTemplate(d, data);
+          try {
+            return options.popupTemplate(d, data);
+          } catch (e) {
+            return "";
+          }
         })
         .style('left', ( position[0]) + "px");
     });
@@ -12220,8 +12501,18 @@
   };
 
   // expose library
-  if ( typeof define === "function" && define.amd ) {
-    define( "datamaps", function(require) { d3 = require('d3'); topojson = require('topojson'); return Datamap; } );
+  if (typeof exports === 'object') {
+    d3 = require('d3');
+    topojson = require('topojson');
+    module.exports = Datamap;
+  }
+  else if ( typeof define === "function" && define.amd ) {
+    define( "datamaps", ["require", "d3", "topojson"], function(require) {
+      d3 = require('d3');
+      topojson = require('topojson');
+
+      return Datamap;
+    });
   }
   else {
     window.Datamap = window.Datamaps = Datamap;

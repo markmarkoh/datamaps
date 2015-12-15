@@ -28,7 +28,7 @@
     "public"
   ],
   "dependencies": {
-    "d3": "~3.5.6",
+    "d3": "^3.5.6",
     "topojson": "^1.6.19"
   }
 }
