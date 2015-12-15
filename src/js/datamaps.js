@@ -371,6 +371,9 @@
             var sharpness = val(datum.arcSharpness, options.arcSharpness, datum);
             return "M" + originXY[0] + ',' + originXY[1] + "S" + (midXY[0] + (50 * sharpness)) + "," + (midXY[1] - (75 * sharpness)) + "," + destXY[0] + "," + destXY[1];
         })
+        .attr('data-info', function(datum) {
+          return JSON.stringify(datum);
+        })
         .transition()
           .delay(100)
           .style('fill', function(datum) {
@@ -479,8 +482,8 @@
           // if animation enabled start with radius 0, otherwise use full size.
           return options.animate ? 0 : val(datum.radius, options.radius, datum);
         })
-        .attr('data-info', function(d) {
-          return JSON.stringify(d);
+        .attr('data-info', function(datum) {
+          return JSON.stringify(datum);
         })
         .attr('filter', function (datum) {
           var filterKey = filterData[ val(datum.filterKey, options.filterKey, datum) ];
