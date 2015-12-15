@@ -335,6 +335,7 @@ For further customization, you can set these properties on each bubble to overri
 
   - `borderColor`
   - `borderWidth`
+  - `borderOpacity`
   - `fillOpacity`
 
 The second parameter is the `options` param, where you can overide any of the default options (documented below)
@@ -467,6 +468,7 @@ If the aspect ratio of your custom map is not the default `16:9` (`0.5625`), you
         dataUrl: null, //if not null, datamaps will fetch the map JSON (currently only supports topojson)
         hideAntarctica: true,
         borderWidth: 1,
+        borderOpacity: 1,
         borderColor: '#FDFDFD',
         popupTemplate: function(geography, data) { //this function should just return a string
           return '&lt;div class="hoverinfo"&gt;&lt;strong&gt;' + geography.properties.name + '&lt;/strong&gt;&lt;/div&gt;';
@@ -475,10 +477,12 @@ If the aspect ratio of your custom map is not the default `16:9` (`0.5625`), you
         highlightOnHover: true,
         highlightFillColor: '#FC8D59',
         highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
-        highlightBorderWidth: 2
+        highlightBorderWidth: 2,
+        highlightBorderOpacity: 1
     },
     bubblesConfig: {
         borderWidth: 2,
+        borderOpacity: 1,
         borderColor: '#FFFFFF',
         popupOnHover: true,
         radius: null,
@@ -491,6 +495,7 @@ If the aspect ratio of your custom map is not the default `16:9` (`0.5625`), you
         highlightFillColor: '#FC8D59',
         highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
         highlightBorderWidth: 2,
+        highlightBorderOpacity: 1,
         highlightFillOpacity: 0.85,
         exitDelay: 100,
         key: JSON.stringify
