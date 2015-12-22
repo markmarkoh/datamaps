@@ -430,13 +430,25 @@
             .style("stroke-width", options.lineWidth || 1)
         }
 
-        layer.append("text")
-          .attr("x", x)
-          .attr("y", y)
-          .style("font-size", (options.fontSize || 10) + 'px')
-          .style("font-family", options.fontFamily || "Verdana")
-          .style("fill", options.labelColor || "#000")
-          .text( d.id );
+          if (options.customLabelText && options.customLabelText[d.id]) {
+              layer.append("text")
+                  .attr("x", x)
+                  .attr("y", y)
+                  .style("font-size", (options.fontSize || 10) + 'px')
+                  .style("font-family", options.fontFamily || "Verdana")
+                  .style("fill", options.labelColor || "#000")
+                  .text( options.customLabelText[d.id] );
+          }
+          else {
+              layer.append("text")
+                  .attr("x", x)
+                  .attr("y", y)
+                  .style("font-size", (options.fontSize || 10) + 'px')
+                  .style("font-family", options.fontFamily || "Verdana")
+                  .style("fill", options.labelColor || "#000")
+                  .text( d.id );
+          }
+
         return "bar";
       });
   }
