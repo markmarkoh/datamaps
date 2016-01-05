@@ -5,7 +5,7 @@
   var d3 = window.d3, topojson = window.topojson;
 
   var defaultOptions = {
-    scope: 'world',
+    scope: 'usa',
     responsive: false,
     aspectRatio: 0.5625,
     setProjection: setProjection,
