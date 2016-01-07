@@ -6,29 +6,48 @@ module.exports = function(grunt) {
       world: {
         src: ['src/js/datamaps.js'],
         dest: 'src/rel/datamaps.world.js',
-        replacements: [{
-          from: '\'__WORLD__\'',
-          to: '<%= grunt.file.read("src/js/data/world.topo.json") %>'
-        }]
+        replacements: [
+        	{
+				from: '\'__DEFAULT__\'',
+				to: '\'world\''
+			},
+        	{
+				from: '\'__WORLD__\'',
+				to: '<%= grunt.file.read("src/js/data/world.topo.json") %>'
+        	}
+        ]
       },
       usa: {
         src: ['src/js/datamaps.js'],
         dest: 'src/rel/datamaps.usa.js',
-        replacements: [{
-          from: '\'__USA__\'',
-          to: '<%= grunt.file.read("src/js/data/usa.topo.json") %>'
-        }]
+        replacements: [
+        	{
+				from: '\'__DEFAULT__\'',
+				to: '\'usa\''
+			},
+        	{
+			  from: '\'__USA__\'',
+			  to: '<%= grunt.file.read("src/js/data/usa.topo.json") %>'
+        	}
+        ]
       },
       all: {
         src: ['src/js/datamaps.js'],
         dest: 'src/rel/datamaps.all.js',
-        replacements: [{
-          from: '\'__USA__\'',
-          to: '<%= grunt.file.read("src/js/data/usa.topo.json") %>'
-        }, {
-          from: '\'__WORLD__\'',
-          to: '<%= grunt.file.read("src/js/data/world.topo.json") %>'
-        }]
+        replacements: [
+        	{
+				from: '\'__DEFAULT__\'',
+				to: '\'world\''
+			},
+        	{
+          		from: '\'__USA__\'',
+		          to: '<%= grunt.file.read("src/js/data/usa.topo.json") %>'
+        	},
+        	{
+          		from: '\'__WORLD__\'',
+          		to: '<%= grunt.file.read("src/js/data/world.topo.json") %>'
+        	}
+        ]
       }
     },
     watch: {
