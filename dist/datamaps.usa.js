@@ -975,8 +975,19 @@
       .attr('class', className || '');
   };
 
-  Datamap.prototype.updateChoropleth = function(data) {
+  Datamap.prototype.updateChoropleth = function(data, options) {
     var svg = this.svg;
+    var that = this;
+
+    // when options.reset = true, reset all the fill colors to the defaultFill and kill all data-info
+    if ( options && options.reset === true ) {
+      svg.selectAll('.datamaps-subunit')
+        .attr('data-info', function() {
+           return "{}"
+        })
+        .transition().style('fill', this.options.fills.defaultFill)
+    }
+
     for ( var subunit in data ) {
       if ( data.hasOwnProperty(subunit) ) {
         var color;
