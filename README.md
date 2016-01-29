@@ -196,6 +196,24 @@ map.updateChoropleth({
 
 You can specify either a literal color (as a string), or an object with a fillKey property.
 
+
+#### Reseting a choropleth to `defaultFill`
+
+The following will reset the entire map to the `defaultFill` and update `CA` to be filled green.
+```js
+map.updateChoropleth({CA: 'green'}, {reset: true})
+```
+
+The following will reset the entire map to `defaultFill`
+```js
+map.updateChoropleth(null, {reset: true})
+```
+
+The following will reset the entire map to `defaultFill`, but update the corresponding data of NY.
+```js
+map.updateChoropleth({NY: {numberOfVoters: 55452}}, {reset: true})
+```
+
 You can also add a map legend with the `legend` plugin (used above)
 
 #### Choropleth with auto-calculated color
