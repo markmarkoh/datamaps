@@ -197,7 +197,7 @@ map.updateChoropleth({
 You can specify either a literal color (as a string), or an object with a fillKey property.
 
 
-#### Reseting a choropleth to `defaultFill`
+#### Resetting a choropleth to `defaultFill`
 
 The following will reset the entire map to the `defaultFill` and update `CA` to be filled green.
 ```js
