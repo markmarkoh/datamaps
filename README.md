@@ -1,6 +1,8 @@
 Datamaps
 ======
 
+[![Join the chat at https://gitter.im/markmarkoh/datamaps](https://badges.gitter.im/markmarkoh/datamaps.svg)](https://gitter.im/markmarkoh/datamaps?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 #### Interactive maps for data visualizations. Bundled into a single Javascript file.
 
 Datamaps is intended to provide some data visualizations based on geographical data. It's SVG-based, can scale to any screen size, and includes everything inside of 1 script file.
