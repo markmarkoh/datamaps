@@ -357,8 +357,20 @@
             return val(datum.strokeWidth, options.strokeWidth, datum);
         })
         .attr('d', function(datum) {
-            var originXY = self.latLngToXY(val(datum.origin.latitude, datum), val(datum.origin.longitude, datum))
-            var destXY = self.latLngToXY(val(datum.destination.latitude, datum), val(datum.destination.longitude, datum));
+
+            var originXY, destXY;
+
+            if (typeof datum.origin === "string") {
+              originXY = self.path.centroid(svg.select('path.' + datum.origin).data()[0])
+            } else {
+              originXY = self.latLngToXY(val(datum.origin.latitude, datum), val(datum.origin.longitude, datum))
+            }
+
+            if (typeof datum.destination === 'string') {
+              destXY = self.path.centroid(svg.select('path.' + datum.destination).data()[0])
+            } else {
+              destXY = self.latLngToXY(val(datum.destination.latitude, datum), val(datum.destination.longitude, datum));
+            }
             var midXY = [ (originXY[0] + destXY[0]) / 2, (originXY[1] + destXY[1]) / 2];
             if (options.greatArc) {
                   // TODO: Move this to inside `if` clause when setting attr `d`
