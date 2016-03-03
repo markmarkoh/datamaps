@@ -188,6 +188,10 @@ You'll need to know the 2 letter state code ('NY' for New York) or the 3 letter 
 
 This will draw a world map and fill in IRL (Ireland) with the corresponding `fills.LOW` and USA with `fills.MEDIUM`.
 
+You can also use `fill: color` for each state if you don't want to define a `fillkey`.
+
+Colors will be applied in this order: `fillKey`, `fill`, `defaultFill`.
+
 #### Updating a choropleth after initial drawing
 ```javascript
 map.updateChoropleth({
@@ -381,7 +385,7 @@ The following options are allowed:
   - `lineWidth` //line width for New England states, default: 1
   - `fontSize` //font size, default: 10
   - `fontFamily` //font family, default: 'Verdana'
-  - `customLabelText` //replaces 2 letter labels with custom 
+  - `customLabelText` //replaces 2 letter labels with custom
 
 An example for using the options:
 
@@ -391,7 +395,7 @@ map.labels({labelColor: 'blue', fontSize: 12});
 
 An example for using the customLabelText
 
-This accepts an object whose keys are uppercase 2 letter state codes. 
+This accepts an object whose keys are uppercase 2 letter state codes.
 Values will be substituted for default label text
 Any missing values default to 2 state letters
 ```javascript
@@ -498,6 +502,7 @@ If the aspect ratio of your custom map is not the default `16:9` (`0.5625`), you
     geographyConfig: {
         dataUrl: null, //if not null, datamaps will fetch the map JSON (currently only supports topojson)
         hideAntarctica: true,
+        hideHawaiiAndAlaska : false,
         borderWidth: 1,
         borderOpacity: 1,
         borderColor: '#FDFDFD',
