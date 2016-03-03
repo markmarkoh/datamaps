@@ -64,7 +64,7 @@
       animationSpeed: 600,
       popupOnHover: false,
       popupTemplate: function(geography, data) {
-        // Case with latitude and logitude
+        // Case with latitude and longitude
         if ( ( data.origin && data.destination ) && data.origin.latitude && data.origin.longitude && data.destination.latitude && data.destination.longitude ) {
           return '<div class="hoverinfo"><strong>Arc</strong><br>Origin: ' + JSON.stringify(data.origin) + '<br>Destination: ' + JSON.stringify(data.destination) + '</div>';
         }

@@ -94,7 +94,7 @@ A map of the USA with an Albers based projection will be default if you only inc
     var map = new Datamap({
         element: document.getElementById('container'),
         fills: {
-            defaultFill: 'rgba(23,48,210,0.9)' //any hex, color name or rgb/rgba value
+            defaultFill: 'rgba(23,48,210,0.9)' // Any hex, color name or rgb/rgba value
         }
     });
 </script>
@@ -181,14 +181,14 @@ You'll need to know the 2 letter state code ('NY' for New York) or the 3 letter 
         }
     });
 
-    //draw a legend for this map
+    // Draw a legend for this map
     map.legend();
 </script>
 ```
 
 This will draw a world map and fill in IRL (Ireland) with the corresponding `fills.LOW` and USA with `fills.MEDIUM`.
 
-You can also use `fill: color` for each state if you don't want to define a `fillkey`.
+You can also use `fill: color` for each state if you don't want to define a `fillKey`.
 
 Colors will be applied in this order: `fillKey`, `fill`, `defaultFill`.
 
@@ -230,7 +230,7 @@ Example [highmaps_world.html](src/examples/highmaps_world.html) explains how to 
 
 #### Custom popup on hover
 
-Expanding on the previous example of using `data`, any property passed into `data` will be sent to the `popupTemplate` function, which can be overriden to display custom messages.
+Expanding on the previous example of using `data`, any property passed into `data` will be sent to the `popupTemplate` function, which can be override to display custom messages.
 ```html
 <script>
     var map = new Datamap({
@@ -264,7 +264,7 @@ Expanding on the previous example of using `data`, any property passed into `dat
 </script>
 ```
 
-`geographyConfig.popupTemplate` just needs to return an HTML string, so feel free to use [Handlebars](https://github.com/wycats/handlebars.js/) or [Underscore](http://underscorejs.org/#template) templates (instead of the terrible Array.join method above).
+`geographyConfig.popupTemplate`, `bubblesConfig.popupTemplate` and `arcConfig.popupTemplate` just needs to return an HTML string, so feel free to use [Handlebars](https://github.com/wycats/handlebars.js/) or [Underscore](http://underscorejs.org/#template) templates (instead of the terrible Array.join method above).
 
 
 #### Bubbles
@@ -362,7 +362,7 @@ For further customization, you can set these properties on each bubble to overri
   - `borderOpacity`
   - `fillOpacity`
 
-The second parameter is the `options` param, where you can overide any of the default options (documented below)
+The second parameter is the `options` param, where you can override any of the default options (documented below)
 
 
 #### Live updating of bubbles
@@ -381,11 +381,11 @@ map.labels();
 
 The following options are allowed:
 
-  - `labelColor` //font color, default: #000
-  - `lineWidth` //line width for New England states, default: 1
-  - `fontSize` //font size, default: 10
-  - `fontFamily` //font family, default: 'Verdana'
-  - `customLabelText` //replaces 2 letter labels with custom
+  - `labelColor` // Font color, default: #000
+  - `lineWidth` // Line width for New England states, default: 1
+  - `fontSize` // Font size, default: 10
+  - `fontFamily` // Font family, default: 'Verdana'
+  - `customLabelText` // Replaces 2 letter labels with custom
 
 An example for using the options:
 
@@ -467,16 +467,17 @@ If the aspect ratio of your custom map is not the default `16:9` (`0.5625`), you
         responsive: true
     });
 
+    // Pure JavaScript
     window.addEventListener('resize', function() {
         map.resize();
     });
 
-    //alternatively with d3
+    // Alternatively with d3
     d3.select(window).on('resize', function() {
         map.resize();
     });
 
-    //alternatively with jQuery
+    // Alternatively with jQuery
     $(window).on('resize', function() {
        map.resize();
     });
@@ -487,26 +488,26 @@ If the aspect ratio of your custom map is not the default `16:9` (`0.5625`), you
 #### Default Options
 ```js
   {
-    scope: 'world', //currently supports 'usa' and 'world', however with custom map data you can specify your own
-    setProjection: setProjection, //returns a d3 path and projection functions
-    projection: 'equirectangular', //style of projection to be used. try "mercator"
-    height: null, //if not null, datamaps will grab the height of 'element'
-    width: null, //if not null, datamaps will grab the width of 'element',
-    responsive: false, //if true, call `resize()` on the map object when it should adjust it's size
-    done: function() {}, //callback when the map is done drawing
+    scope: 'world', // Currently supports 'usa' and 'world', however with custom map data you can specify your own
+    setProjection: setProjection, // Returns a d3 path and projection functions
+    projection: 'equirectangular', // Style of projection to be used. try "mercator"
+    height: null, // If not null, datamaps will grab the height of 'element'
+    width: null, // If not null, datamaps will grab the width of 'element',
+    responsive: false, // If true, call `resize()` on the map object when it should adjust it's size
+    done: function() {}, // Callback when the map is done drawing
     fills: {
-      defaultFill: '#ABDDA4' //the keys in this object map to the "fillKey" of [data] or [bubbles]
+      defaultFill: '#ABDDA4' // The keys in this object map to the "fillKey" of [data] or [bubbles]
     },
-    dataType: 'json', //for use with dataUrl, currently 'json' or 'csv'. CSV should have an `id` column
-    dataUrl: null, //if not null, datamaps will attempt to fetch this based on dataType ( default: json )
+    dataType: 'json', // For use with dataUrl, currently 'json' or 'csv'. CSV should have an `id` column
+    dataUrl: null, // If not null, datamaps will attempt to fetch this based on dataType ( default: json )
     geographyConfig: {
-        dataUrl: null, //if not null, datamaps will fetch the map JSON (currently only supports topojson)
+        dataUrl: null, // If not null, datamaps will fetch the map JSON (currently only supports topojson)
         hideAntarctica: true,
         hideHawaiiAndAlaska : false,
         borderWidth: 1,
         borderOpacity: 1,
         borderColor: '#FDFDFD',
-        popupTemplate: function(geography, data) { //this function should just return a string
+        popupTemplate: function(geography, data) { // This function should just return a string
           return '&lt;div class="hoverinfo"&gt;&lt;strong&gt;' + geography.properties.name + '&lt;/strong&gt;&lt;/div&gt;';
         },
         popupOnHover: true, //disable the popup while hovering
@@ -522,7 +523,7 @@ If the aspect ratio of your custom map is not the default `16:9` (`0.5625`), you
         borderColor: '#FFFFFF',
         popupOnHover: true,
         radius: null,
-        popupTemplate: function(geography, data) {
+        popupTemplate: function(geography, data) { // This function should just return a string
           return '<div class="hoverinfo"><strong>' + data.name + '</strong></div>';
         },
         fillOpacity: 0.75,
@@ -540,7 +541,22 @@ If the aspect ratio of your custom map is not the default `16:9` (`0.5625`), you
       strokeColor: '#DD1C77',
       strokeWidth: 1,
       arcSharpness: 1,
-      animationSpeed: 600
+      animationSpeed: 600,
+      popupOnHover: false,
+      popupTemplate: function(geography, data) { // This function should just return a string
+        // Case with latitude and longitude
+        if ( ( data.origin && data.destination ) && data.origin.latitude && data.origin.longitude && data.destination.latitude && data.destination.longitude ) {
+          return '<div class="hoverinfo"><strong>Arc</strong><br>Origin: ' + JSON.stringify(data.origin) + '<br>Destination: ' + JSON.stringify(data.destination) + '</div>';
+        }
+        // Case with only country name
+        else if ( data.origin && data.destination ) {
+          return '<div class="hoverinfo"><strong>Arc</strong><br>' + data.origin + ' -> ' + data.destination + '</div>';
+        }
+        // Missing information
+        else {
+          return '';
+        }
+      }
     }
   }
 ```
