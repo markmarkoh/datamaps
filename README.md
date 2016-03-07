@@ -534,14 +534,14 @@ If the aspect ratio of your custom map is not the default `16:9` (`0.5625`), you
         highlightBorderWidth: 2,
         highlightBorderOpacity: 1,
         highlightFillOpacity: 0.85,
-        exitDelay: 100,
+        exitDelay: 100, // Milliseconds
         key: JSON.stringify
     },
     arcConfig: {
       strokeColor: '#DD1C77',
       strokeWidth: 1,
       arcSharpness: 1,
-      animationSpeed: 600,
+      animationSpeed: 600, // Milliseconds
       popupOnHover: false,
       popupTemplate: function(geography, data) { // This function should just return a string
         // Case with latitude and longitude
