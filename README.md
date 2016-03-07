@@ -510,7 +510,7 @@ If the aspect ratio of your custom map is not the default `16:9` (`0.5625`), you
         popupTemplate: function(geography, data) { // This function should just return a string
           return '&lt;div class="hoverinfo"&gt;&lt;strong&gt;' + geography.properties.name + '&lt;/strong&gt;&lt;/div&gt;';
         },
-        popupOnHover: true, //disable the popup while hovering
+        popupOnHover: true, // True to show the popup while hovering
         highlightOnHover: true,
         highlightFillColor: '#FC8D59',
         highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
@@ -521,7 +521,7 @@ If the aspect ratio of your custom map is not the default `16:9` (`0.5625`), you
         borderWidth: 2,
         borderOpacity: 1,
         borderColor: '#FFFFFF',
-        popupOnHover: true,
+        popupOnHover: true, // True to show the popup while hovering
         radius: null,
         popupTemplate: function(geography, data) { // This function should just return a string
           return '<div class="hoverinfo"><strong>' + data.name + '</strong></div>';
@@ -542,7 +542,7 @@ If the aspect ratio of your custom map is not the default `16:9` (`0.5625`), you
       strokeWidth: 1,
       arcSharpness: 1,
       animationSpeed: 600, // Milliseconds
-      popupOnHover: false,
+      popupOnHover: false, // True to show the popup while hovering
       popupTemplate: function(geography, data) { // This function should just return a string
         // Case with latitude and longitude
         if ( ( data.origin && data.destination ) && data.origin.latitude && data.origin.longitude && data.destination.latitude && data.destination.longitude ) {
