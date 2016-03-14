@@ -1,7 +1,7 @@
 (function() {
   var svg;
 
-  //save off default references
+  // Save off default references
   var d3 = window.d3, topojson = window.topojson;
 
   var defaultOptions = {
@@ -61,7 +61,22 @@
       strokeColor: '#DD1C77',
       strokeWidth: 1,
       arcSharpness: 1,
-      animationSpeed: 600
+      animationSpeed: 600,
+      popupOnHover: false,
+      popupTemplate: function(geography, data) {
+        // Case with latitude and longitude
+        if ( ( data.origin && data.destination ) && data.origin.latitude && data.origin.longitude && data.destination.latitude && data.destination.longitude ) {
+          return '<div class="hoverinfo"><strong>Arc</strong><br>Origin: ' + JSON.stringify(data.origin) + '<br>Destination: ' + JSON.stringify(data.destination) + '</div>';
+        }
+        // Case with only country name
+        else if ( data.origin && data.destination ) {
+          return '<div class="hoverinfo"><strong>Arc</strong><br>' + data.origin + ' -> ' + data.destination + '</div>';
+        }
+        // Missing information
+        else {
+          return '';
+        }
+      }
     }
   };
 
@@ -166,7 +181,6 @@
         colorCodeData = this.options.data || {},
         geoConfig = this.options.geographyConfig;
 
-
     var subunits = this.svg.select('g.datamaps-subunits');
     if ( subunits.empty() ) {
       subunits = this.addLayer('datamaps-subunits', null, true);
@@ -197,9 +211,9 @@
         return JSON.stringify( colorCodeData[d.id]);
       })
       .style('fill', function(d) {
-        //if fillKey - use that
-        //otherwise check 'fill'
-        //otherwise check 'defaultFill'
+        // If fillKey - use that
+        // Otherwise check 'fill'
+        // Otherwise check 'defaultFill'
         var fillColor;
 
         var datum = colorCodeData[d.id];
@@ -245,7 +259,7 @@
               .style('fill-opacity', val(datum.highlightFillOpacity, options.highlightFillOpacity, datum))
               .attr('data-previousAttributes', JSON.stringify(previousAttributes));
 
-            //as per discussion on https://github.com/markmarkoh/datamaps/issues/19
+            // As per discussion on https://github.com/markmarkoh/datamaps/issues/19
             if ( ! /((MSIE)|(Trident))/.test(navigator.userAgent) ) {
              moveToFront.call(this);
             }
@@ -259,7 +273,7 @@
           var $this = d3.select(this);
 
           if (options.highlightOnHover) {
-            //reapply previous attributes
+            // Reapply previous attributes
             var previousAttributes = JSON.parse( $this.attr('data-previousAttributes') );
             for ( var attr in previousAttributes ) {
               $this.style(attr, previousAttributes[attr]);
@@ -275,7 +289,7 @@
     }
   }
 
-  //plugin to add a simple map legend
+  // Plugin to add a simple map legend
   function addLegend(layer, data, options) {
     data = data || {};
     if ( !this.options.fills ) {
@@ -385,6 +399,18 @@
         })
         .attr('data-info', function(datum) {
           return JSON.stringify(datum);
+        })
+        .on('mouseover', function ( datum ) {
+          var $this = d3.select(this);
+
+          if (options.popupOnHover) {
+            self.updatePopup($this, datum, options, svg);
+          }
+        })
+        .on('mouseout', function ( datum ) {
+          var $this = d3.select(this);
+
+          d3.selectAll('.datamaps-hoverover').style('display', 'none');
         })
         .transition()
           .delay(100)
@@ -498,7 +524,7 @@
           if ( latLng ) return latLng[1];
         })
         .attr('r', function(datum) {
-          // if animation enabled start with radius 0, otherwise use full size.
+          // If animation enabled start with radius 0, otherwise use full size.
           return options.animate ? 0 : val(datum.radius, options.radius, datum);
         })
         .attr('data-info', function(datum) {
@@ -531,7 +557,7 @@
           var $this = d3.select(this);
 
           if (options.highlightOnHover) {
-            //save all previous attributes for mouseout
+            // Save all previous attributes for mouseout
             var previousAttributes = {
               'fill':  $this.style('fill'),
               'stroke': $this.style('stroke'),
@@ -588,7 +614,7 @@
     }
   }
 
-  //stolen from underscore.js
+  // Stolen from underscore.js
   function defaults(obj) {
     Array.prototype.slice.call(arguments, 1).forEach(function(source) {
       if (source) {
@@ -615,19 +641,19 @@
     this.options.bubblesConfig = defaults(options.bubblesConfig, defaultOptions.bubblesConfig);
     this.options.arcConfig = defaults(options.arcConfig, defaultOptions.arcConfig);
 
-    //add the SVG container
+    // Add the SVG container
     if ( d3.select( this.options.element ).select('svg').length > 0 ) {
       addContainer.call(this, this.options.element, this.options.height, this.options.width );
     }
 
-    /* Add core plugins to this instance */
+    // Add core plugins to this instance
     this.addPlugin('bubbles', handleBubbles);
     this.addPlugin('legend', addLegend);
     this.addPlugin('arc', handleArcs);
     this.addPlugin('labels', handleLabels);
     this.addPlugin('graticule', addGraticule);
 
-    //append style block with basic hoverover styles
+    // Append style block with basic hoverover styles
     if ( ! this.options.disableDefaultStyles ) {
       addStyleBlock();
     }
@@ -635,7 +661,7 @@
     return this.draw();
   }
 
-  // resize map
+  // Resize map
   Datamap.prototype.resize = function () {
 
     var self = this;
@@ -649,19 +675,19 @@
     }
   }
 
-  // actually draw the features(states & countries)
+  // Actually draw the features(states & countries)
   Datamap.prototype.draw = function() {
-    //save off in a closure
+    // Save off in a closure
     var self = this;
     var options = self.options;
 
-    //set projections and paths based on scope
+    // Set projections and paths based on scope
     var pathAndProjection = options.setProjection.apply(self, [options.element, options] );
 
     this.path = pathAndProjection.path;
     this.projection = pathAndProjection.projection;
 
-    //if custom URL for topojson data, retrieve it and render
+    // If custom URL for topojson data, retrieve it and render
     if ( options.geographyConfig.dataUrl ) {
       d3.json( options.geographyConfig.dataUrl, function(error, results) {
         if ( error ) throw new Error(error);
@@ -676,11 +702,11 @@
     return this;
 
       function draw (data) {
-        // if fetching remote data, draw the map first then call `updateChoropleth`
+        // If fetching remote data, draw the map first then call `updateChoropleth`
         if ( self.options.dataUrl ) {
-          //allow for csv or json data types
+          // Allow for csv or json data types
           d3[self.options.dataType](self.options.dataUrl, function(data) {
-            //in the case of csv, transform data to object
+            // In the case of csv, transform data to object
             if ( self.options.dataType === 'csv' && (data && data.slice) ) {
               var tmpData = {};
               for(var i = 0; i < data.length; i++) {
@@ -701,7 +727,7 @@
             .style('position', 'absolute');
         }
 
-        //fire off finished callback
+        // Fire off finished callback
         self.options.done(self);
       }
   };
@@ -12430,12 +12456,12 @@
                 Utilities
   ***************************************/
 
-  //convert lat/lng coords to X / Y coords
+  // Convert lat/lng coords to X / Y coords
   Datamap.prototype.latLngToXY = function(lat, lng) {
      return this.projection([lng, lat]);
   };
 
-  //add <g> layer to root SVG
+  // Add <g> layer to root SVG
   Datamap.prototype.addLayer = function( className, id, first ) {
     var layer;
     if ( first ) {
@@ -12452,7 +12478,7 @@
     var svg = this.svg;
     var that = this;
 
-    // when options.reset = true, reset all the fill colors to the defaultFill and kill all data-info
+    // When options.reset = true, reset all the fill colors to the defaultFill and kill all data-info
     if ( options && options.reset === true ) {
       svg.selectAll('.datamaps-subunit')
         .attr('data-info', function() {
@@ -12480,7 +12506,7 @@
         else {
           color = this.options.fills[ subunitData.fillKey ];
         }
-        //if it's an object, overriding the previous data
+        // If it's an object, overriding the previous data
         if ( subunitData === Object(subunitData) ) {
           this.options.data[subunit] = defaults(subunitData, this.options.data[subunit] || {});
           var geo = this.svg.select('.' + subunit).attr('data-info', JSON.stringify(this.options.data[subunit]));
@@ -12530,7 +12556,7 @@
 
         options = defaults(options || {}, self.options[name + 'Config']);
 
-        //add a single layer, reuse the old layer
+        // Add a single layer, reuse the old layer
         if ( !createNewLayer && this.options[name + 'Layer'] ) {
           layer = this.options[name + 'Layer'];
           options = options || this.options[name + 'Options'];
@@ -12548,7 +12574,7 @@
     }
   };
 
-  // expose library
+  // Expose library
   if (typeof exports === 'object') {
     d3 = require('d3');
     topojson = require('topojson');
