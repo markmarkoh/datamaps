@@ -11,6 +11,14 @@ module.exports = function(grunt) {
           to: '<%= grunt.file.read("src/js/data/world.topo.json") %>'
         }]
       },
+      worldHiRes: {
+        src: ['src/js/datamaps.js'],
+        dest: 'src/rel/datamaps.world.hires.js',
+        replacements: [{
+          from: '\'__WORLD__\'',
+          to: '<%= grunt.file.read("src/js/data/world.hires.topo.json") %>'
+        }]
+      },
       usa: {
         src: ['src/js/datamaps.js'],
         dest: 'src/rel/datamaps.usa.js',
@@ -29,6 +37,17 @@ module.exports = function(grunt) {
           from: '\'__WORLD__\'',
           to: '<%= grunt.file.read("src/js/data/world.topo.json") %>'
         }]
+      },
+      allHiRes: {
+        src: ['src/js/datamaps.js'],
+        dest: 'src/rel/datamaps.all.hires.js',
+        replacements: [{
+          from: '\'__USA__\'',
+          to: '<%= grunt.file.read("src/js/data/usa.topo.json") %>'
+        }, {
+          from: '\'__WORLD__\'',
+          to: '<%= grunt.file.read("src/js/data/world.hires.topo.json") %>'
+        }]
       }
     },
     watch: {
@@ -41,8 +60,10 @@ module.exports = function(grunt) {
       dist: {
         files: {
           'src/rel/datamaps.world.min.js': ['src/rel/datamaps.world.js'],
+          'src/rel/datamaps.world.hires.min.js': ['src/rel/datamaps.world.hires.js'],
           'src/rel/datamaps.usa.min.js': ['src/rel/datamaps.usa.js'],
           'src/rel/datamaps.all.min.js': ['src/rel/datamaps.all.js'],
+          'src/rel/datamaps.all.hires.min.js': ['src/rel/datamaps.all.hires.js'],
           'src/rel/datamaps.none.min.js': ['src/js/datamaps.js']
         }
       }
