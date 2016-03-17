@@ -1,8 +1,8 @@
-(function() {
+(function(root) {
   var svg;
 
   // Save off default references
-  var d3 = window.d3, topojson = window.topojson;
+  var d3 = root.d3, topojson = root.topojson;
 
   var defaultOptions = {
     scope: 'world',
@@ -12589,11 +12589,11 @@
     });
   }
   else {
-    window.Datamap = window.Datamaps = Datamap;
+    root.Datamap = root.Datamaps = Datamap;
   }
 
-  if ( window.jQuery ) {
-    window.jQuery.fn.datamaps = function(options, callback) {
+  if ( root.jQuery ) {
+    root.jQuery.fn.datamaps = function(options, callback) {
       options = options || {};
       options.element = this[0];
       var datamap = new Datamap(options);
@@ -12603,4 +12603,4 @@
       return this;
     };
   }
-})();
+})(this);
