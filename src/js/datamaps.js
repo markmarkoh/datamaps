@@ -411,6 +411,17 @@
           var $this = d3.select(this);
 
           d3.selectAll('.datamaps-hoverover').style('display', 'none');
+        }).attr('marker-end',function(datum){
+          // In case of map, add individual arrow/markers sometimes is needed
+          // this allow more precise control of individual arrow  
+          // animation for endarrow temporailiy not handled 
+          if (typeof datum.markerEndElementID === 'string') {
+            return 'url(#' + datum.markerEndElementID + ')';
+          }else return '';
+        }).attr('marker-start',function(datum){
+          if (typeof datum.markerStartElementID === 'string') {
+            return 'url(#' + datum.markerStartElementID + ')';
+          }else return '';
         })
         .transition()
           .delay(100)
@@ -427,7 +438,7 @@
             this.style.transition = this.style.WebkitTransition = 'stroke-dashoffset ' + val(datum.animationSpeed, options.animationSpeed, datum) + 'ms ease-out';
             this.style.strokeDashoffset = '0';
             return 'none';
-          })
+          }); 
 
     arcs.exit()
       .transition()
@@ -1143,3 +1154,5 @@
     };
   }
 })();
+
+
