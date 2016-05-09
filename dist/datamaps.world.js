@@ -582,7 +582,7 @@
           var $this = d3.select(this);
 
           if (options.highlightOnHover) {
-            //reapply previous attributes
+            // Reapply previous attributes
             var previousAttributes = JSON.parse( $this.attr('data-previousAttributes') );
             for ( var attr in previousAttributes ) {
               $this.style(attr, previousAttributes[attr]);
@@ -614,12 +614,19 @@
     }
   }
 
-  // Stolen from underscore.js
   function defaults(obj) {
     Array.prototype.slice.call(arguments, 1).forEach(function(source) {
       if (source) {
         for (var prop in source) {
-          if (obj[prop] == null) obj[prop] = source[prop];
+          // Deep copy if property not set
+          if (obj[prop] == null) {
+            if (typeof source[prop] == 'function') {
+              obj[prop] = source[prop].bind({});
+            }
+            else {
+              obj[prop] = JSON.parse(JSON.stringify(source[prop]));
+            }
+          }
         }
       }
     });
@@ -634,7 +641,7 @@
     if ( typeof d3 === 'undefined' || typeof topojson === 'undefined' ) {
       throw new Error('Include d3.js (v3.0.3 or greater) and topojson on this page before creating a new map');
    }
-    //set options for global use
+    // Set options for global use
     this.options = defaults(options, defaultOptions);
     this.options.geographyConfig = defaults(options.geographyConfig, defaultOptions.geographyConfig);
     this.options.projectionConfig = defaults(options.projectionConfig, defaultOptions.projectionConfig);
