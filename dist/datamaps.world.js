@@ -621,7 +621,7 @@
           // Deep copy if property not set
           if (obj[prop] == null) {
             if (typeof source[prop] == 'function') {
-              obj[prop] = source[prop].bind({});
+              obj[prop] = source[prop];
             }
             else {
               obj[prop] = JSON.parse(JSON.stringify(source[prop]));
@@ -689,7 +689,7 @@
     var options = self.options;
 
     // Set projections and paths based on scope
-    var pathAndProjection = options.setProjection.apply(self, [options.element, options] );
+    var pathAndProjection = options.setProjection.apply(this, [options.element, options] );
 
     this.path = pathAndProjection.path;
     this.projection = pathAndProjection.projection;
