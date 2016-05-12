@@ -172,7 +172,7 @@
   function addStyleBlock() {
     if ( d3.select('.datamaps-style-block').empty() ) {
       d3.select('head').append('style').attr('class', 'datamaps-style-block')
-      .html('.datamap path.datamaps-graticule { fill: none; stroke: #777; stroke-width: 0.5px; stroke-opacity: .5; pointer-events: none; } .datamap .labels {pointer-events: none;} .datamap path {stroke: #FFFFFF; stroke-width: 1px;} .datamaps-legend dt, .datamaps-legend dd { float: left; margin: 0 3px 0 0;} .datamaps-legend dd {width: 20px; margin-right: 6px; border-radius: 3px;} .datamaps-legend {padding-bottom: 20px; z-index: 1001; position: absolute; left: 4px; font-size: 12px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;} .datamaps-hoverover {display: none; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; } .hoverinfo {padding: 4px; border-radius: 1px; background-color: #FFF; box-shadow: 1px 1px 5px #CCC; font-size: 12px; border: 1px solid #CCC; } .hoverinfo hr {border:1px dotted #CCC; }');
+      .html('.datamap path.datamaps-graticule { fill: none; stroke: #777; stroke-width: 0.5px; stroke-opacity: .5; pointer-events: none; } .datamap .labels {pointer-events: none;} .datamap path, .datamap circle, .datamap line {stroke: #FFFFFF; vector-effect: non-scaling-stroke; stroke-width: 1px;} .datamaps-legend dt, .datamaps-legend dd { float: left; margin: 0 3px 0 0;} .datamaps-legend dd {width: 20px; margin-right: 6px; border-radius: 3px;} .datamaps-legend {padding-bottom: 20px; z-index: 1001; position: absolute; left: 4px; font-size: 12px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;} .datamaps-hoverover {display: none; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; } .hoverinfo {padding: 4px; border-radius: 1px; background-color: #FFF; box-shadow: 1px 1px 5px #CCC; font-size: 12px; border: 1px solid #CCC; } .hoverinfo hr {border:1px dotted #CCC; }');
     }
   }
 
@@ -621,7 +621,7 @@
           // Deep copy if property not set
           if (obj[prop] == null) {
             if (typeof source[prop] == 'function') {
-              obj[prop] = source[prop].bind({});
+              obj[prop] = source[prop];
             }
             else {
               obj[prop] = JSON.parse(JSON.stringify(source[prop]));
@@ -689,7 +689,7 @@
     var options = self.options;
 
     // Set projections and paths based on scope
-    var pathAndProjection = options.setProjection.apply(self, [options.element, options] );
+    var pathAndProjection = options.setProjection.apply(this, [options.element, options] );
 
     this.path = pathAndProjection.path;
     this.projection = pathAndProjection.projection;
