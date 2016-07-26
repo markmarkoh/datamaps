@@ -68,17 +68,6 @@ module.exports = function(grunt) {
         }
       }
     },
-    jasmine: {
-      all: [
-        'src/tests/SpecRunner_StatesGlobal.html',
-        'src/tests/SpecRunner_StatesStripped.html',
-        'src/tests/SpecRunner_CountriesStripped.html',
-        'src/tests/SpecRunner_CountriesGlobal.html',
-        'src/tests/SpecRunner_AllStripped.html',
-        'src/tests/SpecRunner_AllGlobal.html',
-        'src/tests/SpecRunner_jQueryPlugin.html'
-      ]
-    },
     copy: {
       all: {
         files: [
@@ -93,6 +82,11 @@ module.exports = function(grunt) {
       options: {
         include: ['name', 'version', 'main', 'dependencies']
       }
+    },
+    karma: {
+      unit: {
+        configFile: 'tests/karma.conf.js'
+      }
     }
   });
 
@@ -103,9 +97,12 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-sync-pkg');
+  grunt.loadNpmTasks('grunt-karma');
+
 
 
   grunt.registerTask('dev', ['replace']);
+  grunt.registerTask('test', ['karma'])
   grunt.registerTask('build', ['replace', 'uglify:dist', 'copy', 'sync']);
 
 };
