@@ -376,14 +376,8 @@
 
             if (typeof datum.origin === "string") {
                switch (datum.origin) {
-                    case  "USA":
-                        originXY = self.latLngToXY(41.140276, -100.760145)
-                        break;
                     case "CAN":
                         originXY = self.latLngToXY(56.624472, -114.665293);
-                        break;
-                    case "JPN":
-                        originXY = self.latLngToXY(35.689487, 139.691706);
                         break;
                     case "CHL":
                         originXY = self.latLngToXY(-33.448890, -70.669265);
@@ -391,11 +385,20 @@
                     case "IDN":
                         originXY = self.latLngToXY(-6.208763, 106.845599);
                         break;
+                    case "JPN":
+                        originXY = self.latLngToXY(35.689487, 139.691706);
+                        break;
                     case "MYS":
                         originXY = self.latLngToXY(14.599512, 120.984219);
                         break;
                     case "NOR":
                         originXY = self.latLngToXY(59.913869, 10.752245);
+                        break;
+                    case "USA":
+                        originXY = self.latLngToXY(41.140276, -100.760145)
+                        break;
+                    case "VNM":
+                        originXY = self.latLngToXY(21.027764, 105.834160);
                         break;
                     default: 
                         originXY = self.path.centroid(svg.select('path.' + datum.origin).data()[0]);
@@ -406,14 +409,8 @@
 
             if (typeof datum.destination === 'string') {
               switch (datum.destination) {
-                    case "USA":
-                        destXY = self.latLngToXY(41.140276, -100.760145);
-                        break;
-                    case "CAN":
+                     case "CAN":
                         destXY = self.latLngToXY(56.624472, -114.665293);
-                        break;
-                    case "JPN":
-                        destXY = self.latLngToXY(35.689487, 139.691706);
                         break;
                     case "CHL":
                         destXY = self.latLngToXY(-33.448890, -70.669265);
@@ -421,11 +418,20 @@
                     case "IDN":
                         destXY = self.latLngToXY(-6.208763, 106.845599);
                         break;
+                    case "JPN":
+                        destXY = self.latLngToXY(35.689487, 139.691706);
+                        break;
                     case "MYS":
                         destXY = self.latLngToXY(14.599512, 120.984219);
                         break;
                     case "NOR":
                         destXY = self.latLngToXY(59.913869, 10.752245);
+                        break;
+                    case "USA":
+                        destXY = self.latLngToXY(41.140276, -100.760145);
+                        break;
+                    case "VNM":
+                        destXY = self.latLngToXY(21.027764, 105.834160);
                         break;
                     default:
                         destXY = self.path.centroid(svg.select('path.' + datum.destination).data()[0]);
