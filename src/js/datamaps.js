@@ -389,13 +389,13 @@
                         originXY = self.latLngToXY(35.689487, 139.691706);
                         break;
                     case "MYS":
-                        originXY = self.latLngToXY(14.599512, 120.984219);
+                        originXY = self.latLngToXY(3.139003, 101.686855);
                         break;
                     case "NOR":
                         originXY = self.latLngToXY(59.913869, 10.752245);
                         break;
                     case "USA":
-                        originXY = self.latLngToXY(41.140276, -100.760145)
+                        originXY = self.latLngToXY(41.140276, -100.760145);
                         break;
                     case "VNM":
                         originXY = self.latLngToXY(21.027764, 105.834160);
@@ -422,7 +422,7 @@
                         destXY = self.latLngToXY(35.689487, 139.691706);
                         break;
                     case "MYS":
-                        destXY = self.latLngToXY(14.599512, 120.984219);
+                        destXY = self.latLngToXY(3.139003, 101.686855);
                         break;
                     case "NOR":
                         destXY = self.latLngToXY(59.913869, 10.752245);
