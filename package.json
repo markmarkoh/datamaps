@@ -4,6 +4,12 @@
   "description": "datamaps with d3.js",
   "version": "0.5.7",
   "author": "Mark DiMarco<markmarkoh@gmail.com>",
+  "contributors": [
+    "Enrico Berti (https://github.com/enricoberti)",
+    "Matteo Guarnerio (http://matteoguarnerio.com)",
+    "Adrian Jones (https://github.com/adrianbj)",
+    "Dave Long <dave@davejlong.com> (https://github.com/davejlong)"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
