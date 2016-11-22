@@ -1126,9 +1126,12 @@
           var geo = this.svg.select('.' + subunit).attr('data-info', JSON.stringify(this.options.data[subunit]));
         }
         svg
-          .selectAll('.' + subunit)
+          // If the subunit is of the form `XX.YY`, it will cause issues
+          // with creating a valid CSS selector. So we'll need to replace
+          // any "." inside the subunit with an escaped "\\.".
+          .selectAll('.' + subunit.replace('.', '\\.'))
           .transition()
-            .style('fill', color);
+          .style('fill', color);
       }
     }
   };
