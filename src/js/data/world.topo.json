@@ -500,7 +500,7 @@
                 "properties": {
                     "name": "Northern Cyprus"
                 },
-                "id": "-99",
+                "id": "CYP",
                 "arcs": [
                     [216, 217]
                 ]
@@ -1041,7 +1041,7 @@
                 "properties": {
                     "name": "Kosovo"
                 },
-                "id": "-99",
+                "id": "XKX",
                 "arcs": [
                     [-18, 405, 406, 407]
                 ]
