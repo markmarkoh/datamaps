@@ -500,7 +500,7 @@
                 "properties": {
                     "name": "Northern Cyprus"
                 },
-                "id": "CYP",
+                "id": "-99",
                 "arcs": [
                     [216, 217]
                 ]
