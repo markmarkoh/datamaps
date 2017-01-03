@@ -717,7 +717,7 @@
     this.options.arcConfig = defaults(options.arcConfig, defaultOptions.arcConfig);
 
     // Add the SVG container
-    if ( d3.select( this.options.element ).select('svg').length > 0 ) {
+    if ( d3.select( this.options.element ).select('svg').empty() ) {
       addContainer.call(this, this.options.element, this.options.height, this.options.width );
     }
 
