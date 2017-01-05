@@ -224,7 +224,9 @@ You can also add a map legend with the `legend` plugin (used above)
 
 #### Choropleth with auto-calculated color
 
-Example [highmaps_world.html](src/examples/highmaps_world.html) explains how to create colorized map based on some quantity of things, like here [In the USA, Who Runs the Fastest, the Farthest...](http://data.runkeeper.com/rk-usa-running-stats-by-state). Example showcase:
+Example [highmaps_world.html](src/examples/highmaps_world.html) explains how to create colorized map based on some quantity of things, [Live Demo](http://jsbin.com/kuvojohapi/1/edit?html,output)
+
+Example result:
 
 ![auto calculated color](/src/screenshots/datamap_highmap_exmaple.jpg)
 
