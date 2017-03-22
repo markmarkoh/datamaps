@@ -12,6 +12,7 @@
         <div id="container1" style="border:1px dotted blue; width: 700px; height: 475px; position: relative;"></div>
         <script src="/public/js/components/d3/d3.min.js"></script>
         <script src="/public/js/components/topojson/topojson.js"></script>
+        <!-- <script src="/public/js/json2.js"></script> -->
         <script src="/public/rel/datamaps.all.js"></script>
         <script>
 
@@ -20,6 +21,7 @@
         element: document.getElementById('container1'),
         projection: 'mercator',
         geographyConfig: {
+            popupOnHover: false,
           highlightBorderColor: '#bada55',
          popupTemplate: function(geography, data) {
             if ( data )

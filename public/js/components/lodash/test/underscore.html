@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Underscore Test Suite</title>
+		<link rel="stylesheet" href="../vendor/qunit/qunit/qunit.css">
+		<style>
+			iframe {
+				display: none;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="qunit"></div>
+		<div id="qunit-fixture">
+			<div id="map-test">
+				<div id="id1"></div>
+				<div id="id2"></div>
+			</div>
+			<img id="chart_image" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==">
+		</div>
+		<script src="../vendor/qunit/qunit/qunit.js"></script>
+		<script src="../vendor/jquery/jquery.js"></script>
+		<script src="../vendor/platform.js/platform.js"></script>
+		<script src="test-ui.js"></script>
+		<script>
+			function init(lodash) {
+				var arrayRef = [],
+				    push = arrayRef.push;
+
+				if (!lodash().map()) {
+					return;
+				}
+				lodash.mixin = function(object) {
+					lodash.forEach(lodash.functions(object), function(methodName) {
+						var func = lodash[methodName] = object[methodName];
+						lodash.prototype[methodName] = function() {
+							var args = [this.__wrapped__];
+							push.apply(args, arguments);
+
+							var result = func.apply(lodash, args);
+							if (this.__chain__) {
+								result = new lodash(result);
+								result.__chain__ = true;
+							}
+							return result;
+						};
+					});
+				};
+
+				lodash.forEach(['pop', 'shift'], function(methodName) {
+					var func = arrayRef[methodName];
+					lodash.prototype[methodName] = function() {
+						func.apply(this.__wrapped__, arguments);
+						return this;
+					};
+				});
+
+
+				lodash.mixin(lodash);
+
+				// expose lodash
+				window._ = lodash;
+			}
+
+			// load Lo-Dash again to overwrite the existing `_` value
+			document.write('<script src="' + (ui.isModularize ? '../lodash.js' : ui.buildPath) + '"><\/script>');
+
+			// load test.js if not using require.js
+			document.write(ui.urlParams.loader != 'none'
+				? '<script data-dojo-config="async:1" src="' + ui.loaderPath + '"><\/script>'
+				: ([
+					'<script src="../vendor/underscore/test/collections.js"><\/script>',
+					'<script src="../vendor/underscore/test/arrays.js"><\/script>',
+					'<script src="../vendor/underscore/test/functions.js"><\/script>',
+					'<script src="../vendor/underscore/test/objects.js"><\/script>',
+					'<script src="../vendor/underscore/test/utility.js"><\/script>',
+					'<script src="../vendor/underscore/test/chaining.js"><\/script>'
+				  ].join('\n'))
+			);
+		</script>
+		<script>
+			(function() {
+				if (window.curl) {
+					curl.config({ 'apiName': 'require' });
+				}
+				if (!window.require) {
+					init(_);
+					return;
+				}
+				var reBasename = /[\w.-]+$/,
+				    basePath = ('//' + location.host + location.pathname).replace(/\btest\/$/, ''),
+				    modulePath = ui.buildPath.replace(/\.js$/, ''),
+				    locationPath = modulePath.replace(reBasename, ''),
+				    moduleMain = modulePath.match(reBasename)[0];
+
+				QUnit.config.autostart = false;
+
+				// load Lo-Dash as a module
+				require({
+					'baseUrl': './',
+					'urlArgs': 't=' + (+new Date),
+					'packages': [
+						{
+							'name': 'lodash',
+							'location': locationPath,
+							'main': moduleMain
+						},
+						{
+							'name': 'test',
+							'location': '../vendor/underscore/test',
+							'config': {
+								// work around no global being exported
+								'exports': 'QUnit',
+								'loader': 'curl/loader/legacy'
+							}
+						}
+					]
+				},
+				['lodash'], function(lodash) {
+					init(lodash);
+					require([
+						'test/collections',
+						'test/arrays',
+						'test/functions',
+						'test/objects',
+						'test/utility',
+						'test/chaining'
+					], function() {
+						QUnit.start();
+					});
+				});
+			}());
+		</script>
+		<script type="text/html" id="template">
+			<%
+			// a comment
+			if (data) { data += 12345; }; %>
+			<li><%= data %></li>
+		</script>
+	</body>
+</html>

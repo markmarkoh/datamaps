@@ -113,6 +113,9 @@
       .attr('data-info', function(d) {
         return JSON.stringify( colorCodeData[d.id]);
       })
+      .attr('data-geography', function(d) {
+        return d.id;
+      })
       .style('fill', function(d) {
         var fillColor;
 
@@ -152,12 +155,10 @@
               .style('fill-opacity', options.highlightFillOpacity)
               .attr('data-previousAttributes', JSON.stringify(previousAttributes));
 
-            /* remove the element and place it at the bottom
-                of the parent since the borders will likely be clipped */
-            var parentEl = $this[0][0].parentElement;
-            var el = $this[0][0];
-            $this.remove();
-            parentEl.appendChild(el);
+            //as per discussion on https://github.com/markmarkoh/datamaps/issues/19
+            if ( ! /MSIE/.test(navigator.userAgent) ) {
+             moveToFront.call(this);
+            }
           }
 
           if ( options.popupOnHover ) {
@@ -178,7 +179,10 @@
           d3.selectAll('.datamaps-hoverover').style('display', 'none');
         });
     }
-
+    
+    function moveToFront() {
+      this.parentNode.appendChild(this);
+    }
   }
 
   //plugin to add a simple map legend
@@ -223,7 +227,6 @@
       throw "Datamaps Error - arcs must be an array";
     }
 
-    console.log(options);
     if ( typeof options === "undefined" ) {
       options = defaultOptions.arcConfig;
     }
@@ -457,6 +460,10 @@
   //convert lat/lng coords to X / Y coords
   Datamap.prototype.latLngToXY = function(lat, lng) {
      return this.projection([lng, lat]);
+  };
+
+  Datamap.prototype.XYtoLngLat = function (x, y) {
+    return this.projection.invert([x, y]);
   };
 
   //add <g> layer to root SVG
