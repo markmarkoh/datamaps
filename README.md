@@ -188,9 +188,9 @@ You'll need to know the 2 letter state code ('NY' for New York) or the 3 letter 
 
 This will draw a world map and fill in IRL (Ireland) with the corresponding `fills.LOW` and USA with `fills.MEDIUM`.
 
-You can also use `fill: color` for each state if you don't want to define a `fillKey`.
+You can also use `fillColor: color` for each state if you don't want to define a `fillKey`.
 
-Colors will be applied in this order: `fillKey`, `fill`, `defaultFill`.
+Colors will be applied in this order: `fillKey`, `fillColor`, `defaultFill`.
 
 #### Updating a choropleth after initial drawing
 ```javascript
