@@ -789,7 +789,7 @@
               }
               data = tmpData;
             }
-            Datamaps.prototype.updateChoropleth.call(self, data);
+            Datamap.prototype.updateChoropleth.call(self, data);
           });
         }
         drawSubunits.call(self, data);
