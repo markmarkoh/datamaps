@@ -248,9 +248,9 @@ Please use **canada.toto.json** for India geopraphy json data from https://githu
 Please note in setProjection method, I have set [-106.3468, 68.1304] to locate center point for Canada in the world map. That means
 Latitude = 106.3468 W and Longitude = 68.1304 N. Remember Latitute and Longitude are always East and North. For western countries, Latitude are in West so make it convert as Negative of East. e.g 102.3421 W ==> -102.3421 E.
 
-You can adjust this latitude and longitude co-ordinates by minor changing. 
+*You can adjust this latitude and longitude co-ordinates by minor changing. 
 e.g, if your map is not showing full view of North then you can change 68.1304 N to 70.3200 N or 71.3200 etc.
-     if your map is not showing full view of East then you can change 32.1304 E to 70.3200 E or 30.3200 etc.
+     if your map is not showing full view of East then you can change 32.1304 E to 70.3200 E or 30.3200 etc.*
      
 [More about other countries maps](https://github.com/Anujarya300/bubble_maps)
 
