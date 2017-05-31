@@ -152,7 +152,7 @@ The example above will result in albersUsa projection.
 
 [Read more about TopoJSON](https://github.com/mbostock/topojson/wiki)
 
-You can create any country's map using custom maps.
+### You can create any country's map using custom maps.
 Follow the below steps:-
 1. Find the {xyz}.topo.json file for you country xyz. You can find from https://github.com/markmarkoh/datamaps/tree/master/dist.
 2. Extract Datamap.prototype.{xyz}Topo json and save it file named {xyz}.topo.json
@@ -164,9 +164,9 @@ Follow the below steps:-
 Here are the some examples of different countries maps.
 
 ### 1. Bubble map on India Geographical region
-
 ![india bubble map](https://github.com/Anujarya300/bubble_maps/blob/master/images/india.jpg)
 
+[india.html](https://github.com/Anujarya300/bubble_maps/blob/master/india.html)
 ```
  var bubble_map = new Datamap({
             element: document.getElementById('india'),
@@ -198,17 +198,16 @@ Here are the some examples of different countries maps.
             }
 });
 ```
-
-## Set the correct projection for India map on world map with the help of Longitude and Latitute of India (you can google it India Longitude and Latitute)
+###### Set the correct projection for India map on world map with the help of Longitude and Latitute of India (you can google it India Longitude and Latitute)
 Please use **india.toto.json** for India geopraphy json data from https://github.com/Anujarya300/bubble_maps/blob/master/data/geography-data/india.topo.json, otherwise your map wont work. (I have truncated IND. from all state ISO code(2-digit ISO code), e.g IND.JH for Jharkhand state truncated to JH)  
 
 Please note in setProjection method, I have set [78.9629, 23.5937] to locate center point for India in the world map. That means
 Latitude = 78.9629 E and Longitude = 23.5937 N. Remember Latitute and Longitude are always East and North. For western countries, Latitude are in West so make it convert as Negative of East. e.g 102.3421 W ==> -102.3421 E.
 
 ### 2. Bubble map on Canada Geographical region
-
 ![canada bubble map](https://github.com/Anujarya300/bubble_maps/blob/master/images/canada.jpg)
 
+[canada.html](https://github.com/Anujarya300/bubble_maps/blob/master/canada.html)
 ```
 var bubble_map = new Datamap({
             element: document.getElementById('canada'),
@@ -242,6 +241,7 @@ var bubble_map = new Datamap({
             }
         });
 ```
+###### Set the correct projection for Canada map on world map with the help of Longitude and Latitute of Canada (you can google it Canada Longitude and Latitute)
 
 Please use **canada.toto.json** for India geopraphy json data from https://github.com/Anujarya300/bubble_maps/blob/master/data/geography-data/canada.topo.json, otherwise your map wont work. (I have truncated CA. from all state ISO code(2-digit ISO code), e.g CA.TN to TN)
         
@@ -251,6 +251,8 @@ Latitude = 106.3468 W and Longitude = 68.1304 N. Remember Latitute and Longitude
 You can adjust this latitude and longitude co-ordinates by minor changing. 
 e.g, if your map is not showing full view of North then you can change 68.1304 N to 70.3200 N or 71.3200 etc.
      if your map is not showing full view of East then you can change 32.1304 E to 70.3200 E or 30.3200 etc.
+     
+[More about other countries maps](https://github.com/Anujarya300/bubble_maps)
 
 #### Creating a Choropleth
 
