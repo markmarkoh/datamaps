@@ -13,6 +13,7 @@
     dataType: 'json',
     data: {},
     done: function() {},
+    error: function() {},
     fills: {
       defaultFill: '#ABDDA4'
     },
@@ -765,7 +766,10 @@
     // If custom URL for topojson data, retrieve it and render
     if ( options.geographyConfig.dataUrl ) {
       d3.json( options.geographyConfig.dataUrl, function(error, results) {
-        if ( error ) throw new Error(error);
+        if ( error ) {
+          self.options.error(error);
+          return;
+        }
         self.customTopo = results;
         draw( results );
       });

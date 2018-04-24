@@ -14,6 +14,7 @@ declare interface DataMapOptions {
         path: d3.geo.Path;
         projection: d3.geo.Projection;
     }) => void;
+    error?: (error: any) => void;
     responsive?: boolean;
     projection?: string;
     height?: null | number;
