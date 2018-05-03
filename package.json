@@ -2,7 +2,7 @@
   "name": "datamaps",
   "main": "dist/datamaps.all.js",
   "description": "datamaps with d3.js",
-  "version": "0.5.8",
+  "version": "0.5.9",
   "author": "Mark DiMarco<markmarkoh@gmail.com>",
   "contributors": [
     "Enrico Berti (https://github.com/enricoberti)",
