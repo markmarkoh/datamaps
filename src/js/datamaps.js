@@ -767,7 +767,7 @@
     if ( options.geographyConfig.dataUrl ) {
       d3.json( options.geographyConfig.dataUrl, function(error, results) {
         if ( error ) {
-          if (self.options.error ) {
+          if ( self.options.error ) {
             self.options.error(error);
             return;
           }
