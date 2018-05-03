@@ -1392,7 +1392,7 @@ module.exports = function(grunt) {
         dest: 'src/rel/datamaps.nul.js',
         replacements: [{
           from: '\'__NUL__\'',
-          to: '<%= grunt.file.read("src/js/data/nul.topo.json") %>'
+          to: '<%= grunt.file.read("src/js/data/_nul.topo.json") %>'
         }]
       },
       nzl: {
@@ -2744,7 +2744,7 @@ module.exports = function(grunt) {
         },
         {
           from: '\'__NUL__\'',
-          to: '<%= grunt.file.read("src/js/data/nul.topo.json") %>'
+          to: '<%= grunt.file.read("src/js/data/_nul.topo.json") %>'
         },
         {
           from: '\'__NZL__\'',
