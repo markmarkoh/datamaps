@@ -227,9 +227,21 @@
 
         return fillColor;
       })
-      .style('stroke-width', geoConfig.borderWidth)
-      .style('stroke-opacity', geoConfig.borderOpacity)
-      .style('stroke', geoConfig.borderColor);
+      .style('stroke-width', function(d) {
+        var datum = colorCodeData[d.id];
+
+        return val(datum && datum.borderWidth, geoConfig.borderWidth, datum);
+      })
+      .style('stroke-opacity', function(d) {
+        var datum = colorCodeData[d.id];
+
+        return val(datum && datum.borderOpacity, geoConfig.borderOpacity, datum);
+      })
+      .style('stroke', function(d) {
+        var datum = colorCodeData[d.id];
+
+        return val(datum && datum.borderColor, geoConfig.borderColor, datum);
+      });
   }
 
   function handleGeographyConfig () {
