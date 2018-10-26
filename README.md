@@ -666,7 +666,7 @@ If the aspect ratio of your custom map is not the default `16:9` (`0.5625`), you
 ```
 ---
 
-#Contributing Guidelines
+### Contributing Guidelines
 
 * Do not run the `grunt build` task or submit any built files in your PR.
 * Have an example in `src/examples` if adding a new feature. Copy an existing feature `.html` file to start.
