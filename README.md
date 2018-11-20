@@ -330,7 +330,7 @@ Example [highmaps_world.html](src/examples/highmaps_world.html) explains how to 
 
 Example result:
 
-![auto calculated color](/src/screenshots/datamap_highmap_exmaple.jpg)
+![auto calculated color](/src/screenshots/datamap_highmap_example.jpg)
 
 #### Custom popup on hover
 
