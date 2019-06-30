@@ -158,7 +158,7 @@ Follow the below steps:-
 2. Extract Datamap.prototype.{xyz}Topo json and save it file named {xyz}.topo.json
 3. If the state codes contains dot(.) in the topo json, then you need to remove the dot from the code e.g, if your state code is CA.AL, remove CA. part to get 2-digit ISO code AL. If the states code are already in 2-digit ISO or do't have dot(.) then don't do any modification follow next steps.
 4. Objects country name in {xyz}.topo.json should be same as you declared in the Datamap scope. e.g, for Canada, in canada.topo.json we have {"type":"Topology","objects":{"can":{"type":"GeometryCollection"}}} and we have provided scope as 'canada' in the canada.html page. So this case 'can' in canada.topo.json must be as 'canada' i.e {"type":"Topology","objects":{"canada":{"type":"GeometryCollection"}}}.
-5. You need to override setProjection method, which is explained above three countires. You can refer any one.
+5. You need to override setProjection method, which is explained above three countries. You can refer any one.
 6. Done
 
 Here are the some examples of different countries maps.
