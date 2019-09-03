@@ -7,7 +7,7 @@ declare interface DataMapOptions {
     bubblesConfig?: DataMapBubblesConfigOptions;
     arcConfig?: DataMapArcConfigOptions;
     setProjection?: (element: HTMLElement, options: DataMapOptions) => DataMapProjection;
-    fills?: { defaultFill?: string, [key: string]: string };
+    fills?: { defaultFill?: string, [key: string]: string | undefined };
     done?: (datamap: {
         svg: d3.Selection<any>,
         options: DataMapOptions,
