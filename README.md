@@ -1,4 +1,4 @@
-> :warning: If you are interested in being added as a maintainer for Datamaps, please get in touch with me over email: mark dimarco at gmail
+> ## :warning: If you are interested in being added as a maintainer for Datamaps, please get in touch with me over email: mark dimarco at gmail
 
 
 Datamaps
