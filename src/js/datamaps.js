@@ -1126,12 +1126,18 @@
         // If it's an object, overriding the previous data
         if ( subunitData === Object(subunitData) ) {
           this.options.data[subunit] = defaults(subunitData, this.options.data[subunit] || {});
-          var geo = this.svg.select('.' + subunit).attr('data-info', JSON.stringify(this.options.data[subunit]));
+          var geo = this.svg.select('.' + CSS.escape(subunit)).attr('data-info', JSON.stringify(this.options.data[subunit]));
         }
         svg
-          .selectAll('.' + subunit)
+          .selectAll('.' + CSS.escape(subunit))
           .transition()
             .style('fill', color);
+      }
+    }
+    
+    for (var existingSubunit in this.options.data) {
+      if(this.options.data.hasOwnProperty(existingSubunit) && !data.hasOwnProperty(existingSubunit)) {
+        map.options.data[existingSubunit] = {};
       }
     }
   };
