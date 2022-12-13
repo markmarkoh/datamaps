@@ -132,7 +132,6 @@ A map of the USA with an Albers based projection will be default if you only inc
                 .center([long, lat])
                 .scale(element.offsetWidth)
                 .translate([element.offsetWidth / 2, element.offsetHeight / 2]);
-}
             path = d3.geo.path()
                 .projection( projection );
 
