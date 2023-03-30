@@ -10,7 +10,7 @@ var bombs = new Backbone.Collection([
   {
     name: 'Gerboise Bleue',
     radius: 0,
-    yeild: 70,
+    yield: 70,
     country: 'France',
     significance: 'First fission weapon test by France',
     date: '1960-02-13',
@@ -20,7 +20,7 @@ var bombs = new Backbone.Collection([
   }, {
     name: 'Canopus',
     radius: 0,
-    yeild: 2600,
+    yield: 2600,
     country: 'France',
     significance: 'First "staged" thermonuclear test by France',
     fillKey: 'FRA',
@@ -30,7 +30,7 @@ var bombs = new Backbone.Collection([
   }, {
     name: 'Smiling Buddha',
     radius: 0,
-    yeild: 12,
+    yield: 12,
     country: 'India',
     significance: 'First fission nuclear explosive test by India',
     fillKey: 'IND',
@@ -40,7 +40,7 @@ var bombs = new Backbone.Collection([
   }, {
     name: 'Pokhran-II',
     radius: 0,
-    yeild: 60,
+    yield: 60,
     country: 'India',
     fillKey: 'IND',
     significance: 'First potential fusion/boosted weapon test by India; first deployable fission weapon test by India',
@@ -50,7 +50,7 @@ var bombs = new Backbone.Collection([
   }, {
     name: '2006 North Korean nuclear test',
     radius: 0,
-    yeild: 1,
+    yield: 1,
     country: 'North Korea',
     fillKey: 'PRK',
     significance: 'First fission plutonium-based device tested by North Korea; likely resulted as a fizzle',
@@ -60,7 +60,7 @@ var bombs = new Backbone.Collection([
   }, {
     name: '2009 North Korean nuclear test',
     radius: 0,
-    yeild: 15,
+    yield: 15,
     country: 'North Korea',
     significance: 'First successful fission device tested by North Korea',
     date: '2009-05-25',
@@ -70,7 +70,7 @@ var bombs = new Backbone.Collection([
   }, {
     name: 'Chagai-I',
     radius: 0,
-    yeild: 40,
+    yield: 40,
     country: 'Pakistan',
     significance: 'First fission weapon (boosted) test by Pakistan',
     fillKey: 'PAK',
@@ -80,7 +80,7 @@ var bombs = new Backbone.Collection([
   }, {
     name: 'Chagai-II',
     radius: 0,
-    yeild: 20,
+    yield: 20,
     country: 'Pakistan',
     significance: 'Second fission weapon (boosted) test by Pakistan',
     fillKey: 'PAK',
@@ -90,7 +90,7 @@ var bombs = new Backbone.Collection([
   }, {
     name: '596',
     radius: 0,
-    yeild: 22,
+    yield: 22,
     country: 'PR China',
     significance: 'First fission weapon test by the People\'s Republic of China',
     fillKey: 'PRC',
@@ -100,7 +100,7 @@ var bombs = new Backbone.Collection([
   }, {
     name: 'Test No. 6',
     radius: 0,
-    yeild: 3300,
+    yield: 3300,
     country: 'PR China',
     fillKey: 'PRC',
     significance: 'First "staged" thermonuclear weapon test by the People\'s Republic of China',
@@ -110,7 +110,7 @@ var bombs = new Backbone.Collection([
   }, {
     name: 'Hurricane',
     radius: 0,
-    yeild: 25,
+    yield: 25,
     country: 'UK',
     significance: 'First fission weapon test by the UK',
     fillKey: 'GBR',
@@ -120,7 +120,7 @@ var bombs = new Backbone.Collection([
   }, {
     name: 'Grapple X',
     radius: 0,
-    yeild: 1800,
+    yield: 1800,
     country: 'UK',
     fillKey: 'GBR',
     significance: 'First (successful) "staged" thermonuclear weapon test by the UK',
@@ -131,7 +131,7 @@ var bombs = new Backbone.Collection([
 {
     name: 'Trinity',
     radius: 0,
-    yeild: 19,
+    yield: 19,
     country: 'USA',
     fillKey: 'USA',
     significance: 'First fission device test, first plutonium implosion detonation ',
@@ -141,7 +141,7 @@ var bombs = new Backbone.Collection([
   },{
     name: 'Little Boy',
     radius: 0,
-    yeild: 13,
+    yield: 13,
     country: 'USA',
     fillKey: 'USA',
     significance: 'Bombing of Hiroshima, Japan, first detonation of an enriched uranium gun-type device, first use of a nuclear device in military combat.',
@@ -151,7 +151,7 @@ var bombs = new Backbone.Collection([
   },{
     name: 'Fat Man',
     radius: 0,
-    yeild: 20,
+    yield: 20,
     fillKey: 'USA',
     country: 'USA',
     significance: 'Bombing of Nagasaki, Japan, second and last use of a nuclear device in military combat.',
@@ -161,7 +161,7 @@ var bombs = new Backbone.Collection([
   },{
     name: 'Ivy Mike',
     radius: 0,
-    yeild: 10400,
+    yield: 10400,
     country: 'USA',
     fillKey: 'USA',
     significance: 'First cryogenic fusion fuel "staged" thermonuclear weapon, primarily a test device and not weaponized',
@@ -171,7 +171,7 @@ var bombs = new Backbone.Collection([
   },{
     name: 'Castle Bravo',
     radius: 0,
-    yeild: 15000,
+    yield: 15000,
     country: 'USA',
     significance: 'First dry fusion fuel "staged" thermonuclear weapon; a serious nuclear fallout accident occurred',
     fillKey: 'USA',
@@ -181,7 +181,7 @@ var bombs = new Backbone.Collection([
   },{
     name: 'RDS-1',
     radius: 0,
-    yeild: 22, 
+    yield: 22, 
     country: 'USSR',
     fillKey: 'RUS',
     significance: 'First fission weapon test by the USSR',
@@ -191,7 +191,7 @@ var bombs = new Backbone.Collection([
   },{
     name: 'Joe 4',
     radius: 0,
-    yeild: 400,
+    yield: 400,
     country: 'USSR',
     fillKey: 'RUS',
     significance: 'First fusion weapon test by the USSR (not "staged")',
@@ -201,7 +201,7 @@ var bombs = new Backbone.Collection([
   },{
     name: 'RDS-37',
     radius: 0,
-    yeild: 1600,
+    yield: 1600,
     country: 'USSR',
     fillKey: 'RUS',
     significance: 'First "staged" thermonuclear weapon test by the USSR (deployable)',
@@ -212,7 +212,7 @@ var bombs = new Backbone.Collection([
   },{
     name: 'Tsar Bomba',
     radius: 0,
-    yeild: 50000,
+    yield: 50000,
     country: 'USSR',
     fillKey: 'RUS',
     significance: 'Largest thermonuclear weapon ever tested—scaled down from its initial 100 Mt design by 50%',
@@ -223,7 +223,7 @@ var bombs = new Backbone.Collection([
 ]);
 
     //prep the data
-    var yields = bombs.pluck('yeild');
+    var yields = bombs.pluck('yield');
 
     var min = d3.min( yields );
     var max = d3.max( yields );
@@ -233,7 +233,7 @@ var bombs = new Backbone.Collection([
         .range([10, 45]);
 
     bombs.each(function(val, idx) {
-        bombs.at(idx).set('radius', scale(val.get('yeild')));
+        bombs.at(idx).set('radius', scale(val.get('yield')));
     });
 
    new Map({
@@ -243,7 +243,7 @@ var bombs = new Backbone.Collection([
         bubble_config: {
             popupTemplate: _.template([
                 '<div class="hoverinfo"><strong><%= data.name %></strong>',
-                '<br/>Payload: <%= data.yeild %> kilotons',
+                '<br/>Payload: <%= data.yield %> kilotons',
                 '<br/>Country: <%= data.country %>',
                 '<br/>Date: <%= data.date %>',
                 '</div>'].join(''))
