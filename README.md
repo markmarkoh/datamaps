@@ -603,6 +603,7 @@ If the aspect ratio of your custom map is not the default `16:9` (`0.5625`), you
     width: null, // If not null, datamaps will grab the width of 'element',
     responsive: false, // If true, call `resize()` on the map object when it should adjust it's size
     done: function() {}, // Callback when the map is done drawing
+    error: null, // If not null, callback when the map cannot fetch the dataUrl
     fills: {
       defaultFill: '#ABDDA4' // The keys in this object map to the "fillKey" of [data] or [bubbles]
     },
