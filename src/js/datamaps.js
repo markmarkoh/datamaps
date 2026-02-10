@@ -238,6 +238,12 @@
     var self = this;
     var options = this.options.geographyConfig;
 
+    var overlayLayer = svg.select('g.datamaps-subunits');
+    var hoverStrokePath = overlayLayer.append('path')
+      .attr('class', 'datamaps-hover-stroke')
+      .style('fill', 'none')
+      .style('pointer-events', 'none');
+
     if ( options.highlightOnHover || options.popupOnHover ) {
       svg.selectAll('.datamaps-subunit')
         .on('mouseover', function(d) {
@@ -250,19 +256,17 @@
               'stroke-width': $this.style('stroke-width'),
               'fill-opacity': $this.style('fill-opacity')
             };
+            $this.attr('data-previousAttributes', JSON.stringify(previousAttributes))
 
             $this
               .style('fill', val(datum.highlightFillColor, options.highlightFillColor, datum))
+              .style('fill-opacity', val(datum.highlightFillOpacity, options.highlightFillOpacity, datum));
+
+            hoverStrokePath
+              .attr('d', self.path(d))
               .style('stroke', val(datum.highlightBorderColor, options.highlightBorderColor, datum))
               .style('stroke-width', val(datum.highlightBorderWidth, options.highlightBorderWidth, datum))
               .style('stroke-opacity', val(datum.highlightBorderOpacity, options.highlightBorderOpacity, datum))
-              .style('fill-opacity', val(datum.highlightFillOpacity, options.highlightFillOpacity, datum))
-              .attr('data-previousAttributes', JSON.stringify(previousAttributes));
-
-            // As per discussion on https://github.com/markmarkoh/datamaps/issues/19
-            if ( ! /((MSIE)|(Trident))/.test(navigator.userAgent) ) {
-             moveToFront.call(this);
-            }
           }
 
           if ( options.popupOnHover ) {
@@ -278,15 +282,13 @@
             for ( var attr in previousAttributes ) {
               $this.style(attr, previousAttributes[attr]);
             }
+            hoverStrokePath.attr('d', null);
           }
           $this.on('mousemove', null);
           d3.selectAll('.datamaps-hoverover').style('display', 'none');
         });
     }
 
-    function moveToFront() {
-      this.parentNode.appendChild(this);
-    }
   }
 
   // Plugin to add a simple map legend
