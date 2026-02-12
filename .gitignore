@@ -4,3 +4,6 @@ npm-debug.log
 *.sublime-workspace
 bower_components
 rel
+tmp
+.idea
+/.vs
