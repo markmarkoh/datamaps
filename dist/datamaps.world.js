@@ -700,9 +700,12 @@
 
   function Datamap( options ) {
 
+    d3 = window.d3;
+    topojson = window.topojson;
+    
     if ( typeof d3 === 'undefined' || typeof topojson === 'undefined' ) {
       throw new Error('Include d3.js (v3.0.3 or greater) and topojson on this page before creating a new map');
-   }
+    }
     // Set options for global use
     this.options = defaults(options, defaultOptions);
     this.options.geographyConfig = defaults(options.geographyConfig, defaultOptions.geographyConfig);
