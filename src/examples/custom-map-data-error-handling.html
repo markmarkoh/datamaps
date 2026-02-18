@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<body>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="http://d3js.org/topojson.v1.min.js"></script>
+  <script src="/src/rel/datamaps.world.js"></script>
+  <h2>Custom Map Data Error Handling</h2>
+  <div id="errorContainer" style="color: green; padding: 10px; font-size: 16px;" />
+  <div id="container1" style="position: relative; width: 500px; height: 450px;"></div>
+  <script>
+    var map = new Datamap({
+      element: document.getElementById('container1'),
+      geographyConfig: {
+        dataUrl: 'NON_EXISTANT.json'
+      },
+      error: function(e) {
+        const domEl = document.getElementById('errorContainer');
+        domEl.innerText = `Caught error when fetching data: ${e}`;
+      }
+    });
+  </script>
+</body>
